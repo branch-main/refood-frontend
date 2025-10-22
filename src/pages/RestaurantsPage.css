@@ -1,0 +1,10 @@
+.restaurants-page {
+  padding: 2rem 0;
+}
+
+.restaurants-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
