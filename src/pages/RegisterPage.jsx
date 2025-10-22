@@ -54,14 +54,14 @@ export const RegisterPage = () => {
       <div className="auth-container">
         <Card>
           <div className="auth-card">
-            <h1 className="auth-title">Create Account</h1>
-            <p className="auth-subtitle">Join us in fighting food waste</p>
+            <h1 className="auth-title">Crear Cuenta</h1>
+            <p className="auth-subtitle">Únete a nosotros en la lucha contra el desperdicio de alimentos</p>
 
             {error && <div className="auth-error">{error}</div>}
 
             <form onSubmit={handleSubmit} className="auth-form">
               <Input
-                label="Username"
+                label="Usuario"
                 type="text"
                 name="username"
                 value={formData.username}
@@ -70,7 +70,7 @@ export const RegisterPage = () => {
               />
 
               <Input
-                label="Email"
+                label="Correo Electrónico"
                 type="email"
                 name="email"
                 value={formData.email}
@@ -79,7 +79,7 @@ export const RegisterPage = () => {
               />
 
               <Input
-                label="Password"
+                label="Contraseña"
                 type="password"
                 name="password"
                 value={formData.password}
@@ -88,7 +88,7 @@ export const RegisterPage = () => {
               />
 
               <div className="input-group">
-                <label className="input-label">Account Type</label>
+                <label className="input-label">Tipo de Cuenta</label>
                 <select 
                   name="user_type"
                   className="input"
@@ -96,15 +96,15 @@ export const RegisterPage = () => {
                   onChange={handleChange}
                   required
                 >
-                  <option value={USER_TYPES.CONSUMER}>Consumer</option>
-                  <option value={USER_TYPES.RESTAURANT}>Restaurant</option>
-                  <option value={USER_TYPES.NGO}>NGO/Food Bank</option>
+                  <option value={USER_TYPES.CONSUMER}>Consumidor</option>
+                  <option value={USER_TYPES.RESTAURANT}>Restaurante</option>
+                  <option value={USER_TYPES.NGO}>ONG/Banco de Alimentos</option>
                 </select>
               </div>
 
               <div className="form-row">
                 <Input
-                  label="First Name"
+                  label="Nombre"
                   type="text"
                   name="first_name"
                   value={formData.first_name}
@@ -113,7 +113,7 @@ export const RegisterPage = () => {
                 />
 
                 <Input
-                  label="Last Name"
+                  label="Apellido"
                   type="text"
                   name="last_name"
                   value={formData.last_name}
@@ -123,7 +123,7 @@ export const RegisterPage = () => {
               </div>
 
               <Input
-                label="Phone Number"
+                label="Número de Teléfono"
                 type="tel"
                 name="phone"
                 value={formData.phone}
@@ -131,12 +131,12 @@ export const RegisterPage = () => {
               />
 
               <Button type="submit" fullWidth loading={loading}>
-                Create Account
+                Crear Cuenta
               </Button>
             </form>
 
             <p className="auth-footer">
-              Already have an account? <Link to="/login">Login</Link>
+              ¿Ya tienes una cuenta? <Link to="/login">Iniciar Sesión</Link>
             </p>
           </div>
         </Card>

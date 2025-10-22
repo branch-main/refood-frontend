@@ -19,28 +19,28 @@ export const Navbar = () => {
         </Link>
 
         <div className="navbar-menu">
-          <Link to="/" className="navbar-link">Home</Link>
-          <Link to="/listings" className="navbar-link">Browse Food</Link>
-          <Link to="/restaurants" className="navbar-link">Restaurants</Link>
+          <Link to="/" className="navbar-link">Inicio</Link>
+          <Link to="/listings" className="navbar-link">Explorar Alimentos</Link>
+          <Link to="/restaurants" className="navbar-link">Restaurantes</Link>
           
           {isAuthenticated ? (
             <>
-              <Link to="/orders" className="navbar-link">My Orders</Link>
-              <Link to="/favorites" className="navbar-link">Favorites</Link>
+              <Link to="/orders" className="navbar-link">Mis Pedidos</Link>
+              <Link to="/favorites" className="navbar-link">Favoritos</Link>
               <div className="navbar-user">
                 <Link to="/profile" className="navbar-link">
                   👤 {user?.username}
                 </Link>
                 <button onClick={handleLogout} className="navbar-logout">
-                  Logout
+                  Cerrar Sesión
                 </button>
               </div>
             </>
           ) : (
             <>
-              <Link to="/login" className="navbar-link">Login</Link>
+              <Link to="/login" className="navbar-link">Iniciar Sesión</Link>
               <Link to="/register" className="navbar-link navbar-link-primary">
-                Sign Up
+                Registrarse
               </Link>
             </>
           )}

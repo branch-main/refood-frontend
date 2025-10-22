@@ -6,38 +6,38 @@ export const Footer = () => {
       <div className="footer-container">
         <div className="footer-section">
           <h3>🍽️ ReeFood</h3>
-          <p>Reducing food waste, one meal at a time.</p>
+          <p>Reduciendo el desperdicio de alimentos, una comida a la vez.</p>
         </div>
         
         <div className="footer-section">
-          <h4>Quick Links</h4>
+          <h4>Enlaces Rápidos</h4>
           <ul>
-            <li><a href="/listings">Browse Food</a></li>
-            <li><a href="/restaurants">Restaurants</a></li>
-            <li><a href="/about">About Us</a></li>
+            <li><a href="/listings">Explorar Alimentos</a></li>
+            <li><a href="/restaurants">Restaurantes</a></li>
+            <li><a href="/about">Acerca de Nosotros</a></li>
           </ul>
         </div>
 
         <div className="footer-section">
-          <h4>Support</h4>
+          <h4>Soporte</h4>
           <ul>
-            <li><a href="/help">Help Center</a></li>
-            <li><a href="/contact">Contact Us</a></li>
-            <li><a href="/faq">FAQ</a></li>
+            <li><a href="/help">Centro de Ayuda</a></li>
+            <li><a href="/contact">Contáctanos</a></li>
+            <li><a href="/faq">Preguntas Frecuentes</a></li>
           </ul>
         </div>
 
         <div className="footer-section">
           <h4>Legal</h4>
           <ul>
-            <li><a href="/privacy">Privacy Policy</a></li>
-            <li><a href="/terms">Terms of Service</a></li>
+            <li><a href="/privacy">Política de Privacidad</a></li>
+            <li><a href="/terms">Términos de Servicio</a></li>
           </ul>
         </div>
       </div>
       
       <div className="footer-bottom">
-        <p>&copy; 2024 ReeFood. All rights reserved.</p>
+        <p>&copy; 2024 ReeFood. Todos los derechos reservados.</p>
       </div>
     </footer>
   );

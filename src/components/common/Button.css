@@ -18,12 +18,12 @@
 }
 
 .btn-primary {
-  background: #10b981;
+  background: #B21F1F;
   color: white;
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: #059669;
+  background: #8B1616;
 }
 
 .btn-secondary {
@@ -46,12 +46,12 @@
 
 .btn-outline {
   background: transparent;
-  border: 2px solid #10b981;
-  color: #10b981;
+  border: 2px solid #B21F1F;
+  color: #B21F1F;
 }
 
 .btn-outline:hover:not(:disabled) {
-  background: #10b981;
+  background: #B21F1F;
   color: white;
 }
 

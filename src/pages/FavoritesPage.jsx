@@ -27,8 +27,8 @@ export const FavoritesPage = () => {
     <div className="favorites-page">
       <div className="container">
         <div className="page-header">
-          <h1>My Favorite Restaurants</h1>
-          <p>Quick access to your favorite places</p>
+          <h1>Mis Restaurantes Favoritos</h1>
+          <p>Acceso rápido a tus lugares favoritos</p>
         </div>
 
         {loading ? (
@@ -37,9 +37,9 @@ export const FavoritesPage = () => {
           <div className="restaurants-list">
             {favorites.length === 0 ? (
               <div className="empty-state">
-                <p>You haven't added any favorites yet.</p>
+                <p>No has agregado ningún favorito todavía.</p>
                 <a href="/restaurants" className="empty-link">
-                  Browse restaurants
+                  Explorar restaurantes
                 </a>
               </div>
             ) : (

@@ -13,8 +13,21 @@ export const RestaurantsPage = () => {
   const { location } = useGeolocation();
 
   useEffect(() => {
+    // Fetch immediately on mount
     fetchRestaurants();
-  }, [search, location]);
+  }, []);
+
+  useEffect(() => {
+    // Fetch when search changes
+    fetchRestaurants();
+  }, [search]);
+
+  useEffect(() => {
+    // Refetch when location becomes available
+    if (location) {
+      fetchRestaurants();
+    }
+  }, [location]);
 
   const fetchRestaurants = async () => {
     try {
@@ -22,6 +35,8 @@ export const RestaurantsPage = () => {
       const params = {};
       
       if (search) params.search = search;
+      
+      // Add location params if available
       if (location) {
         params.lat = location.lat;
         params.lng = location.lng;
@@ -32,6 +47,7 @@ export const RestaurantsPage = () => {
       setRestaurants(data.results || data);
     } catch (error) {
       console.error('Failed to fetch restaurants:', error);
+      setRestaurants([]);
     } finally {
       setLoading(false);
     }
@@ -41,13 +57,13 @@ export const RestaurantsPage = () => {
     <div className="restaurants-page">
       <div className="container">
         <div className="page-header">
-          <h1>Partner Restaurants</h1>
-          <p>Discover restaurants fighting food waste in your area</p>
+          <h1>Restaurantes Asociados</h1>
+          <p>Descubre restaurantes combatiendo el desperdicio de alimentos en tu área</p>
         </div>
 
         <Input
           type="text"
-          placeholder="Search restaurants..."
+          placeholder="Buscar restaurantes..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
@@ -58,7 +74,7 @@ export const RestaurantsPage = () => {
           <div className="restaurants-list">
             {restaurants.length === 0 ? (
               <div className="empty-state">
-                <p>No restaurants found. Try adjusting your search.</p>
+                <p>No se encontraron restaurantes. Intenta ajustar tu búsqueda.</p>
               </div>
             ) : (
               restaurants.map((restaurant) => (

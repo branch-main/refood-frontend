@@ -18,7 +18,7 @@
 .navbar-brand {
   font-size: 1.5rem;
   font-weight: 700;
-  color: #10b981;
+  color: #B21F1F;
   text-decoration: none;
 }
 
@@ -36,18 +36,18 @@
 }
 
 .navbar-link:hover {
-  color: #10b981;
+  color: #B21F1F;
 }
 
 .navbar-link-primary {
-  background: #10b981;
+  background: #B21F1F;
   color: white;
   padding: 0.5rem 1rem;
   border-radius: 0.5rem;
 }
 
 .navbar-link-primary:hover {
-  background: #059669;
+  background: #8B1616;
   color: white;
 }
 

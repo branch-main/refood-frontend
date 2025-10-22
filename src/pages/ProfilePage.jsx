@@ -12,7 +12,7 @@ export const ProfilePage = () => {
     <div className="profile-page">
       <div className="container-small">
         <div className="page-header">
-          <h1>My Profile</h1>
+          <h1>Mi Perfil</h1>
         </div>
 
         <Card>
@@ -25,17 +25,17 @@ export const ProfilePage = () => {
 
             <div className="profile-info">
               <div className="info-row">
-                <span className="info-label">Username:</span>
+                <span className="info-label">Usuario:</span>
                 <span className="info-value">{user.username}</span>
               </div>
 
               <div className="info-row">
-                <span className="info-label">Email:</span>
+                <span className="info-label">Correo:</span>
                 <span className="info-value">{user.email}</span>
               </div>
 
               <div className="info-row">
-                <span className="info-label">Account Type:</span>
+                <span className="info-label">Tipo de Cuenta:</span>
                 <span className="info-value">
                   <span className="user-type-badge">{user.user_type}</span>
                 </span>
@@ -43,7 +43,7 @@ export const ProfilePage = () => {
 
               {user.first_name && (
                 <div className="info-row">
-                  <span className="info-label">Name:</span>
+                  <span className="info-label">Nombre:</span>
                   <span className="info-value">
                     {user.first_name} {user.last_name}
                   </span>
@@ -52,13 +52,13 @@ export const ProfilePage = () => {
 
               {user.phone && (
                 <div className="info-row">
-                  <span className="info-label">Phone:</span>
+                  <span className="info-label">Teléfono:</span>
                   <span className="info-value">{user.phone}</span>
                 </div>
               )}
 
               <div className="info-row">
-                <span className="info-label">Member Since:</span>
+                <span className="info-label">Miembro Desde:</span>
                 <span className="info-value">{formatDate(user.created_at)}</span>
               </div>
             </div>

@@ -31,7 +31,7 @@ export const LoginPage = () => {
       await login(formData.username, formData.password);
       navigate('/');
     } catch (err) {
-      setError(err.response?.data?.detail || 'Login failed. Please try again.');
+      setError(err.response?.data?.detail || 'Inicio de sesión fallido. Por favor intenta de nuevo.');
     } finally {
       setLoading(false);
     }
@@ -42,14 +42,14 @@ export const LoginPage = () => {
       <div className="auth-container">
         <Card>
           <div className="auth-card">
-            <h1 className="auth-title">Welcome Back</h1>
-            <p className="auth-subtitle">Login to continue saving food and money</p>
+            <h1 className="auth-title">Bienvenido de Nuevo</h1>
+            <p className="auth-subtitle">Inicia sesión para continuar ahorrando alimentos y dinero</p>
 
             {error && <div className="auth-error">{error}</div>}
 
             <form onSubmit={handleSubmit} className="auth-form">
               <Input
-                label="Username"
+                label="Usuario"
                 type="text"
                 name="username"
                 value={formData.username}
@@ -58,7 +58,7 @@ export const LoginPage = () => {
               />
 
               <Input
-                label="Password"
+                label="Contraseña"
                 type="password"
                 name="password"
                 value={formData.password}
@@ -67,12 +67,12 @@ export const LoginPage = () => {
               />
 
               <Button type="submit" fullWidth loading={loading}>
-                Login
+                Iniciar Sesión
               </Button>
             </form>
 
             <p className="auth-footer">
-              Don't have an account? <Link to="/register">Sign up</Link>
+              ¿No tienes una cuenta? <Link to="/register">Regístrate</Link>
             </p>
           </div>
         </Card>

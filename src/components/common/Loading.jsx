@@ -5,7 +5,7 @@ export const Loading = ({ fullScreen = false }) => {
     return (
       <div className="loading-screen">
         <div className="spinner"></div>
-        <p>Loading...</p>
+        <p>Cargando...</p>
       </div>
     );
   }

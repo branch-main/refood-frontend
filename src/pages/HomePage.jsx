@@ -10,18 +10,18 @@ export const HomePage = () => {
       <section className="hero">
         <div className="hero-content">
           <h1 className="hero-title">
-            Reduce Food Waste,<br />Save Money
+            Reduce el Desperdicio de Alimentos,<br />Ahorra Dinero
           </h1>
           <p className="hero-subtitle">
-            Discover surplus food from local restaurants at discounted prices.
-            Help reduce waste while enjoying great meals.
+            Descubre alimentos excedentes de restaurantes locales a precios con descuento.
+            Ayuda a reducir el desperdicio mientras disfrutas de excelentes comidas.
           </p>
           <div className="hero-buttons">
             <Button size="large" onClick={() => navigate('/listings')}>
-              Browse Food
+              Explorar Alimentos
             </Button>
             <Button size="large" variant="outline" onClick={() => navigate('/restaurants')}>
-              View Restaurants
+              Ver Restaurantes
             </Button>
           </div>
         </div>
@@ -32,27 +32,27 @@ export const HomePage = () => {
 
       <section className="features">
         <div className="container">
-          <h2 className="section-title">How It Works</h2>
+          <h2 className="section-title">Cómo Funciona</h2>
           <div className="features-grid">
             <div className="feature-card">
               <div className="feature-icon">🔍</div>
-              <h3>Browse</h3>
-              <p>Discover surplus food from restaurants near you at discounted prices</p>
+              <h3>Explorar</h3>
+              <p>Descubre alimentos excedentes de restaurantes cerca de ti a precios con descuento</p>
             </div>
             <div className="feature-card">
               <div className="feature-icon">🛒</div>
-              <h3>Order</h3>
-              <p>Reserve your meals and pay securely through our platform</p>
+              <h3>Ordenar</h3>
+              <p>Reserva tus comidas y paga de forma segura a través de nuestra plataforma</p>
             </div>
             <div className="feature-card">
               <div className="feature-icon">📦</div>
-              <h3>Pickup</h3>
-              <p>Collect your order at the scheduled time from the restaurant</p>
+              <h3>Recoger</h3>
+              <p>Recoge tu pedido en el horario programado del restaurante</p>
             </div>
             <div className="feature-card">
               <div className="feature-icon">♻️</div>
-              <h3>Save</h3>
-              <p>Save money while helping reduce food waste and protect the environment</p>
+              <h3>Ahorrar</h3>
+              <p>Ahorra dinero mientras ayudas a reducir el desperdicio de alimentos y proteger el medio ambiente</p>
             </div>
           </div>
         </div>
@@ -63,19 +63,19 @@ export const HomePage = () => {
           <div className="stats-grid">
             <div className="stat-card">
               <div className="stat-number">50%</div>
-              <div className="stat-label">Average Savings</div>
+              <div className="stat-label">Ahorro Promedio</div>
             </div>
             <div className="stat-card">
               <div className="stat-number">1000+</div>
-              <div className="stat-label">Meals Saved</div>
+              <div className="stat-label">Comidas Salvadas</div>
             </div>
             <div className="stat-card">
               <div className="stat-number">500kg</div>
-              <div className="stat-label">Food Waste Prevented</div>
+              <div className="stat-label">Desperdicio Prevenido</div>
             </div>
             <div className="stat-card">
               <div className="stat-number">100+</div>
-              <div className="stat-label">Partner Restaurants</div>
+              <div className="stat-label">Restaurantes Asociados</div>
             </div>
           </div>
         </div>
@@ -83,12 +83,12 @@ export const HomePage = () => {
 
       <section className="cta">
         <div className="container">
-          <h2 className="cta-title">Ready to Get Started?</h2>
+          <h2 className="cta-title">¿Listo para Comenzar?</h2>
           <p className="cta-text">
-            Join thousands of people fighting food waste and saving money
+            Únete a miles de personas combatiendo el desperdicio de alimentos y ahorrando dinero
           </p>
           <Button size="large" onClick={() => navigate('/register')}>
-            Sign Up Now
+            Regístrate Ahora
           </Button>
         </div>
       </section>

@@ -45,10 +45,10 @@ export const ListingCard = ({ listing }) => {
 
           <div className="listing-meta">
             <span className={`listing-status status-${listing.status}`}>
-              {listing.status}
+              {listing.status === 'available' ? 'Disponible' : 'Agotado'}
             </span>
             <span className="listing-quantity">
-              {listing.available_quantity} available
+              {listing.available_quantity} disponibles
             </span>
           </div>
         </div>

@@ -19,11 +19,21 @@ export const ListingsPage = () => {
 
   useEffect(() => {
     fetchCategories();
+    // Fetch listings immediately on mount, then again when filters change
+    fetchListings();
   }, []);
 
   useEffect(() => {
+    // Fetch when filters change
     fetchListings();
-  }, [filters, location]);
+  }, [filters]);
+
+  useEffect(() => {
+    // Refetch when location becomes available
+    if (location) {
+      fetchListings();
+    }
+  }, [location]);
 
   const fetchCategories = async () => {
     try {
@@ -39,6 +49,7 @@ export const ListingsPage = () => {
       setLoading(true);
       const params = { ...filters };
       
+      // Add location params if available
       if (location) {
         params.lat = location.lat;
         params.lng = location.lng;
@@ -49,6 +60,7 @@ export const ListingsPage = () => {
       setListings(data.results || data);
     } catch (error) {
       console.error('Failed to fetch listings:', error);
+      setListings([]);
     } finally {
       setLoading(false);
     }
@@ -65,15 +77,15 @@ export const ListingsPage = () => {
     <div className="listings-page">
       <div className="container">
         <div className="page-header">
-          <h1>Browse Available Food</h1>
-          <p>Discover great food at discounted prices near you</p>
+          <h1>Explorar Alimentos Disponibles</h1>
+          <p>Descubre excelente comida a precios con descuento cerca de ti</p>
         </div>
 
         <div className="filters-section">
           <Input
             type="text"
             name="search"
-            placeholder="Search listings..."
+            placeholder="Buscar alimentos..."
             value={filters.search}
             onChange={handleFilterChange}
           />
@@ -84,7 +96,7 @@ export const ListingsPage = () => {
             value={filters.category}
             onChange={handleFilterChange}
           >
-            <option value="">All Categories</option>
+            <option value="">Todas las Categorías</option>
             {categories.map((category) => (
               <option key={category.id} value={category.id}>
                 {category.name}
@@ -98,9 +110,9 @@ export const ListingsPage = () => {
             value={filters.listing_type}
             onChange={handleFilterChange}
           >
-            <option value="">All Types</option>
-            <option value="sale">For Sale</option>
-            <option value="donation">Donation</option>
+            <option value="">Todos los Tipos</option>
+            <option value="sale">En Venta</option>
+            <option value="donation">Donación</option>
           </select>
         </div>
 
@@ -110,7 +122,7 @@ export const ListingsPage = () => {
           <div className="listings-grid">
             {listings.length === 0 ? (
               <div className="empty-state">
-                <p>No listings found. Try adjusting your filters.</p>
+                <p>No se encontraron alimentos. Intenta ajustar tus filtros.</p>
               </div>
             ) : (
               listings.map((listing) => (

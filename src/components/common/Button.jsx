@@ -19,7 +19,7 @@ export const Button = ({
       onClick={onClick}
       {...props}
     >
-      {loading ? 'Loading...' : children}
+      {loading ? 'Cargando...' : children}
     </button>
   );
 };

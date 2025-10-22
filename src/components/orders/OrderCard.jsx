@@ -19,11 +19,14 @@ export const OrderCard = ({ order, onAction }) => {
       <div className="order-card">
         <div className="order-header">
           <div>
-            <h3 className="order-number">Order #{order.order_number}</h3>
+            <h3 className="order-number">Pedido #{order.order_number}</h3>
             <p className="order-date">{formatDateTime(order.created_at)}</p>
           </div>
           <span className={`order-status status-${getStatusColor(order.status)}`}>
-            {order.status}
+            {order.status === 'pending' ? 'Pendiente' : 
+             order.status === 'confirmed' ? 'Confirmado' :
+             order.status === 'ready' ? 'Listo' :
+             order.status === 'completed' ? 'Completado' : 'Cancelado'}
           </span>
         </div>
 
@@ -49,7 +52,7 @@ export const OrderCard = ({ order, onAction }) => {
 
           {order.pickup_time && (
             <div className="order-pickup">
-              <span>Pickup: {formatDateTime(order.pickup_time)}</span>
+              <span>Recogida: {formatDateTime(order.pickup_time)}</span>
             </div>
           )}
         </div>
@@ -60,7 +63,7 @@ export const OrderCard = ({ order, onAction }) => {
               onClick={() => onAction('cancel', order.id)}
               className="order-action-cancel"
             >
-              Cancel Order
+              Cancelar Pedido
             </button>
           </div>
         )}

@@ -31,7 +31,7 @@ export const RestaurantCard = ({ restaurant }) => {
             </span>
             {restaurant.distance && (
               <span className="restaurant-distance">
-                {formatDistance(restaurant.distance)} away
+                {formatDistance(restaurant.distance)} de distancia
               </span>
             )}
           </div>
@@ -39,7 +39,7 @@ export const RestaurantCard = ({ restaurant }) => {
           {restaurant.rating && (
             <div className="restaurant-rating">
               <span className="rating-stars">⭐ {formatRating(restaurant.rating)}</span>
-              <span className="rating-count">({restaurant.total_ratings} reviews)</span>
+              <span className="rating-count">({restaurant.total_ratings} reseñas)</span>
             </div>
           )}
         </div>

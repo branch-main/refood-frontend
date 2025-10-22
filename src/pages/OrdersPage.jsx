@@ -40,8 +40,8 @@ export const OrdersPage = () => {
     <div className="orders-page">
       <div className="container">
         <div className="page-header">
-          <h1>My Orders</h1>
-          <p>Track your orders and pickup times</p>
+          <h1>Mis Pedidos</h1>
+          <p>Rastrea tus pedidos y horarios de recogida</p>
         </div>
 
         {loading ? (
@@ -50,9 +50,9 @@ export const OrdersPage = () => {
           <div className="orders-list">
             {orders.length === 0 ? (
               <div className="empty-state">
-                <p>You haven't placed any orders yet.</p>
+                <p>No has realizado ningún pedido todavía.</p>
                 <a href="/listings" className="empty-link">
-                  Browse listings to get started
+                  Explora alimentos para comenzar
                 </a>
               </div>
             ) : (
