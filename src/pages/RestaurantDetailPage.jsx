@@ -1,10 +1,18 @@
-import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { restaurantService, listingService } from '../services';
-import { Card, Button, Loading } from '../components/common';
-import { ListingCard } from '../components/listings/ListingCard';
-import { formatRating } from '../utils';
-import { FiPhone, FiMail, FiMapPin, FiClock, FiStar, FiHeart, FiPackage } from 'react-icons/fi';
+import { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { restaurantService, listingService } from "../services";
+import { Card, Button, Loading } from "../components/common";
+import { ListingCard } from "../components/listings/ListingCard";
+import { formatRating } from "../utils";
+import {
+  FiPhone,
+  FiMail,
+  FiMapPin,
+  FiClock,
+  FiStar,
+  FiHeart,
+  FiPackage,
+} from "react-icons/fi";
 
 export const RestaurantDetailPage = () => {
   const { id } = useParams();
@@ -25,7 +33,7 @@ export const RestaurantDetailPage = () => {
       const data = await restaurantService.getRestaurant(id);
       setRestaurant(data);
     } catch (error) {
-      console.error('Failed to fetch restaurant:', error);
+      console.error("Failed to fetch restaurant:", error);
     } finally {
       setLoading(false);
     }
@@ -36,7 +44,7 @@ export const RestaurantDetailPage = () => {
       const data = await listingService.getListings({ restaurant: id });
       setListings(data.results || data);
     } catch (error) {
-      console.error('Failed to fetch listings:', error);
+      console.error("Failed to fetch listings:", error);
     }
   };
 
@@ -46,34 +54,51 @@ export const RestaurantDetailPage = () => {
   };
 
   const getPlaceholderImage = () => {
-    return `https://ui-avatars.com/api/?name=${encodeURIComponent(restaurant?.business_name || 'Restaurant')}&size=800&background=B21F1F&color=ffffff&bold=true`;
+    return `https://ui-avatars.com/api/?name=${encodeURIComponent(restaurant?.business_name || "Restaurant")}&size=800&background=B21F1F&color=ffffff&bold=true`;
   };
 
   const isOpenNow = () => {
     if (!restaurant?.opening_hours) return null;
-    
+
     const now = new Date();
-    const dayName = now.toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
-    const currentTime = now.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });
-    
+    const dayName = now
+      .toLocaleDateString("en-US", { weekday: "long" })
+      .toLowerCase();
+    const currentTime = now.toLocaleTimeString("en-US", {
+      hour12: false,
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+
     const todayHours = restaurant.opening_hours[dayName];
-    if (!todayHours || todayHours.toLowerCase() === 'cerrado' || todayHours.toLowerCase() === 'closed') {
+    if (
+      !todayHours ||
+      todayHours.toLowerCase() === "cerrado" ||
+      todayHours.toLowerCase() === "closed"
+    ) {
       return false;
     }
-    
+
     // Parse hours like "09:00 - 22:00"
-    const timeMatch = todayHours.match(/(\d{1,2}):(\d{2})\s*-\s*(\d{1,2}):(\d{2})/);
+    const timeMatch = todayHours.match(
+      /(\d{1,2}):(\d{2})\s*-\s*(\d{1,2}):(\d{2})/,
+    );
     if (!timeMatch) return null;
-    
+
     const [_, openHour, openMin, closeHour, closeMin] = timeMatch;
-    const openTime = `${openHour.padStart(2, '0')}:${openMin}`;
-    const closeTime = `${closeHour.padStart(2, '0')}:${closeMin}`;
-    
+    const openTime = `${openHour.padStart(2, "0")}:${openMin}`;
+    const closeTime = `${closeHour.padStart(2, "0")}:${closeMin}`;
+
     return currentTime >= openTime && currentTime <= closeTime;
   };
 
   if (loading) return <Loading fullScreen />;
-  if (!restaurant) return <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"><p>Restaurante no encontrado</p></div>;
+  if (!restaurant)
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <p>Restaurante no encontrado</p>
+      </div>
+    );
 
   const openStatus = isOpenNow();
 
@@ -84,8 +109,8 @@ export const RestaurantDetailPage = () => {
         <div className="absolute inset-0 bg-black/10"></div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Back Button */}
-          <button 
-            className="bg-white/10 backdrop-blur-sm border border-white/20 text-white text-base cursor-pointer px-5 py-2.5 rounded-lg mb-6 inline-flex items-center gap-2 transition-all font-semibold hover:bg-white/20 hover:-translate-x-1" 
+          <button
+            className="bg-white/10 backdrop-blur-sm border border-white/20 text-white text-base cursor-pointer px-5 py-2.5 rounded-lg mb-6 inline-flex items-center gap-2 transition-all font-semibold hover:bg-white/20 hover:-translate-x-1"
             onClick={() => navigate(-1)}
           >
             ← Volver
@@ -116,13 +141,17 @@ export const RestaurantDetailPage = () => {
                   </span>
                 )}
                 {openStatus !== null && (
-                  <span className={`px-4 py-1.5 rounded-full text-sm font-semibold flex items-center gap-1.5 backdrop-blur-sm border shadow-lg ${
-                    openStatus 
-                      ? 'bg-green-500/90 text-white border-green-400' 
-                      : 'bg-red-500/90 text-white border-red-400'
-                  }`}>
-                    <span className={`w-2 h-2 rounded-full animate-pulse ${openStatus ? 'bg-white' : 'bg-white'}`}></span>
-                    {openStatus ? 'Abierto ahora' : 'Cerrado'}
+                  <span
+                    className={`px-4 py-1.5 rounded-full text-sm font-semibold flex items-center gap-1.5 backdrop-blur-sm border shadow-lg ${
+                      openStatus
+                        ? "bg-green-500/90 text-white border-green-400"
+                        : "bg-red-500/90 text-white border-red-400"
+                    }`}
+                  >
+                    <span
+                      className={`w-2 h-2 rounded-full animate-pulse ${openStatus ? "bg-white" : "bg-white"}`}
+                    ></span>
+                    {openStatus ? "Abierto ahora" : "Cerrado"}
                   </span>
                 )}
               </div>
@@ -135,9 +164,13 @@ export const RestaurantDetailPage = () => {
                 <div className="flex items-center gap-3 mb-4 justify-center md:justify-start">
                   <div className="flex items-center gap-2">
                     <FiStar className="text-xl md:text-2xl fill-yellow-400 text-yellow-400" />
-                    <span className="text-xl md:text-2xl font-bold drop-shadow-md">{formatRating(restaurant.rating)}</span>
+                    <span className="text-xl md:text-2xl font-bold drop-shadow-md">
+                      {formatRating(restaurant.rating)}
+                    </span>
                   </div>
-                  <span className="text-base md:text-lg opacity-90 drop-shadow-md">({restaurant.total_ratings} reseñas)</span>
+                  <span className="text-base md:text-lg opacity-90 drop-shadow-md">
+                    ({restaurant.total_ratings} reseñas)
+                  </span>
                 </div>
               )}
 
@@ -147,13 +180,15 @@ export const RestaurantDetailPage = () => {
 
               {/* Quick Actions */}
               <div className="flex gap-4 flex-wrap justify-center md:justify-start">
-                <Button 
-                  onClick={handleToggleFavorite} 
+                <Button
+                  onClick={handleToggleFavorite}
                   variant="secondary"
                   className="!bg-white !text-[#B21F1F] hover:!bg-red-50 !shadow-lg hover:!shadow-xl !border-2 !border-[#B21F1F] !font-bold !py-3 !px-6 !rounded-xl transition-all flex items-center gap-2"
                 >
-                  <FiHeart className={`text-lg ${isFavorite ? 'fill-[#B21F1F]' : ''}`} />
-                  {isFavorite ? 'Guardado' : 'Guardar Restaurante'}
+                  <FiHeart
+                    className={`text-lg ${isFavorite ? "fill-[#B21F1F]" : ""}`}
+                  />
+                  {isFavorite ? "Guardado" : "Guardar Restaurante"}
                 </Button>
               </div>
             </div>
@@ -167,28 +202,47 @@ export const RestaurantDetailPage = () => {
         <Card className="mb-8 shadow-lg">
           <div className="p-4 md:p-6">
             <h2 className="text-lg md:text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <FiPhone className="text-xl md:text-2xl text-[#B21F1F]" /> Información de Contacto
+              <FiPhone className="text-xl md:text-2xl text-[#B21F1F]" />{" "}
+              Información de Contacto
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="flex items-center gap-3 text-gray-700 p-3 bg-gray-50 rounded-lg">
                 <FiMapPin className="text-xl md:text-2xl text-[#B21F1F] flex-shrink-0" />
                 <div className="flex-1 min-w-0">
-                  <div className="text-xs text-gray-500 font-medium mb-1">Dirección</div>
-                  <span className="text-sm font-medium break-words">{restaurant.address}</span>
+                  <div className="text-xs text-gray-500 font-medium mb-1">
+                    Dirección
+                  </div>
+                  <span className="text-sm font-medium break-words">
+                    {restaurant.address}
+                  </span>
                 </div>
               </div>
               <div className="flex items-center gap-3 text-gray-700 p-3 bg-gray-50 rounded-lg">
                 <FiPhone className="text-xl md:text-2xl text-[#B21F1F] flex-shrink-0" />
                 <div className="flex-1 min-w-0">
-                  <div className="text-xs text-gray-500 font-medium mb-1">Teléfono</div>
-                  <a href={`tel:${restaurant.phone}`} className="text-sm font-medium text-[#B21F1F] hover:underline break-all">{restaurant.phone}</a>
+                  <div className="text-xs text-gray-500 font-medium mb-1">
+                    Teléfono
+                  </div>
+                  <a
+                    href={`tel:${restaurant.phone}`}
+                    className="text-sm font-medium text-[#B21F1F] hover:underline break-all"
+                  >
+                    {restaurant.phone}
+                  </a>
                 </div>
               </div>
               <div className="flex items-center gap-3 text-gray-700 p-3 bg-gray-50 rounded-lg">
                 <FiMail className="text-xl md:text-2xl text-[#B21F1F] flex-shrink-0" />
                 <div className="flex-1 min-w-0">
-                  <div className="text-xs text-gray-500 font-medium mb-1">Email</div>
-                  <a href={`mailto:${restaurant.email}`} className="text-sm font-medium text-[#B21F1F] hover:underline break-all">{restaurant.email}</a>
+                  <div className="text-xs text-gray-500 font-medium mb-1">
+                    Email
+                  </div>
+                  <a
+                    href={`mailto:${restaurant.email}`}
+                    className="text-sm font-medium text-[#B21F1F] hover:underline break-all"
+                  >
+                    {restaurant.email}
+                  </a>
                 </div>
               </div>
             </div>
@@ -199,35 +253,42 @@ export const RestaurantDetailPage = () => {
           <Card className="mb-8 shadow-lg">
             <div className="p-6">
               <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-                <FiClock className="text-2xl text-[#B21F1F]" /> Horario de Apertura
+                <FiClock className="text-2xl text-[#B21F1F]" /> Horario de
+                Apertura
               </h2>
               <div className="space-y-2">
-                {Object.entries(restaurant.opening_hours).map(([day, hours]) => {
-                  const today = new Date().toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
-                  const isToday = day === today;
-                  
-                  return (
-                    <div 
-                      key={day} 
-                      className={`flex justify-between items-center p-4 rounded-lg transition-all ${
-                        isToday 
-                          ? 'bg-[#B21F1F] text-white shadow-md' 
-                          : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
-                      }`}
-                    >
-                      <div className="flex items-center gap-3">
-                        {isToday && <span className="text-lg">•</span>}
-                        <span className={`font-semibold capitalize ${isToday ? 'text-white' : 'text-gray-900'}`}>
-                          {getDayName(day)}
-                          {isToday && <span className="ml-2 text-xs font-normal opacity-90">(Hoy)</span>}
+                {Object.entries(restaurant.opening_hours).map(
+                  ([day, hours]) => {
+                    const today = new Date()
+                      .toLocaleDateString("en-US", { weekday: "long" })
+                      .toLowerCase();
+                    const isToday = day === today;
+
+                    return (
+                      <div
+                        key={day}
+                        className={`flex justify-between items-center p-4 rounded-lg transition-all ${
+                          isToday
+                            ? "bg-[#B21F1F] text-white shadow-md"
+                            : "bg-gray-50 text-gray-700 hover:bg-gray-100"
+                        }`}
+                      >
+                        <div className="flex items-center gap-3">
+                          <span
+                            className={`font-semibold capitalize ${isToday ? "text-white" : "text-gray-900"}`}
+                          >
+                            {getDayName(day)}
+                          </span>
+                        </div>
+                        <span
+                          className={`font-medium ${isToday ? "text-white" : "text-gray-600"}`}
+                        >
+                          {hours}
                         </span>
                       </div>
-                      <span className={`font-medium ${isToday ? 'text-white' : 'text-gray-600'}`}>
-                        {hours}
-                      </span>
-                    </div>
-                  );
-                })}
+                    );
+                  },
+                )}
               </div>
             </div>
           </Card>
@@ -236,15 +297,21 @@ export const RestaurantDetailPage = () => {
         {/* Available Listings */}
         <div>
           <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-            <FiPackage className="text-2xl text-[#B21F1F]" /> Alimentos Disponibles
+            <FiPackage className="text-2xl text-[#B21F1F]" /> Alimentos
+            Disponibles
           </h2>
-          
+
           {listings.length === 0 ? (
             <Card className="shadow-lg">
               <div className="text-center py-12 px-8">
                 <span className="text-5xl mb-4 block">🍴</span>
-                <p className="text-gray-500 text-base">Este restaurante no tiene alimentos disponibles en este momento.</p>
-                <p className="text-gray-400 text-sm mt-2">Vuelve pronto para ver nuevas ofertas</p>
+                <p className="text-gray-500 text-base">
+                  Este restaurante no tiene alimentos disponibles en este
+                  momento.
+                </p>
+                <p className="text-gray-400 text-sm mt-2">
+                  Vuelve pronto para ver nuevas ofertas
+                </p>
               </div>
             </Card>
           ) : (
@@ -262,13 +329,13 @@ export const RestaurantDetailPage = () => {
 
 const getDayName = (day) => {
   const days = {
-    monday: 'Lunes',
-    tuesday: 'Martes',
-    wednesday: 'Miércoles',
-    thursday: 'Jueves',
-    friday: 'Viernes',
-    saturday: 'Sábado',
-    sunday: 'Domingo'
+    monday: "Lunes",
+    tuesday: "Martes",
+    wednesday: "Miércoles",
+    thursday: "Jueves",
+    friday: "Viernes",
+    saturday: "Sábado",
+    sunday: "Domingo",
   };
   return days[day] || day;
 };
