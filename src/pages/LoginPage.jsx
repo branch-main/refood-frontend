@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthContext } from '../contexts/AuthContext';
 import { Card, Input, Button } from '../components/common';
-import './AuthPages.css';
 
 export const LoginPage = () => {
   const [formData, setFormData] = useState({
@@ -38,16 +37,16 @@ export const LoginPage = () => {
   };
 
   return (
-    <div className="auth-page">
-      <div className="auth-container">
+    <div className="min-h-[calc(100vh-200px)] flex items-center justify-center py-8 px-8">
+      <div className="w-full max-w-lg">
         <Card>
-          <div className="auth-card">
-            <h1 className="auth-title">Bienvenido de Nuevo</h1>
-            <p className="auth-subtitle">Inicia sesión para continuar ahorrando alimentos y dinero</p>
+          <div className="p-4">
+            <h1 className="text-3xl font-bold text-center mb-2 text-gray-900">Bienvenido de Nuevo</h1>
+            <p className="text-center text-gray-500 mb-8">Inicia sesión para continuar ahorrando alimentos y dinero</p>
 
-            {error && <div className="auth-error">{error}</div>}
+            {error && <div className="bg-red-100 text-red-800 px-3 py-3 rounded-lg mb-6 text-sm">{error}</div>}
 
-            <form onSubmit={handleSubmit} className="auth-form">
+            <form onSubmit={handleSubmit} className="flex flex-col gap-2">
               <Input
                 label="Usuario"
                 type="text"
@@ -71,8 +70,8 @@ export const LoginPage = () => {
               </Button>
             </form>
 
-            <p className="auth-footer">
-              ¿No tienes una cuenta? <Link to="/register">Regístrate</Link>
+            <p className="text-center mt-6 text-gray-500">
+              ¿No tienes una cuenta? <Link to="/register" className="text-[#B21F1F] font-semibold no-underline hover:underline">Regístrate</Link>
             </p>
           </div>
         </Card>
