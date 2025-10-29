@@ -1,90 +1,152 @@
 import { Link, useNavigate } from 'react-router-dom';
+import { useState, useRef, useEffect } from 'react';
 import { useAuthContext } from '../../contexts/AuthContext';
 
 export const Navbar = () => {
   const { isAuthenticated, user, logout } = useAuthContext();
   const navigate = useNavigate();
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const dropdownRef = useRef(null);
 
   const handleLogout = async () => {
     await logout();
     navigate('/login');
   };
 
-  return (
-    <nav className="bg-white shadow-md sticky top-0 z-[1000] border-b border-black/5 backdrop-blur-lg">
-      <div className="max-w-7xl mx-auto px-10 py-4 flex justify-between items-center min-h-[70px] lg:px-6 md:px-4 md:min-h-[60px] md:py-3">
-        <Link 
-          to="/" 
-          className="text-3xl font-bold text-[#B21F1F] no-underline transition-all duration-200 tracking-tight hover:scale-105 hover:text-[#8B1616] md:text-2xl"
-        >
-          🍽️ ReeFood
-        </Link>
+  const getUserInitials = () => {
+    if (!user?.username) return '?';
+    const names = user.username.split(' ');
+    if (names.length >= 2) {
+      return `${names[0][0]}${names[1][0]}`.toUpperCase();
+    }
+    return user.username.substring(0, 2).toUpperCase();
+  };
 
-        <div className="flex items-center gap-10 lg:gap-4 md:gap-4 md:text-sm">
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsProfileOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  return (
+    <nav className="bg-white/95 backdrop-blur-md shadow-sm sticky top-0 z-[1000] border-b border-gray-200">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center h-16">
+          {/* Logo */}
           <Link 
             to="/" 
-            className="relative text-gray-600 no-underline font-medium text-[0.95rem] py-2 transition-all duration-300 hover:text-[#B21F1F] after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-[#B21F1F] after:transition-all after:duration-300 hover:after:w-full md:text-sm md:py-1.5"
+            className="flex items-center gap-2 text-2xl font-extrabold text-[#B21F1F] no-underline transition-all duration-200 hover:scale-105"
           >
-            Inicio
+            <span className="text-3xl">🍽️</span>
+            <span className="tracking-tight">ReeFood</span>
           </Link>
-          <Link 
-            to="/listings" 
-            className="relative text-gray-600 no-underline font-medium text-[0.95rem] py-2 transition-all duration-300 hover:text-[#B21F1F] after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-[#B21F1F] after:transition-all after:duration-300 hover:after:w-full md:text-sm md:py-1.5"
-          >
-            Explorar Alimentos
-          </Link>
-          <Link 
-            to="/restaurants" 
-            className="relative text-gray-600 no-underline font-medium text-[0.95rem] py-2 transition-all duration-300 hover:text-[#B21F1F] after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-[#B21F1F] after:transition-all after:duration-300 hover:after:w-full md:text-sm md:py-1.5"
-          >
-            Restaurantes
-          </Link>
-          
-          {isAuthenticated ? (
-            <>
-              <Link 
-                to="/orders" 
-                className="relative text-gray-600 no-underline font-medium text-[0.95rem] py-2 transition-all duration-300 hover:text-[#B21F1F] after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-[#B21F1F] after:transition-all after:duration-300 hover:after:w-full md:text-sm md:py-1.5"
-              >
-                Mis Pedidos
-              </Link>
-              <Link 
-                to="/favorites" 
-                className="relative text-gray-600 no-underline font-medium text-[0.95rem] py-2 transition-all duration-300 hover:text-[#B21F1F] after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-[#B21F1F] after:transition-all after:duration-300 hover:after:w-full md:text-sm md:py-1.5"
-              >
-                Favoritos
-              </Link>
-              <div className="flex items-center gap-5 pl-6 border-l border-gray-200 lg:gap-3 lg:pl-4 md:gap-3 md:pl-4">
+
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center gap-1">
+            <Link 
+              to="/" 
+              className="text-gray-600 no-underline font-medium text-sm px-3 py-2 rounded-lg transition-all hover:text-[#B21F1F] hover:bg-red-50"
+            >
+              Inicio
+            </Link>
+            <Link 
+              to="/listings" 
+              className="text-gray-600 no-underline font-medium text-sm px-3 py-2 rounded-lg transition-all hover:text-[#B21F1F] hover:bg-red-50"
+            >
+              Explorar
+            </Link>
+            <Link 
+              to="/restaurants" 
+              className="text-gray-600 no-underline font-medium text-sm px-3 py-2 rounded-lg transition-all hover:text-[#B21F1F] hover:bg-red-50"
+            >
+              Restaurantes
+            </Link>
+            
+            {isAuthenticated ? (
+              <>
                 <Link 
-                  to="/profile" 
-                  className="relative text-gray-600 no-underline font-medium text-[0.95rem] py-2 transition-all duration-300 hover:text-[#B21F1F] after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-[#B21F1F] after:transition-all after:duration-300 hover:after:w-full md:text-sm md:py-1.5"
+                  to="/orders" 
+                  className="text-gray-600 no-underline font-medium text-sm px-3 py-2 rounded-lg transition-all hover:text-[#B21F1F] hover:bg-red-50"
                 >
-                  👤 {user?.username}
+                  Mis Pedidos
                 </Link>
-                <button 
-                  onClick={handleLogout} 
-                  className="bg-transparent border-[1.5px] border-gray-200 text-gray-600 px-5 py-2.5 rounded-lg cursor-pointer font-medium text-[0.95rem] transition-all duration-300 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800 hover:-translate-y-0.5 hover:shadow-md md:px-4 md:py-2 md:text-sm"
+                <Link 
+                  to="/favorites" 
+                  className="text-gray-600 no-underline font-medium text-sm px-3 py-2 rounded-lg transition-all hover:text-[#B21F1F] hover:bg-red-50"
                 >
-                  Cerrar Sesión
-                </button>
+                  Favoritos
+                </Link>
+
+                {/* Profile Dropdown */}
+                <div className="relative ml-3" ref={dropdownRef}>
+                  <button
+                    onClick={() => setIsProfileOpen(!isProfileOpen)}
+                    className="flex items-center gap-2 px-2 py-2 rounded-lg transition-all hover:bg-red-50"
+                  >
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#B21F1F] to-[#8B1616] flex items-center justify-center text-white font-bold text-xs shadow-md">
+                      {getUserInitials()}
+                    </div>
+                    <svg 
+                      className={`w-4 h-4 text-gray-600 transition-transform ${isProfileOpen ? 'rotate-180' : ''}`} 
+                      fill="none" 
+                      stroke="currentColor" 
+                      viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+
+                  {isProfileOpen && (
+                    <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-gray-200 py-2 animate-[fadeIn_0.2s_ease-out]">
+                      <div className="px-4 py-3 border-b border-gray-100">
+                        <p className="text-sm font-semibold text-gray-900">{user?.username}</p>
+                        <p className="text-xs text-gray-500 mt-1">{user?.email}</p>
+                      </div>
+                      <Link
+                        to="/profile"
+                        className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-red-50 hover:text-[#B21F1F] transition-colors no-underline"
+                        onClick={() => setIsProfileOpen(false)}
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                        <span className="font-medium">Mi Perfil</span>
+                      </Link>
+                      <button
+                        onClick={handleLogout}
+                        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors border-0 bg-transparent cursor-pointer text-left"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                        </svg>
+                        <span className="font-medium">Cerrar Sesión</span>
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </>
+            ) : (
+              <div className="flex items-center gap-2 ml-3">
+                <Link 
+                  to="/login" 
+                  className="text-gray-600 no-underline font-medium text-sm px-4 py-2 rounded-lg transition-all hover:text-[#B21F1F] hover:bg-red-50"
+                >
+                  Iniciar Sesión
+                </Link>
+                <Link 
+                  to="/register" 
+                  className="bg-gradient-to-r from-[#B21F1F] to-[#8B1616] text-white no-underline text-sm px-5 py-2 rounded-lg shadow-md font-semibold transition-all hover:shadow-lg hover:-translate-y-0.5"
+                >
+                  Registrarse
+                </Link>
               </div>
-            </>
-          ) : (
-            <>
-              <Link 
-                to="/login" 
-                className="relative text-gray-600 no-underline font-medium text-[0.95rem] py-2 transition-all duration-300 hover:text-[#B21F1F] after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-[#B21F1F] after:transition-all after:duration-300 hover:after:w-full md:text-sm md:py-1.5"
-              >
-                Iniciar Sesión
-              </Link>
-              <Link 
-                to="/register" 
-                className="bg-gradient-to-br from-[#B21F1F] to-[#8B1616] text-white px-6 py-2.5 rounded-lg shadow-[0_4px_12px_rgba(178,31,31,0.25)] font-medium text-[0.95rem] transition-all duration-300 hover:bg-gradient-to-br hover:from-[#8B1616] hover:to-[#6B1111] hover:-translate-y-0.5 hover:shadow-[0_6px_16px_rgba(178,31,31,0.35)] md:px-4 md:py-2 md:text-sm"
-              >
-                Registrarse
-              </Link>
-            </>
-          )}
+            )}
+          </div>
         </div>
       </div>
     </nav>
