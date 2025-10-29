@@ -4,6 +4,7 @@ import { restaurantService, listingService } from '../services';
 import { Card, Button, Loading } from '../components/common';
 import { ListingCard } from '../components/listings/ListingCard';
 import { formatRating } from '../utils';
+import { FiPhone, FiMail, FiMapPin, FiClock, FiStar, FiHeart, FiPackage } from 'react-icons/fi';
 
 export const RestaurantDetailPage = () => {
   const { id } = useParams();
@@ -132,7 +133,10 @@ export const RestaurantDetailPage = () => {
 
               {restaurant.rating && (
                 <div className="flex items-center gap-3 mb-4 justify-center md:justify-start">
-                  <span className="text-xl md:text-2xl font-bold drop-shadow-md">⭐ {formatRating(restaurant.rating)}</span>
+                  <div className="flex items-center gap-2">
+                    <FiStar className="text-xl md:text-2xl fill-yellow-400 text-yellow-400" />
+                    <span className="text-xl md:text-2xl font-bold drop-shadow-md">{formatRating(restaurant.rating)}</span>
+                  </div>
                   <span className="text-base md:text-lg opacity-90 drop-shadow-md">({restaurant.total_ratings} reseñas)</span>
                 </div>
               )}
@@ -146,9 +150,10 @@ export const RestaurantDetailPage = () => {
                 <Button 
                   onClick={handleToggleFavorite} 
                   variant="secondary"
-                  className="bg-white text-[#B21F1F] hover:bg-gray-100 shadow-lg"
+                  className="!bg-white !text-[#B21F1F] hover:!bg-red-50 !shadow-lg hover:!shadow-xl !border-2 !border-[#B21F1F] !font-bold !py-3 !px-6 !rounded-xl transition-all flex items-center gap-2"
                 >
-                  {isFavorite ? '❤️ Guardado' : '🤍 Guardar Restaurante'}
+                  <FiHeart className={`text-lg ${isFavorite ? 'fill-[#B21F1F]' : ''}`} />
+                  {isFavorite ? 'Guardado' : 'Guardar Restaurante'}
                 </Button>
               </div>
             </div>
@@ -162,25 +167,25 @@ export const RestaurantDetailPage = () => {
         <Card className="mb-8 shadow-lg">
           <div className="p-4 md:p-6">
             <h2 className="text-lg md:text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <span className="text-xl md:text-2xl">📞</span> Información de Contacto
+              <FiPhone className="text-xl md:text-2xl text-[#B21F1F]" /> Información de Contacto
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="flex items-center gap-3 text-gray-700 p-3 bg-gray-50 rounded-lg">
-                <span className="text-xl md:text-2xl">📍</span>
+                <FiMapPin className="text-xl md:text-2xl text-[#B21F1F] flex-shrink-0" />
                 <div className="flex-1 min-w-0">
                   <div className="text-xs text-gray-500 font-medium mb-1">Dirección</div>
                   <span className="text-sm font-medium break-words">{restaurant.address}</span>
                 </div>
               </div>
               <div className="flex items-center gap-3 text-gray-700 p-3 bg-gray-50 rounded-lg">
-                <span className="text-xl md:text-2xl">📞</span>
+                <FiPhone className="text-xl md:text-2xl text-[#B21F1F] flex-shrink-0" />
                 <div className="flex-1 min-w-0">
                   <div className="text-xs text-gray-500 font-medium mb-1">Teléfono</div>
                   <a href={`tel:${restaurant.phone}`} className="text-sm font-medium text-[#B21F1F] hover:underline break-all">{restaurant.phone}</a>
                 </div>
               </div>
               <div className="flex items-center gap-3 text-gray-700 p-3 bg-gray-50 rounded-lg">
-                <span className="text-xl md:text-2xl">✉️</span>
+                <FiMail className="text-xl md:text-2xl text-[#B21F1F] flex-shrink-0" />
                 <div className="flex-1 min-w-0">
                   <div className="text-xs text-gray-500 font-medium mb-1">Email</div>
                   <a href={`mailto:${restaurant.email}`} className="text-sm font-medium text-[#B21F1F] hover:underline break-all">{restaurant.email}</a>
@@ -194,7 +199,7 @@ export const RestaurantDetailPage = () => {
           <Card className="mb-8 shadow-lg">
             <div className="p-6">
               <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-                <span className="text-2xl">🕒</span> Horario de Apertura
+                <FiClock className="text-2xl text-[#B21F1F]" /> Horario de Apertura
               </h2>
               <div className="space-y-2">
                 {Object.entries(restaurant.opening_hours).map(([day, hours]) => {
@@ -231,7 +236,7 @@ export const RestaurantDetailPage = () => {
         {/* Available Listings */}
         <div>
           <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-            <span className="text-2xl">🍽️</span> Alimentos Disponibles
+            <FiPackage className="text-2xl text-[#B21F1F]" /> Alimentos Disponibles
           </h2>
           
           {listings.length === 0 ? (
