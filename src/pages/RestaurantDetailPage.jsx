@@ -44,92 +44,179 @@ export const RestaurantDetailPage = () => {
     setIsFavorite(!isFavorite);
   };
 
+  const getPlaceholderImage = () => {
+    return `https://ui-avatars.com/api/?name=${encodeURIComponent(restaurant?.business_name || 'Restaurant')}&size=800&background=B21F1F&color=ffffff&bold=true`;
+  };
+
+  const isOpenNow = () => {
+    if (!restaurant?.opening_hours) return null;
+    
+    const now = new Date();
+    const dayName = now.toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
+    const currentTime = now.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });
+    
+    const todayHours = restaurant.opening_hours[dayName];
+    if (!todayHours || todayHours.toLowerCase() === 'cerrado' || todayHours.toLowerCase() === 'closed') {
+      return false;
+    }
+    
+    // Parse hours like "09:00 - 22:00"
+    const timeMatch = todayHours.match(/(\d{1,2}):(\d{2})\s*-\s*(\d{1,2}):(\d{2})/);
+    if (!timeMatch) return null;
+    
+    const [_, openHour, openMin, closeHour, closeMin] = timeMatch;
+    const openTime = `${openHour.padStart(2, '0')}:${openMin}`;
+    const closeTime = `${closeHour.padStart(2, '0')}:${closeMin}`;
+    
+    return currentTime >= openTime && currentTime <= closeTime;
+  };
+
   if (loading) return <Loading fullScreen />;
   if (!restaurant) return <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"><p>Restaurante no encontrado</p></div>;
 
+  const openStatus = isOpenNow();
+
   return (
-    <div className="min-h-[calc(100vh-200px)]">
-      <div className="bg-gradient-to-br from-[#B21F1F] to-[#8B1616] text-white py-12 mb-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <button 
-            className="bg-white/20 border border-white/30 text-white text-base cursor-pointer px-6 py-3 rounded-lg mb-8 inline-flex items-center gap-2 transition-all font-semibold hover:bg-white/30 hover:-translate-x-1" 
-            onClick={() => navigate(-1)}
-          >
-            ← Volver
-          </button>
+    <div className="min-h-[calc(100vh-200px)] py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Back Button */}
+        <button 
+          className="bg-white border border-gray-300 text-gray-700 text-base cursor-pointer px-6 py-3 rounded-lg mb-6 inline-flex items-center gap-2 transition-all font-semibold hover:bg-gray-50 hover:-translate-x-1 shadow-sm" 
+          onClick={() => navigate(-1)}
+        >
+          ← Volver
+        </button>
 
-          <div className="flex justify-between items-start gap-8 flex-col lg:flex-row">
-            <div className="flex gap-8 flex-1 flex-col md:flex-row">
-              {restaurant.logo && (
-                <img 
-                  src={restaurant.logo} 
-                  alt={restaurant.business_name} 
-                  className="w-[150px] h-[150px] rounded-2xl object-cover bg-white p-2 shadow-[0_8px_16px_rgba(0,0,0,0.2)]" 
+        {/* Header Section with Image */}
+        <Card className="mb-8 overflow-hidden shadow-lg">
+          <div className="flex gap-8 p-6 md:flex-col">
+            {/* Restaurant Image */}
+            <div className="flex-shrink-0">
+              <div className="relative w-64 h-64 rounded-xl overflow-hidden bg-gray-100 md:w-full md:h-72">
+                <img
+                  src={restaurant.logo || getPlaceholderImage()}
+                  alt={restaurant.business_name}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.target.src = getPlaceholderImage();
+                  }}
                 />
-              )}
-              
-              <div className="flex-1">
-                <div className="flex items-center gap-4 mb-4 flex-wrap">
-                  <h1 className="text-5xl font-extrabold m-0 leading-tight md:text-4xl sm:text-3xl">{restaurant.business_name}</h1>
-                  {restaurant.is_premium && (
-                    <span className="bg-white/20 px-4 py-2 rounded-full text-sm font-semibold border border-white/30">⭐ Premium</span>
-                  )}
-                </div>
-
-                <p className="text-xl leading-relaxed mb-6 opacity-95 sm:text-base">{restaurant.description}</p>
-
-                <div className="flex flex-col gap-4">
-                  {restaurant.rating && (
-                    <div className="flex items-center gap-3">
-                      <span className="text-2xl font-bold">⭐ {formatRating(restaurant.rating)}</span>
-                      <span className="text-lg opacity-90">({restaurant.total_ratings} reseñas)</span>
-                    </div>
-                  )}
-
-                  <div className="flex flex-col gap-2 text-base opacity-95">
-                    <span>📍 {restaurant.address}</span>
-                    <span>📞 {restaurant.phone}</span>
-                    <span>✉️ {restaurant.email}</span>
+                {restaurant.is_premium && (
+                  <div className="absolute top-4 right-4 bg-gradient-to-br from-yellow-400 to-orange-500 text-white px-4 py-2 rounded-lg text-sm font-bold shadow-lg">
+                    ⭐ Premium
                   </div>
-                </div>
+                )}
               </div>
             </div>
 
-            <div className="flex flex-col gap-4">
-              <Button onClick={handleToggleFavorite} variant="secondary">
-                {isFavorite ? '❤️ Guardado' : '🤍 Guardar'}
-              </Button>
+            {/* Restaurant Info */}
+            <div className="flex-1 flex flex-col">
+              <div className="flex justify-between items-start gap-4 mb-4 md:flex-col">
+                <div className="flex-1">
+                  <div className="flex items-center gap-3 mb-2 flex-wrap">
+                    <h1 className="text-4xl font-extrabold text-gray-900 m-0 leading-tight md:text-3xl">
+                      {restaurant.business_name}
+                    </h1>
+                    {openStatus !== null && (
+                      <span className={`px-3 py-1 rounded-full text-sm font-semibold flex items-center gap-1.5 ${
+                        openStatus 
+                          ? 'bg-green-100 text-green-700 border border-green-300' 
+                          : 'bg-red-100 text-red-700 border border-red-300'
+                      }`}>
+                        <span className={`w-2 h-2 rounded-full ${openStatus ? 'bg-green-500' : 'bg-red-500'}`}></span>
+                        {openStatus ? 'Abierto ahora' : 'Cerrado'}
+                      </span>
+                    )}
+                  </div>
+                  {restaurant.rating && (
+                    <div className="flex items-center gap-3 mb-4">
+                      <span className="text-xl font-bold text-[#B21F1F]">⭐ {formatRating(restaurant.rating)}</span>
+                      <span className="text-base text-gray-600">({restaurant.total_ratings} reseñas)</span>
+                    </div>
+                  )}
+                </div>
+                <Button onClick={handleToggleFavorite} variant="secondary">
+                  {isFavorite ? '❤️ Guardado' : '🤍 Guardar'}
+                </Button>
+              </div>
+
+              <p className="text-gray-700 text-base leading-relaxed mb-6">
+                {restaurant.description}
+              </p>
+
+              {/* Quick Contact Info */}
+              <div className="grid grid-cols-1 gap-3 mt-auto">
+                <div className="flex items-center gap-3 text-gray-700">
+                  <span className="text-xl">📍</span>
+                  <span className="text-sm">{restaurant.address}</span>
+                </div>
+                <div className="flex items-center gap-3 text-gray-700">
+                  <span className="text-xl">📞</span>
+                  <a href={`tel:${restaurant.phone}`} className="text-sm text-[#B21F1F] hover:underline">{restaurant.phone}</a>
+                </div>
+                <div className="flex items-center gap-3 text-gray-700">
+                  <span className="text-xl">✉️</span>
+                  <a href={`mailto:${restaurant.email}`} className="text-sm text-[#B21F1F] hover:underline break-all">{restaurant.email}</a>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      </div>
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        </Card>
+        {/* Opening Hours */}
         {restaurant.opening_hours && (
-          <Card className="mb-8 bg-white p-8">
-            <h2 className="text-3xl font-bold text-gray-900 mb-6">🕒 Horario de Apertura</h2>
-            <div className="grid grid-cols-2 gap-4 md:grid-cols-1">
-              {Object.entries(restaurant.opening_hours).map(([day, hours]) => (
-                <div key={day} className="flex justify-between items-center p-4 bg-gray-50 rounded-lg border-l-4 border-[#B21F1F]">
-                  <span className="font-semibold text-gray-700 capitalize">{getDayName(day)}</span>
-                  <span className="text-gray-600 font-medium">{hours}</span>
-                </div>
-              ))}
+          <Card className="mb-8 shadow-lg">
+            <div className="p-6">
+              <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                <span className="text-2xl">🕒</span> Horario de Apertura
+              </h2>
+              <div className="space-y-2">
+                {Object.entries(restaurant.opening_hours).map(([day, hours]) => {
+                  const today = new Date().toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
+                  const isToday = day === today;
+                  
+                  return (
+                    <div 
+                      key={day} 
+                      className={`flex justify-between items-center p-4 rounded-lg transition-all ${
+                        isToday 
+                          ? 'bg-[#B21F1F] text-white shadow-md' 
+                          : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        {isToday && <span className="text-lg">•</span>}
+                        <span className={`font-semibold capitalize ${isToday ? 'text-white' : 'text-gray-900'}`}>
+                          {getDayName(day)}
+                          {isToday && <span className="ml-2 text-xs font-normal opacity-90">(Hoy)</span>}
+                        </span>
+                      </div>
+                      <span className={`font-medium ${isToday ? 'text-white' : 'text-gray-600'}`}>
+                        {hours}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           </Card>
         )}
 
-        <div className="mt-8">
-          <h2 className="text-3xl font-extrabold text-gray-900 mb-6">Alimentos Disponibles</h2>
+        {/* Available Listings */}
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+            <span className="text-2xl">🍽️</span> Alimentos Disponibles
+          </h2>
           
           {listings.length === 0 ? (
-            <Card>
-              <div className="text-center py-12">
-                <p className="text-gray-500 text-lg">Este restaurante no tiene alimentos disponibles en este momento.</p>
+            <Card className="shadow-lg">
+              <div className="text-center py-12 px-8">
+                <span className="text-5xl mb-4 block">🍴</span>
+                <p className="text-gray-500 text-base">Este restaurante no tiene alimentos disponibles en este momento.</p>
+                <p className="text-gray-400 text-sm mt-2">Vuelve pronto para ver nuevas ofertas</p>
               </div>
             </Card>
           ) : (
-            <div className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-6 md:grid-cols-[repeat(auto-fill,minmax(250px,1fr))] sm:grid-cols-1">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {listings.map((listing) => (
                 <ListingCard key={listing.id} listing={listing} />
               ))}

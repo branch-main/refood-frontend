@@ -72,9 +72,9 @@ export const RestaurantsPage = () => {
         {loading ? (
           <Loading />
         ) : (
-          <div className="flex flex-col gap-6 mt-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
             {restaurants.length === 0 ? (
-              <div className="text-center py-16 px-8 text-gray-500">
+              <div className="col-span-full text-center py-16 px-8 text-gray-500">
                 <p>No se encontraron restaurantes. Intenta ajustar tu búsqueda.</p>
               </div>
             ) : (
