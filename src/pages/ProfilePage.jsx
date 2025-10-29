@@ -131,17 +131,17 @@ export const ProfilePage = () => {
   return (
     <div className="min-h-[calc(100vh-200px)] bg-gray-50 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex gap-6 lg:flex-row md:flex-row sm:flex-col">
+        <div className="flex flex-col lg:flex-row gap-6">
           {/* Sidebar */}
-          <div className="w-80 flex-shrink-0 lg:w-80 md:w-64 sm:w-full">
-            <Card className="lg:sticky md:sticky sm:relative top-20">
+          <div className="w-full lg:w-80 flex-shrink-0">
+            <Card className="lg:sticky lg:top-20">
               {/* Profile Header */}
               <div className="p-6 text-center border-b border-gray-200">
                 <div className="w-24 h-24 mx-auto rounded-full bg-gradient-to-br from-[#B21F1F] to-[#8B1616] flex items-center justify-center text-white text-3xl font-bold shadow-lg mb-4">
                   {getUserInitials()}
                 </div>
                 <h2 className="text-xl font-bold text-gray-900">{user.username}</h2>
-                <p className="text-sm text-gray-500 mt-1">{user.email}</p>
+                <p className="text-sm text-gray-500 mt-1 break-all">{user.email}</p>
                 <div className="mt-3 inline-flex items-center gap-2 bg-red-50 text-[#B21F1F] px-3 py-1 rounded-full text-xs font-semibold">
                   {user.user_type}
                 </div>
