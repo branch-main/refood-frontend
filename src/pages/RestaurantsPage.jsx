@@ -3,7 +3,6 @@ import { restaurantService } from '../services';
 import { useGeolocation } from '../hooks';
 import { RestaurantCard } from '../components/restaurants/RestaurantCard';
 import { Loading, Input } from '../components/common';
-import './RestaurantsPage.css';
 
 export const RestaurantsPage = () => {
   const [restaurants, setRestaurants] = useState([]);
@@ -54,7 +53,7 @@ export const RestaurantsPage = () => {
   };
 
   return (
-    <div className="restaurants-page">
+    <div className="py-8">
       <div className="container">
         <div className="page-header">
           <h1>Restaurantes Asociados</h1>
@@ -71,7 +70,7 @@ export const RestaurantsPage = () => {
         {loading ? (
           <Loading />
         ) : (
-          <div className="restaurants-list">
+          <div className="flex flex-col gap-6 mt-8">
             {restaurants.length === 0 ? (
               <div className="empty-state">
                 <p>No se encontraron restaurantes. Intenta ajustar tu búsqueda.</p>
