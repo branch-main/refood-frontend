@@ -77,22 +77,24 @@ export const RestaurantDetailPage = () => {
   const openStatus = isOpenNow();
 
   return (
-    <div className="min-h-[calc(100vh-200px)] py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Back Button */}
-        <button 
-          className="bg-white border border-gray-300 text-gray-700 text-base cursor-pointer px-6 py-3 rounded-lg mb-6 inline-flex items-center gap-2 transition-all font-semibold hover:bg-gray-50 hover:-translate-x-1 shadow-sm" 
-          onClick={() => navigate(-1)}
-        >
-          ← Volver
-        </button>
+    <div className="min-h-[calc(100vh-200px)]">
+      {/* Hero Banner */}
+      <div className="relative bg-gradient-to-br from-[#B21F1F] to-[#8B1616] text-white">
+        <div className="absolute inset-0 bg-black/10"></div>
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {/* Back Button */}
+          <button 
+            className="bg-white/10 backdrop-blur-sm border border-white/20 text-white text-base cursor-pointer px-5 py-2.5 rounded-lg mb-6 inline-flex items-center gap-2 transition-all font-semibold hover:bg-white/20 hover:-translate-x-1" 
+            onClick={() => navigate(-1)}
+          >
+            ← Volver
+          </button>
 
-        {/* Header Section with Image */}
-        <Card className="mb-8 overflow-hidden shadow-lg">
-          <div className="flex gap-8 p-6 md:flex-col">
+          {/* Hero Content */}
+          <div className="flex gap-8 items-start md:flex-col">
             {/* Restaurant Image */}
             <div className="flex-shrink-0">
-              <div className="relative w-64 h-64 rounded-xl overflow-hidden bg-gray-100 md:w-full md:h-72">
+              <div className="relative w-48 h-48 rounded-2xl overflow-hidden bg-white/10 backdrop-blur-sm border-4 border-white/20 shadow-2xl md:w-40 md:h-40">
                 <img
                   src={restaurant.logo || getPlaceholderImage()}
                   alt={restaurant.business_name}
@@ -101,62 +103,87 @@ export const RestaurantDetailPage = () => {
                     e.target.src = getPlaceholderImage();
                   }}
                 />
-                {restaurant.is_premium && (
-                  <div className="absolute top-4 right-4 bg-gradient-to-br from-yellow-400 to-orange-500 text-white px-4 py-2 rounded-lg text-sm font-bold shadow-lg">
-                    ⭐ Premium
-                  </div>
-                )}
               </div>
             </div>
 
             {/* Restaurant Info */}
-            <div className="flex-1 flex flex-col">
-              <div className="flex justify-between items-start gap-4 mb-4 md:flex-col">
-                <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-2 flex-wrap">
-                    <h1 className="text-4xl font-extrabold text-gray-900 m-0 leading-tight md:text-3xl">
-                      {restaurant.business_name}
-                    </h1>
-                    {openStatus !== null && (
-                      <span className={`px-3 py-1 rounded-full text-sm font-semibold flex items-center gap-1.5 ${
-                        openStatus 
-                          ? 'bg-green-100 text-green-700 border border-green-300' 
-                          : 'bg-red-100 text-red-700 border border-red-300'
-                      }`}>
-                        <span className={`w-2 h-2 rounded-full ${openStatus ? 'bg-green-500' : 'bg-red-500'}`}></span>
-                        {openStatus ? 'Abierto ahora' : 'Cerrado'}
-                      </span>
-                    )}
-                  </div>
-                  {restaurant.rating && (
-                    <div className="flex items-center gap-3 mb-4">
-                      <span className="text-xl font-bold text-[#B21F1F]">⭐ {formatRating(restaurant.rating)}</span>
-                      <span className="text-base text-gray-600">({restaurant.total_ratings} reseñas)</span>
-                    </div>
-                  )}
-                </div>
-                <Button onClick={handleToggleFavorite} variant="secondary">
-                  {isFavorite ? '❤️ Guardado' : '🤍 Guardar'}
-                </Button>
+            <div className="flex-1 pt-2">
+              <div className="flex items-start gap-3 mb-3 flex-wrap">
+                {restaurant.is_premium && (
+                  <span className="bg-gradient-to-br from-yellow-400 to-orange-500 text-white px-4 py-1.5 rounded-full text-sm font-bold shadow-lg">
+                    ⭐ Premium
+                  </span>
+                )}
+                {openStatus !== null && (
+                  <span className={`px-4 py-1.5 rounded-full text-sm font-semibold flex items-center gap-1.5 backdrop-blur-sm border shadow-lg ${
+                    openStatus 
+                      ? 'bg-green-500/90 text-white border-green-400' 
+                      : 'bg-red-500/90 text-white border-red-400'
+                  }`}>
+                    <span className={`w-2 h-2 rounded-full animate-pulse ${openStatus ? 'bg-white' : 'bg-white'}`}></span>
+                    {openStatus ? 'Abierto ahora' : 'Cerrado'}
+                  </span>
+                )}
               </div>
 
-              <p className="text-gray-700 text-base leading-relaxed mb-6">
+              <h1 className="text-5xl font-extrabold m-0 leading-tight mb-4 drop-shadow-lg md:text-4xl sm:text-3xl">
+                {restaurant.business_name}
+              </h1>
+
+              {restaurant.rating && (
+                <div className="flex items-center gap-3 mb-4">
+                  <span className="text-2xl font-bold drop-shadow-md">⭐ {formatRating(restaurant.rating)}</span>
+                  <span className="text-lg opacity-90 drop-shadow-md">({restaurant.total_ratings} reseñas)</span>
+                </div>
+              )}
+
+              <p className="text-lg leading-relaxed mb-6 opacity-95 max-w-3xl">
                 {restaurant.description}
               </p>
 
-              {/* Quick Contact Info */}
-              <div className="grid grid-cols-1 gap-3 mt-auto">
-                <div className="flex items-center gap-3 text-gray-700">
-                  <span className="text-xl">📍</span>
-                  <span className="text-sm">{restaurant.address}</span>
+              {/* Quick Actions */}
+              <div className="flex gap-4 flex-wrap">
+                <Button 
+                  onClick={handleToggleFavorite} 
+                  variant="secondary"
+                  className="bg-white text-[#B21F1F] hover:bg-gray-100 shadow-lg"
+                >
+                  {isFavorite ? '❤️ Guardado' : '🤍 Guardar Restaurante'}
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Contact Info Card */}
+        <Card className="mb-8 shadow-lg">
+          <div className="p-6">
+            <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+              <span className="text-2xl">📞</span> Información de Contacto
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="flex items-center gap-3 text-gray-700 p-3 bg-gray-50 rounded-lg">
+                <span className="text-2xl">📍</span>
+                <div className="flex-1">
+                  <div className="text-xs text-gray-500 font-medium mb-1">Dirección</div>
+                  <span className="text-sm font-medium">{restaurant.address}</span>
                 </div>
-                <div className="flex items-center gap-3 text-gray-700">
-                  <span className="text-xl">📞</span>
-                  <a href={`tel:${restaurant.phone}`} className="text-sm text-[#B21F1F] hover:underline">{restaurant.phone}</a>
+              </div>
+              <div className="flex items-center gap-3 text-gray-700 p-3 bg-gray-50 rounded-lg">
+                <span className="text-2xl">📞</span>
+                <div className="flex-1">
+                  <div className="text-xs text-gray-500 font-medium mb-1">Teléfono</div>
+                  <a href={`tel:${restaurant.phone}`} className="text-sm font-medium text-[#B21F1F] hover:underline">{restaurant.phone}</a>
                 </div>
-                <div className="flex items-center gap-3 text-gray-700">
-                  <span className="text-xl">✉️</span>
-                  <a href={`mailto:${restaurant.email}`} className="text-sm text-[#B21F1F] hover:underline break-all">{restaurant.email}</a>
+              </div>
+              <div className="flex items-center gap-3 text-gray-700 p-3 bg-gray-50 rounded-lg">
+                <span className="text-2xl">✉️</span>
+                <div className="flex-1">
+                  <div className="text-xs text-gray-500 font-medium mb-1">Email</div>
+                  <a href={`mailto:${restaurant.email}`} className="text-sm font-medium text-[#B21F1F] hover:underline break-all">{restaurant.email}</a>
                 </div>
               </div>
             </div>
