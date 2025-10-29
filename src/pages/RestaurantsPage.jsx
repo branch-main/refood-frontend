@@ -54,25 +54,27 @@ export const RestaurantsPage = () => {
 
   return (
     <div className="py-8">
-      <div className="container">
-        <div className="page-header">
-          <h1>Restaurantes Asociados</h1>
-          <p>Descubre restaurantes combatiendo el desperdicio de alimentos en tu área</p>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="mb-8 text-center">
+          <h1 className="text-3xl font-bold mb-2">Restaurantes Asociados</h1>
+          <p className="text-gray-600">Descubre restaurantes combatiendo el desperdicio de alimentos en tu área</p>
         </div>
 
-        <Input
-          type="text"
-          placeholder="Buscar restaurantes..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
+        <div className="mb-8">
+          <Input
+            type="text"
+            placeholder="Buscar restaurantes..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
 
         {loading ? (
           <Loading />
         ) : (
           <div className="flex flex-col gap-6 mt-8">
             {restaurants.length === 0 ? (
-              <div className="empty-state">
+              <div className="text-center py-16 px-8 text-gray-500">
                 <p>No se encontraron restaurantes. Intenta ajustar tu búsqueda.</p>
               </div>
             ) : (
