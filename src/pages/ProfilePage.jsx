@@ -131,10 +131,10 @@ export const ProfilePage = () => {
   return (
     <div className="min-h-[calc(100vh-200px)] bg-gray-50 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex gap-6 md:flex-col">
+        <div className="flex gap-6 lg:flex-row md:flex-row sm:flex-col">
           {/* Sidebar */}
-          <div className="w-80 flex-shrink-0 md:w-full">
-            <Card className="sticky top-20">
+          <div className="w-80 flex-shrink-0 lg:w-80 md:w-64 sm:w-full">
+            <Card className="lg:sticky md:sticky sm:relative top-20">
               {/* Profile Header */}
               <div className="p-6 text-center border-b border-gray-200">
                 <div className="w-24 h-24 mx-auto rounded-full bg-gradient-to-br from-[#B21F1F] to-[#8B1616] flex items-center justify-center text-white text-3xl font-bold shadow-lg mb-4">
@@ -228,7 +228,7 @@ export const ProfilePage = () => {
                     {!isEditing && (
                       <Button
                         onClick={() => setIsEditing(true)}
-                        className="bg-[#B21F1F] !text-white hover:!bg-[#8B1616]"
+                        className="bg-[#B21F1F] !text-white hover:!bg-[#8B1616] !px-6 !py-2.5 !rounded-lg"
                       >
                         <FiEdit3 className="inline mr-2" /> Editar
                       </Button>
@@ -246,15 +246,14 @@ export const ProfilePage = () => {
                         <Button
                           onClick={handleCancel}
                           variant="outline"
-                          size="small"
+                          className="!px-5 !py-2 !rounded-lg"
                         >
                           <FiX className="inline mr-1" /> Cancelar
                         </Button>
                         <Button
                           onClick={handleSubmit}
                           loading={loading}
-                          className="bg-green-600 !text-white hover:!bg-green-700"
-                          size="small"
+                          className="bg-green-600 !text-white hover:!bg-green-700 !px-5 !py-2 !rounded-lg"
                         >
                           <FiSave className="inline mr-1" /> Guardar
                         </Button>
