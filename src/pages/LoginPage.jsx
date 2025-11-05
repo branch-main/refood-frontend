@@ -2,11 +2,11 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthContext } from '../contexts/AuthContext';
 import { Card, Input, Button } from '../components/common';
-import { FiUser, FiLock, FiCheck } from 'react-icons/fi';
+import { FiMail, FiLock, FiCheck } from 'react-icons/fi';
 
 export const LoginPage = () => {
   const [formData, setFormData] = useState({
-    username: '',
+    email: '',
     password: '',
   });
   const [error, setError] = useState('');
@@ -28,7 +28,7 @@ export const LoginPage = () => {
     setLoading(true);
 
     try {
-      await login(formData.username, formData.password);
+      await login(formData.email, formData.password);
       navigate('/');
     } catch (err) {
       setError(err.response?.data?.detail || 'Inicio de sesión fallido. Por favor intenta de nuevo.');
@@ -102,20 +102,20 @@ export const LoginPage = () => {
               <form onSubmit={handleSubmit} className="space-y-5">
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Usuario
+                    Correo Electrónico
                   </label>
                   <div className="relative">
                     <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
-                      <FiUser className="text-xl" />
+                      <FiMail className="text-xl" />
                     </div>
                     <input
-                      type="text"
-                      name="username"
-                      value={formData.username}
+                      type="email"
+                      name="email"
+                      value={formData.email}
                       onChange={handleChange}
                       required
                       className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#B21F1F] focus:border-transparent transition-all"
-                      placeholder="Ingresa tu usuario"
+                      placeholder="tu@email.com"
                     />
                   </div>
                 </div>

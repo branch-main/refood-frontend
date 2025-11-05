@@ -18,8 +18,18 @@ export const FavoritesPage = () => {
       setFavorites(data.results || data);
     } catch (error) {
       console.error('Failed to fetch favorites:', error);
+      setFavorites([]);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleRemoveFavorite = async (favoriteId) => {
+    try {
+      await favoriteService.removeFavorite(favoriteId);
+      setFavorites(favorites.filter(fav => fav.id !== favoriteId));
+    } catch (error) {
+      console.error('Failed to remove favorite:', error);
     }
   };
 
@@ -34,9 +44,9 @@ export const FavoritesPage = () => {
         {loading ? (
           <Loading />
         ) : (
-          <div className="flex flex-col gap-6 mt-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
             {favorites.length === 0 ? (
-              <div className="text-center py-16 px-8 text-gray-500">
+              <div className="col-span-full text-center py-16 px-8 text-gray-500">
                 <p>No has agregado ningún favorito todavía.</p>
                 <a 
                   href="/restaurants" 
@@ -49,7 +59,9 @@ export const FavoritesPage = () => {
               favorites.map((favorite) => (
                 <RestaurantCard 
                   key={favorite.id} 
-                  restaurant={favorite.restaurant_info}
+                  restaurant={favorite.restaurant_info || favorite.restaurant}
+                  onRemoveFavorite={() => handleRemoveFavorite(favorite.id)}
+                  isFavorite={true}
                 />
               ))
             )}

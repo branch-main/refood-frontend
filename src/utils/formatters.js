@@ -8,7 +8,7 @@
  * @param {string} currency - Currency symbol
  * @returns {string} Formatted price
  */
-export const formatPrice = (price, currency = '$') => {
+export const formatPrice = (price, currency = "S/ ") => {
   const numPrice = parseFloat(price);
   if (isNaN(numPrice)) return `${currency}0.00`;
   return `${currency}${numPrice.toFixed(2)}`;
@@ -23,7 +23,8 @@ export const formatPrice = (price, currency = '$') => {
 export const calculateDiscount = (original, discounted) => {
   const originalPrice = parseFloat(original);
   const discountedPrice = parseFloat(discounted);
-  if (isNaN(originalPrice) || isNaN(discountedPrice) || originalPrice === 0) return 0;
+  if (isNaN(originalPrice) || isNaN(discountedPrice) || originalPrice === 0)
+    return 0;
   return Math.round(((originalPrice - discountedPrice) / originalPrice) * 100);
 };
 
@@ -34,7 +35,7 @@ export const calculateDiscount = (original, discounted) => {
  */
 export const formatDistance = (distance) => {
   const dist = parseFloat(distance);
-  if (isNaN(dist)) return 'N/A';
+  if (isNaN(dist)) return "N/A";
   if (dist < 1) return `${Math.round(dist * 1000)}m`;
   return `${dist.toFixed(1)}km`;
 };
@@ -45,12 +46,12 @@ export const formatDistance = (distance) => {
  * @returns {string} Formatted date
  */
 export const formatDate = (date) => {
-  if (!date) return '';
+  if (!date) return "";
   const d = new Date(date);
-  return d.toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
+  return d.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
   });
 };
 
@@ -60,14 +61,14 @@ export const formatDate = (date) => {
  * @returns {string} Formatted datetime
  */
 export const formatDateTime = (datetime) => {
-  if (!datetime) return '';
+  if (!datetime) return "";
   const d = new Date(datetime);
-  return d.toLocaleString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
+  return d.toLocaleString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
   });
 };
 
@@ -77,11 +78,11 @@ export const formatDateTime = (datetime) => {
  * @returns {string} Formatted time
  */
 export const formatTime = (time) => {
-  if (!time) return '';
+  if (!time) return "";
   const d = new Date(time);
-  return d.toLocaleTimeString('en-US', {
-    hour: '2-digit',
-    minute: '2-digit',
+  return d.toLocaleTimeString("en-US", {
+    hour: "2-digit",
+    minute: "2-digit",
   });
 };
 
@@ -91,7 +92,7 @@ export const formatTime = (time) => {
  * @returns {string} Relative time string
  */
 export const getRelativeTime = (date) => {
-  if (!date) return '';
+  if (!date) return "";
   const d = new Date(date);
   const now = new Date();
   const diffMs = now - d;
@@ -99,10 +100,12 @@ export const getRelativeTime = (date) => {
   const diffHours = Math.floor(diffMins / 60);
   const diffDays = Math.floor(diffHours / 24);
 
-  if (diffMins < 1) return 'Just now';
-  if (diffMins < 60) return `${diffMins} minute${diffMins !== 1 ? 's' : ''} ago`;
-  if (diffHours < 24) return `${diffHours} hour${diffHours !== 1 ? 's' : ''} ago`;
-  if (diffDays < 7) return `${diffDays} day${diffDays !== 1 ? 's' : ''} ago`;
+  if (diffMins < 1) return "Just now";
+  if (diffMins < 60)
+    return `${diffMins} minute${diffMins !== 1 ? "s" : ""} ago`;
+  if (diffHours < 24)
+    return `${diffHours} hour${diffHours !== 1 ? "s" : ""} ago`;
+  if (diffDays < 7) return `${diffDays} day${diffDays !== 1 ? "s" : ""} ago`;
   return formatDate(date);
 };
 
@@ -123,8 +126,8 @@ export const truncateText = (text, length = 100) => {
  * @returns {string} Formatted phone number
  */
 export const formatPhone = (phone) => {
-  if (!phone) return '';
-  const cleaned = phone.replace(/\D/g, '');
+  if (!phone) return "";
+  const cleaned = phone.replace(/\D/g, "");
   if (cleaned.length === 10) {
     return `(${cleaned.slice(0, 3)}) ${cleaned.slice(3, 6)}-${cleaned.slice(6)}`;
   }
@@ -138,6 +141,6 @@ export const formatPhone = (phone) => {
  */
 export const formatRating = (rating) => {
   const num = parseFloat(rating);
-  if (isNaN(num)) return '0.0';
+  if (isNaN(num)) return "0.0";
   return num.toFixed(1);
 };

@@ -3,14 +3,13 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuthContext } from '../contexts/AuthContext';
 import { Card, Button } from '../components/common';
 import { USER_TYPES } from '../utils';
-import { FiUser, FiMail, FiLock, FiPhone, FiEdit3, FiCheck } from 'react-icons/fi';
+import { FiMail, FiLock, FiPhone, FiEdit3, FiCheck } from 'react-icons/fi';
 
 export const RegisterPage = () => {
   const [formData, setFormData] = useState({
-    username: '',
     email: '',
     password: '',
-    confirmPassword: '',
+    password_confirm: '',
     user_type: USER_TYPES.CONSUMER,
     first_name: '',
     last_name: '',
@@ -34,7 +33,7 @@ export const RegisterPage = () => {
     setError('');
 
     // Validate passwords match
-    if (formData.password !== formData.confirmPassword) {
+    if (formData.password !== formData.password_confirm) {
       setError('Las contraseñas no coinciden');
       return;
     }
@@ -42,9 +41,7 @@ export const RegisterPage = () => {
     setLoading(true);
 
     try {
-      // Remove confirmPassword before sending to API
-      const { confirmPassword, ...registrationData } = formData;
-      await register(registrationData);
+      await register(formData);
       navigate('/');
     } catch (err) {
       const errorData = err.response?.data;
@@ -124,26 +121,6 @@ export const RegisterPage = () => {
               <form onSubmit={handleSubmit} className="space-y-5">
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Usuario
-                  </label>
-                  <div className="relative">
-                    <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
-                      <FiUser className="text-xl" />
-                    </div>
-                    <input
-                      type="text"
-                      name="username"
-                      value={formData.username}
-                      onChange={handleChange}
-                      required
-                      className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#B21F1F] focus:border-transparent transition-all"
-                      placeholder="Elige tu nombre de usuario"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
                     Correo Electrónico
                   </label>
                   <div className="relative">
@@ -192,8 +169,8 @@ export const RegisterPage = () => {
                     </div>
                     <input
                       type="password"
-                      name="confirmPassword"
-                      value={formData.confirmPassword}
+                      name="password_confirm"
+                      value={formData.password_confirm}
                       onChange={handleChange}
                       required
                       className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#B21F1F] focus:border-transparent transition-all"

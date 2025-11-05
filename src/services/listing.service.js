@@ -1,4 +1,4 @@
-import api from './api';
+import api from "./api";
 
 /**
  * Food Listing Service
@@ -11,7 +11,7 @@ const listingService = {
    * @returns {Promise} Paginated listings
    */
   getListings: async (params = {}) => {
-    const response = await api.get('/listings/', { params });
+    const response = await api.get("/menu/items", { params });
     return response.data;
   },
 
@@ -33,7 +33,7 @@ const listingService = {
    * @returns {Promise} List of nearby listings
    */
   getNearbyListings: async (lat, lng, radius = 10) => {
-    const response = await api.get('/listings/nearby/', {
+    const response = await api.get("/listings/nearby/", {
       params: { lat, lng, radius },
     });
     return response.data;
@@ -46,21 +46,21 @@ const listingService = {
    */
   createListing: async (listingData) => {
     const formData = new FormData();
-    
+
     // Append all fields to FormData
     Object.keys(listingData).forEach((key) => {
-      if (key === 'allergens') {
+      if (key === "allergens") {
         formData.append(key, JSON.stringify(listingData[key]));
-      } else if (key === 'image' && listingData[key] instanceof File) {
+      } else if (key === "image" && listingData[key] instanceof File) {
         formData.append(key, listingData[key]);
       } else {
         formData.append(key, listingData[key]);
       }
     });
 
-    const response = await api.post('/listings/', formData, {
+    const response = await api.post("/listings/", formData, {
       headers: {
-        'Content-Type': 'multipart/form-data',
+        "Content-Type": "multipart/form-data",
       },
     });
     return response.data;
@@ -74,11 +74,11 @@ const listingService = {
    */
   updateListing: async (id, listingData) => {
     const formData = new FormData();
-    
+
     Object.keys(listingData).forEach((key) => {
-      if (key === 'allergens') {
+      if (key === "allergens") {
         formData.append(key, JSON.stringify(listingData[key]));
-      } else if (key === 'image' && listingData[key] instanceof File) {
+      } else if (key === "image" && listingData[key] instanceof File) {
         formData.append(key, listingData[key]);
       } else if (listingData[key] !== undefined && listingData[key] !== null) {
         formData.append(key, listingData[key]);
@@ -87,7 +87,7 @@ const listingService = {
 
     const response = await api.patch(`/listings/${id}/`, formData, {
       headers: {
-        'Content-Type': 'multipart/form-data',
+        "Content-Type": "multipart/form-data",
       },
     });
     return response.data;
@@ -108,7 +108,7 @@ const listingService = {
    * @returns {Promise} Filtered listings
    */
   searchListings: async (filters) => {
-    const response = await api.get('/listings/', { params: filters });
+    const response = await api.get("/listings/", { params: filters });
     return response.data;
   },
 };

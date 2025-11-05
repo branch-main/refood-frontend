@@ -1,9 +1,5 @@
-import api from './api';
+import api from "./api";
 
-/**
- * Authentication Service
- * Handles user registration, login, logout, and profile management
- */
 const authService = {
   /**
    * Register a new user
@@ -11,25 +7,25 @@ const authService = {
    * @returns {Promise} User object and token
    */
   register: async (userData) => {
-    const response = await api.post('/auth/register/', userData);
+    const response = await api.post("/auth/register/", userData);
     if (response.data.token) {
-      localStorage.setItem('auth_token', response.data.token);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
+      localStorage.setItem("auth_token", response.data.token);
+      localStorage.setItem("user", JSON.stringify(response.data.user));
     }
     return response.data;
   },
 
   /**
    * Login user
-   * @param {string} username - Username
+   * @param {string} email - Email
    * @param {string} password - Password
    * @returns {Promise} User object and token
    */
-  login: async (username, password) => {
-    const response = await api.post('/auth/login/', { username, password });
+  login: async (email, password) => {
+    const response = await api.post("/auth/login/", { email, password });
     if (response.data.token) {
-      localStorage.setItem('auth_token', response.data.token);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
+      localStorage.setItem("auth_token", response.data.token);
+      localStorage.setItem("user", JSON.stringify(response.data.user));
     }
     return response.data;
   },
@@ -40,10 +36,10 @@ const authService = {
    */
   logout: async () => {
     try {
-      await api.post('/auth/logout/');
+      await api.post("/auth/logout/");
     } finally {
-      localStorage.removeItem('auth_token');
-      localStorage.removeItem('user');
+      localStorage.removeItem("auth_token");
+      localStorage.removeItem("user");
     }
   },
 
@@ -52,8 +48,19 @@ const authService = {
    * @returns {Promise} User object
    */
   getCurrentUser: async () => {
-    const response = await api.get('/auth/me/');
-    localStorage.setItem('user', JSON.stringify(response.data));
+    const response = await api.get("/auth/profile/");
+    localStorage.setItem("user", JSON.stringify(response.data));
+    return response.data;
+  },
+
+  /**
+   * Update user profile
+   * @param {Object} profileData - Profile data to update
+   * @returns {Promise} Updated user object
+   */
+  updateProfile: async (profileData) => {
+    const response = await api.put("/auth/profile/", profileData);
+    localStorage.setItem("user", JSON.stringify(response.data));
     return response.data;
   },
 
@@ -62,7 +69,7 @@ const authService = {
    * @returns {string|null} Token
    */
   getToken: () => {
-    return localStorage.getItem('auth_token');
+    return localStorage.getItem("auth_token");
   },
 
   /**
@@ -70,7 +77,7 @@ const authService = {
    * @returns {Object|null} User object
    */
   getStoredUser: () => {
-    const user = localStorage.getItem('user');
+    const user = localStorage.getItem("user");
     return user ? JSON.parse(user) : null;
   },
 
@@ -79,7 +86,7 @@ const authService = {
    * @returns {boolean}
    */
   isAuthenticated: () => {
-    return !!localStorage.getItem('auth_token');
+    return !!localStorage.getItem("auth_token");
   },
 };
 

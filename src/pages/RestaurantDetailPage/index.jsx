@@ -1,0 +1,90 @@
+import { useState } from "react";
+import { useParams } from "react-router-dom";
+import { menuService, restaurantService } from "../../services";
+import { Loading } from "../../components/common";
+import { useAsync } from "../../hooks";
+import { RestaurantHeroBanner } from "./RestaurantHeroBanner";
+import { ContactInfoCard } from "./ContactInfoCard";
+import { OpeningHoursCard } from "./OpeningHoursCard";
+import { MenuItemsSection } from "./MenuItemsSection";
+
+export const RestaurantDetailPage = () => {
+  const { id } = useParams();
+  const [isFavorite, setIsFavorite] = useState(false);
+
+  const { loading, value: restaurant } = useAsync(async () => {
+    return restaurantService.getRestaurant(id);
+  }, [id]);
+
+  const { value: openingHours } = useAsync(async () => {
+    return restaurantService.getRestaurantOpeningHours(id);
+  }, [id]);
+
+  const { value: menuItems } = useAsync(async () => {
+    return menuService.getRestaurantMenu(id);
+  }, [id]);
+
+  const handleToggleFavorite = async () => {
+    setIsFavorite((prev) => !prev);
+  };
+
+  const getPlaceholderImage = () => {
+    return `https://ui-avatars.com/api/?name=${encodeURIComponent(restaurant?.name || "Restaurant")}&size=800&background=B21F1F&color=ffffff&bold=true`;
+  };
+
+  const isOpenNow = () => {
+    if (!openingHours || openingHours.length === 0) return null;
+
+    const now = new Date();
+    const currentDay = now.getDay();
+    const currentTime = now.toLocaleTimeString("en-US", {
+      hour12: false,
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+
+    const todayHours = openingHours.find((h) => h.day === currentDay);
+    if (!todayHours) return false;
+
+    const openTime = todayHours.open_time.substring(0, 5);
+    const closeTime = todayHours.close_time.substring(0, 5);
+
+    return currentTime >= openTime && currentTime <= closeTime;
+  };
+
+  if (loading) return <Loading fullScreen />;
+
+  if (!restaurant) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
+        <div className="text-6xl mb-4">🍽️</div>
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">
+          Restaurante no encontrado
+        </h2>
+        <p className="text-gray-500 mb-6">
+          El restaurante que buscas no existe o ha sido eliminado
+        </p>
+      </div>
+    );
+  }
+
+  const openStatus = isOpenNow();
+
+  return (
+    <div className="min-h-[calc(100vh-200px)]">
+      <RestaurantHeroBanner
+        restaurant={restaurant}
+        openStatus={openStatus}
+        isFavorite={isFavorite}
+        onToggleFavorite={handleToggleFavorite}
+        getPlaceholderImage={getPlaceholderImage}
+      />
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <ContactInfoCard restaurant={restaurant} />
+        <OpeningHoursCard openingHours={openingHours} />
+        <MenuItemsSection menuItems={menuItems} />
+      </div>
+    </div>
+  );
+};

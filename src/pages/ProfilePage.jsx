@@ -8,7 +8,6 @@ import { OrderCard } from '../components/orders/OrderCard';
 import { RestaurantCard } from '../components/restaurants/RestaurantCard';
 import { 
   FiMail, 
-  FiUser, 
   FiEdit3, 
   FiPhone, 
   FiSave,
@@ -39,11 +38,9 @@ export const ProfilePage = () => {
     const tab = searchParams.get('tab') || 'profile';
     setActiveTab(tab);
     
-    if (tab === 'orders') {
-      fetchOrders();
-    } else if (tab === 'favorites') {
-      fetchFavorites();
-    }
+    // Always fetch orders and favorites count for stats
+    fetchOrders();
+    fetchFavorites();
   }, [searchParams]);
 
   const fetchOrders = async () => {
@@ -62,11 +59,22 @@ export const ProfilePage = () => {
     try {
       setFavoritesLoading(true);
       const data = await favoriteService.getFavorites();
+      console.log('Favorites data:', data);
       setFavorites(data.results || data);
     } catch (error) {
       console.error('Failed to fetch favorites:', error);
+      setFavorites([]);
     } finally {
       setFavoritesLoading(false);
+    }
+  };
+
+  const handleRemoveFavorite = async (favoriteId) => {
+    try {
+      await favoriteService.removeFavorite(favoriteId);
+      setFavorites(favorites.filter(fav => fav.id !== favoriteId));
+    } catch (error) {
+      console.error('Failed to remove favorite:', error);
     }
   };
 
@@ -120,12 +128,16 @@ export const ProfilePage = () => {
   };
 
   const getUserInitials = () => {
-    if (!user?.username) return '?';
-    const names = user.username.split(' ');
-    if (names.length >= 2) {
-      return `${names[0][0]}${names[1][0]}`.toUpperCase();
+    if (user?.first_name && user?.last_name) {
+      return `${user.first_name[0]}${user.last_name[0]}`.toUpperCase();
     }
-    return user.username.substring(0, 2).toUpperCase();
+    if (user?.first_name) {
+      return user.first_name.substring(0, 2).toUpperCase();
+    }
+    if (user?.email) {
+      return user.email.substring(0, 2).toUpperCase();
+    }
+    return '?';
   };
 
   return (
@@ -140,7 +152,11 @@ export const ProfilePage = () => {
                 <div className="w-24 h-24 mx-auto rounded-full bg-gradient-to-br from-[#B21F1F] to-[#8B1616] flex items-center justify-center text-white text-3xl font-bold shadow-lg mb-4">
                   {getUserInitials()}
                 </div>
-                <h2 className="text-xl font-bold text-gray-900">{user.username}</h2>
+                <h2 className="text-xl font-bold text-gray-900">
+                  {user.first_name && user.last_name 
+                    ? `${user.first_name} ${user.last_name}` 
+                    : user.email.split('@')[0]}
+                </h2>
                 <p className="text-sm text-gray-500 mt-1 break-all">{user.email}</p>
                 <div className="mt-3 inline-flex items-center gap-2 bg-red-50 text-[#B21F1F] px-3 py-1 rounded-full text-xs font-semibold">
                   {user.user_type}
@@ -264,31 +280,12 @@ export const ProfilePage = () => {
                   <form onSubmit={handleSubmit}>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       {/* Email */}
-                      <div>
+                      <div className="md:col-span-2">
                         <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2">
                           <FiMail className="text-[#B21F1F]" />
                           Correo Electrónico
                         </label>
-                        {isEditing ? (
-                          <Input
-                            type="email"
-                            name="email"
-                            value={formData.email}
-                            onChange={handleChange}
-                            required
-                          />
-                        ) : (
-                          <p className="text-gray-900 bg-gray-50 px-4 py-3 rounded-lg">{user.email}</p>
-                        )}
-                      </div>
-
-                      {/* Username */}
-                      <div>
-                        <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2">
-                          <FiUser className="text-[#B21F1F]" />
-                          Nombre de Usuario
-                        </label>
-                        <p className="text-gray-500 bg-gray-100 px-4 py-3 rounded-lg">{user.username}</p>
+                        <p className="text-gray-500 bg-gray-100 px-4 py-3 rounded-lg">{user.email}</p>
                         <p className="text-xs text-gray-400 mt-1">No se puede modificar</p>
                       </div>
 
@@ -331,7 +328,7 @@ export const ProfilePage = () => {
                       </div>
 
                       {/* Phone */}
-                      <div>
+                      <div className="md:col-span-2">
                         <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2">
                           <FiPhone className="text-[#B21F1F]" />
                           Teléfono
@@ -406,10 +403,20 @@ export const ProfilePage = () => {
                       </Link>
                     </div>
                   ) : (
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                      {favorites.map((favorite) => (
-                        <RestaurantCard key={favorite.id} restaurant={favorite.restaurant} />
-                      ))}
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {favorites.map((favorite) => {
+                        console.log('Favorite item:', favorite);
+                        const restaurantData = favorite.restaurant_info || favorite.restaurant || favorite;
+                        return (
+                          <RestaurantCard 
+                            key={favorite.id} 
+                            restaurant={restaurantData}
+                            onRemoveFavorite={() => handleRemoveFavorite(favorite.id)}
+                            isFavorite={true}
+                            compact={true}
+                          />
+                        );
+                      })}
                     </div>
                   )}
                 </div>
