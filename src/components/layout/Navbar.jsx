@@ -96,7 +96,7 @@ export const Navbar = () => {
               Inicio
             </Link>
             <Link
-              to="/listings"
+              to="/menu"
               className="text-gray-600 no-underline font-medium text-sm px-3 py-2 rounded-lg transition-all hover:text-[#B21F1F] hover:bg-red-50"
             >
               Explorar
@@ -129,7 +129,7 @@ export const Navbar = () => {
                     onClick={() => setIsProfileOpen(!isProfileOpen)}
                     className="flex items-center gap-2 px-2 py-2 rounded-lg transition-all hover:bg-red-50"
                   >
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#B21F1F] to-[#8B1616] flex items-center justify-center text-white font-bold text-xs shadow-md">
+                    <div className="w-8 h-8 rounded-full bg-linear-to-br from-[#B21F1F] to-[#8B1616] flex items-center justify-center text-white font-bold text-xs shadow-md">
                       {getUserInitials()}
                     </div>
                     <svg
@@ -231,7 +231,7 @@ export const Navbar = () => {
                 Inicio
               </Link>
               <Link
-                to="/listings"
+                to="/menu"
                 className="text-gray-600 no-underline font-medium text-sm px-4 py-3 rounded-lg transition-all hover:text-[#B21F1F] hover:bg-red-50"
                 onClick={() => setIsMobileMenuOpen(false)}
               >

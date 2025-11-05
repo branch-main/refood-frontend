@@ -1,26 +1,28 @@
-import { useState, useEffect } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
-import { useAuthContext } from '../contexts/AuthContext';
-import { Card, Button, Input, Loading } from '../components/common';
-import { formatDate } from '../utils';
-import { orderService, favoriteService } from '../services';
-import { OrderCard } from '../components/orders/OrderCard';
-import { RestaurantCard } from '../components/restaurants/RestaurantCard';
-import { 
-  FiMail, 
-  FiEdit3, 
-  FiPhone, 
+import { useState, useEffect } from "react";
+import { Link, useSearchParams } from "react-router-dom";
+import { useAuthContext } from "../contexts/AuthContext";
+import { Card, Button, Input, Loading } from "../components/common";
+import { formatDate } from "../utils";
+import { orderService, favoriteService } from "../services";
+import { OrderCard } from "../components/orders/OrderCard";
+import { RestaurantCard } from "../components/restaurants/RestaurantCard";
+import {
+  FiMail,
+  FiEdit3,
+  FiPhone,
   FiSave,
   FiX,
   FiShoppingBag,
   FiHeart,
-  FiSettings
-} from 'react-icons/fi';
+  FiSettings,
+} from "react-icons/fi";
 
 export const ProfilePage = () => {
   const { user, updateUser } = useAuthContext();
   const [searchParams, setSearchParams] = useSearchParams();
-  const [activeTab, setActiveTab] = useState(searchParams.get('tab') || 'profile');
+  const [activeTab, setActiveTab] = useState(
+    searchParams.get("tab") || "profile",
+  );
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
   const [orders, setOrders] = useState([]);
@@ -28,16 +30,16 @@ export const ProfilePage = () => {
   const [ordersLoading, setOrdersLoading] = useState(false);
   const [favoritesLoading, setFavoritesLoading] = useState(false);
   const [formData, setFormData] = useState({
-    first_name: user?.first_name || '',
-    last_name: user?.last_name || '',
-    phone: user?.phone || '',
-    email: user?.email || '',
+    first_name: user?.first_name || "",
+    last_name: user?.last_name || "",
+    phone: user?.phone || "",
+    email: user?.email || "",
   });
 
   useEffect(() => {
-    const tab = searchParams.get('tab') || 'profile';
+    const tab = searchParams.get("tab") || "profile";
     setActiveTab(tab);
-    
+
     // Always fetch orders and favorites count for stats
     fetchOrders();
     fetchFavorites();
@@ -49,7 +51,7 @@ export const ProfilePage = () => {
       const data = await orderService.getOrders();
       setOrders(data.results || data);
     } catch (error) {
-      console.error('Failed to fetch orders:', error);
+      console.error("Failed to fetch orders:", error);
     } finally {
       setOrdersLoading(false);
     }
@@ -59,10 +61,10 @@ export const ProfilePage = () => {
     try {
       setFavoritesLoading(true);
       const data = await favoriteService.getFavorites();
-      console.log('Favorites data:', data);
+      console.log("Favorites data:", data);
       setFavorites(data.results || data);
     } catch (error) {
-      console.error('Failed to fetch favorites:', error);
+      console.error("Failed to fetch favorites:", error);
       setFavorites([]);
     } finally {
       setFavoritesLoading(false);
@@ -72,21 +74,21 @@ export const ProfilePage = () => {
   const handleRemoveFavorite = async (favoriteId) => {
     try {
       await favoriteService.removeFavorite(favoriteId);
-      setFavorites(favorites.filter(fav => fav.id !== favoriteId));
+      setFavorites(favorites.filter((fav) => fav.id !== favoriteId));
     } catch (error) {
-      console.error('Failed to remove favorite:', error);
+      console.error("Failed to remove favorite:", error);
     }
   };
 
   const handleOrderAction = async (action, orderId) => {
     try {
-      if (action === 'cancel') {
+      if (action === "cancel") {
         await orderService.cancelOrder(orderId);
         fetchOrders();
       }
     } catch (error) {
-      console.error('Failed to perform action:', error);
-      alert('Failed to perform action. Please try again.');
+      console.error("Failed to perform action:", error);
+      alert("Failed to perform action. Please try again.");
     }
   };
 
@@ -106,8 +108,8 @@ export const ProfilePage = () => {
       await updateUser(formData);
       setIsEditing(false);
     } catch (error) {
-      console.error('Failed to update profile:', error);
-      alert('Failed to update profile. Please try again.');
+      console.error("Failed to update profile:", error);
+      alert("Failed to update profile. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -115,10 +117,10 @@ export const ProfilePage = () => {
 
   const handleCancel = () => {
     setFormData({
-      first_name: user.first_name || '',
-      last_name: user.last_name || '',
-      phone: user.phone || '',
-      email: user.email || '',
+      first_name: user.first_name || "",
+      last_name: user.last_name || "",
+      phone: user.phone || "",
+      email: user.email || "",
     });
     setIsEditing(false);
   };
@@ -137,7 +139,7 @@ export const ProfilePage = () => {
     if (user?.email) {
       return user.email.substring(0, 2).toUpperCase();
     }
-    return '?';
+    return "?";
   };
 
   return (
@@ -153,11 +155,13 @@ export const ProfilePage = () => {
                   {getUserInitials()}
                 </div>
                 <h2 className="text-xl font-bold text-gray-900">
-                  {user.first_name && user.last_name 
-                    ? `${user.first_name} ${user.last_name}` 
-                    : user.email.split('@')[0]}
+                  {user.first_name && user.last_name
+                    ? `${user.first_name} ${user.last_name}`
+                    : user.email.split("@")[0]}
                 </h2>
-                <p className="text-sm text-gray-500 mt-1 break-all">{user.email}</p>
+                <p className="text-sm text-gray-500 mt-1 break-all">
+                  {user.email}
+                </p>
                 <div className="mt-3 inline-flex items-center gap-2 bg-red-50 text-[#B21F1F] px-3 py-1 rounded-full text-xs font-semibold">
                   {user.user_type}
                 </div>
@@ -166,22 +170,22 @@ export const ProfilePage = () => {
               {/* Navigation */}
               <nav className="p-4">
                 <button
-                  onClick={() => changeTab('profile')}
+                  onClick={() => changeTab("profile")}
                   className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-all mb-2 ${
-                    activeTab === 'profile'
-                      ? 'bg-red-50 text-[#B21F1F] font-semibold'
-                      : 'text-gray-700 hover:bg-gray-100'
+                    activeTab === "profile"
+                      ? "bg-red-50 text-[#B21F1F] font-semibold"
+                      : "text-gray-700 hover:bg-gray-100"
                   }`}
                 >
                   <FiSettings className="text-lg" />
                   <span>Mi Perfil</span>
                 </button>
                 <button
-                  onClick={() => changeTab('orders')}
+                  onClick={() => changeTab("orders")}
                   className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-all mb-2 ${
-                    activeTab === 'orders'
-                      ? 'bg-red-50 text-[#B21F1F] font-semibold'
-                      : 'text-gray-700 hover:bg-gray-100'
+                    activeTab === "orders"
+                      ? "bg-red-50 text-[#B21F1F] font-semibold"
+                      : "text-gray-700 hover:bg-gray-100"
                   }`}
                 >
                   <FiShoppingBag className="text-lg" />
@@ -193,11 +197,11 @@ export const ProfilePage = () => {
                   )}
                 </button>
                 <button
-                  onClick={() => changeTab('favorites')}
+                  onClick={() => changeTab("favorites")}
                   className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-all ${
-                    activeTab === 'favorites'
-                      ? 'bg-red-50 text-[#B21F1F] font-semibold'
-                      : 'text-gray-700 hover:bg-gray-100'
+                    activeTab === "favorites"
+                      ? "bg-red-50 text-[#B21F1F] font-semibold"
+                      : "text-gray-700 hover:bg-gray-100"
                   }`}
                 >
                   <FiHeart className="text-lg" />
@@ -212,19 +216,27 @@ export const ProfilePage = () => {
 
               {/* Stats */}
               <div className="p-4 border-t border-gray-200">
-                <p className="text-xs text-gray-500 uppercase font-semibold mb-3">Estadísticas</p>
+                <p className="text-xs text-gray-500 uppercase font-semibold mb-3">
+                  Estadísticas
+                </p>
                 <div className="space-y-2">
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-gray-600">Pedidos</span>
-                    <span className="text-sm font-bold text-gray-900">{orders.length}</span>
+                    <span className="text-sm font-bold text-gray-900">
+                      {orders.length}
+                    </span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-gray-600">Favoritos</span>
-                    <span className="text-sm font-bold text-gray-900">{favorites.length}</span>
+                    <span className="text-sm font-bold text-gray-900">
+                      {favorites.length}
+                    </span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-gray-600">Miembro desde</span>
-                    <span className="text-sm font-bold text-gray-900">{new Date(user.created_at).getFullYear()}</span>
+                    <span className="text-sm font-bold text-gray-900">
+                      {new Date(user.created_at).getFullYear()}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -233,13 +245,17 @@ export const ProfilePage = () => {
 
           {/* Main Content */}
           <div className="flex-1">
-            {activeTab === 'profile' && (
+            {activeTab === "profile" && (
               <Card>
                 <div className="p-6 border-b border-gray-200">
                   <div className="flex justify-between items-center">
                     <div>
-                      <h1 className="text-2xl font-bold text-gray-900">Información Personal</h1>
-                      <p className="text-sm text-gray-500 mt-1">Gestiona tu información de perfil</p>
+                      <h1 className="text-2xl font-bold text-gray-900">
+                        Información Personal
+                      </h1>
+                      <p className="text-sm text-gray-500 mt-1">
+                        Gestiona tu información de perfil
+                      </p>
                     </div>
                     {!isEditing && (
                       <Button
@@ -256,7 +272,8 @@ export const ProfilePage = () => {
                   {isEditing && (
                     <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 flex justify-between items-center">
                       <p className="text-sm text-blue-800">
-                        <strong>Modo de edición:</strong> Realiza cambios y guárdalos cuando termines.
+                        <strong>Modo de edición:</strong> Realiza cambios y
+                        guárdalos cuando termines.
                       </p>
                       <div className="flex gap-2">
                         <Button
@@ -285,8 +302,12 @@ export const ProfilePage = () => {
                           <FiMail className="text-[#B21F1F]" />
                           Correo Electrónico
                         </label>
-                        <p className="text-gray-500 bg-gray-100 px-4 py-3 rounded-lg">{user.email}</p>
-                        <p className="text-xs text-gray-400 mt-1">No se puede modificar</p>
+                        <p className="text-gray-500 bg-gray-100 px-4 py-3 rounded-lg">
+                          {user.email}
+                        </p>
+                        <p className="text-xs text-gray-400 mt-1">
+                          No se puede modificar
+                        </p>
                       </div>
 
                       {/* First Name */}
@@ -304,7 +325,9 @@ export const ProfilePage = () => {
                             placeholder="Tu nombre"
                           />
                         ) : (
-                          <p className="text-gray-900 bg-gray-50 px-4 py-3 rounded-lg">{user.first_name || 'No especificado'}</p>
+                          <p className="text-gray-900 bg-gray-50 px-4 py-3 rounded-lg">
+                            {user.first_name || "No especificado"}
+                          </p>
                         )}
                       </div>
 
@@ -323,7 +346,9 @@ export const ProfilePage = () => {
                             placeholder="Tu apellido"
                           />
                         ) : (
-                          <p className="text-gray-900 bg-gray-50 px-4 py-3 rounded-lg">{user.last_name || 'No especificado'}</p>
+                          <p className="text-gray-900 bg-gray-50 px-4 py-3 rounded-lg">
+                            {user.last_name || "No especificado"}
+                          </p>
                         )}
                       </div>
 
@@ -342,7 +367,9 @@ export const ProfilePage = () => {
                             placeholder="Tu número de teléfono"
                           />
                         ) : (
-                          <p className="text-gray-900 bg-gray-50 px-4 py-3 rounded-lg">{user.phone || 'No especificado'}</p>
+                          <p className="text-gray-900 bg-gray-50 px-4 py-3 rounded-lg">
+                            {user.phone || "No especificado"}
+                          </p>
                         )}
                       </div>
                     </div>
@@ -351,11 +378,15 @@ export const ProfilePage = () => {
               </Card>
             )}
 
-            {activeTab === 'orders' && (
+            {activeTab === "orders" && (
               <Card>
                 <div className="p-6 border-b border-gray-200">
-                  <h1 className="text-2xl font-bold text-gray-900">Mis Pedidos</h1>
-                  <p className="text-sm text-gray-500 mt-1">Rastrea tus pedidos y horarios de recogida</p>
+                  <h1 className="text-2xl font-bold text-gray-900">
+                    Mis Pedidos
+                  </h1>
+                  <p className="text-sm text-gray-500 mt-1">
+                    Rastrea tus pedidos y horarios de recogida
+                  </p>
                 </div>
                 <div className="p-6">
                   {ordersLoading ? (
@@ -363,9 +394,11 @@ export const ProfilePage = () => {
                   ) : orders.length === 0 ? (
                     <div className="text-center py-16 px-8">
                       <FiShoppingBag className="text-6xl text-gray-300 mx-auto mb-4" />
-                      <p className="text-gray-500 mb-4">No tienes pedidos todavía.</p>
-                      <Link 
-                        to="/listings" 
+                      <p className="text-gray-500 mb-4">
+                        No tienes pedidos todavía.
+                      </p>
+                      <Link
+                        to="/menu"
                         className="inline-block bg-[#B21F1F] text-white px-6 py-2 rounded-lg font-semibold hover:bg-[#8B1616] transition-all"
                       >
                         Explorar Alimentos
@@ -374,7 +407,11 @@ export const ProfilePage = () => {
                   ) : (
                     <div className="space-y-4">
                       {orders.map((order) => (
-                        <OrderCard key={order.id} order={order} onAction={handleOrderAction} />
+                        <OrderCard
+                          key={order.id}
+                          order={order}
+                          onAction={handleOrderAction}
+                        />
                       ))}
                     </div>
                   )}
@@ -382,11 +419,15 @@ export const ProfilePage = () => {
               </Card>
             )}
 
-            {activeTab === 'favorites' && (
+            {activeTab === "favorites" && (
               <Card>
                 <div className="p-6 border-b border-gray-200">
-                  <h1 className="text-2xl font-bold text-gray-900">Mis Favoritos</h1>
-                  <p className="text-sm text-gray-500 mt-1">Acceso rápido a tus lugares favoritos</p>
+                  <h1 className="text-2xl font-bold text-gray-900">
+                    Mis Favoritos
+                  </h1>
+                  <p className="text-sm text-gray-500 mt-1">
+                    Acceso rápido a tus lugares favoritos
+                  </p>
                 </div>
                 <div className="p-6">
                   {favoritesLoading ? (
@@ -394,9 +435,11 @@ export const ProfilePage = () => {
                   ) : favorites.length === 0 ? (
                     <div className="text-center py-16 px-8">
                       <FiHeart className="text-6xl text-gray-300 mx-auto mb-4" />
-                      <p className="text-gray-500 mb-4">No has agregado ningún favorito todavía.</p>
-                      <Link 
-                        to="/restaurants" 
+                      <p className="text-gray-500 mb-4">
+                        No has agregado ningún favorito todavía.
+                      </p>
+                      <Link
+                        to="/restaurants"
                         className="inline-block bg-[#B21F1F] text-white px-6 py-2 rounded-lg font-semibold hover:bg-[#8B1616] transition-all"
                       >
                         Explorar Restaurantes
@@ -405,13 +448,18 @@ export const ProfilePage = () => {
                   ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                       {favorites.map((favorite) => {
-                        console.log('Favorite item:', favorite);
-                        const restaurantData = favorite.restaurant_info || favorite.restaurant || favorite;
+                        console.log("Favorite item:", favorite);
+                        const restaurantData =
+                          favorite.restaurant_info ||
+                          favorite.restaurant ||
+                          favorite;
                         return (
-                          <RestaurantCard 
-                            key={favorite.id} 
+                          <RestaurantCard
+                            key={favorite.id}
                             restaurant={restaurantData}
-                            onRemoveFavorite={() => handleRemoveFavorite(favorite.id)}
+                            onRemoveFavorite={() =>
+                              handleRemoveFavorite(favorite.id)
+                            }
                             isFavorite={true}
                             compact={true}
                           />

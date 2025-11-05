@@ -56,12 +56,12 @@ export const RestaurantDetailPage = () => {
 
   if (!restaurant) {
     return (
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
-        <div className="text-6xl mb-4">🍽️</div>
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 text-center">
+        <div className="text-5xl mb-3">🍽️</div>
+        <h2 className="text-xl font-bold text-gray-900 mb-2">
           Restaurante no encontrado
         </h2>
-        <p className="text-gray-500 mb-6">
+        <p className="text-gray-600 text-sm mb-4">
           El restaurante que buscas no existe o ha sido eliminado
         </p>
       </div>
@@ -71,7 +71,7 @@ export const RestaurantDetailPage = () => {
   const openStatus = isOpenNow();
 
   return (
-    <div className="min-h-[calc(100vh-200px)]">
+    <div className="min-h-screen bg-gray-50">
       <RestaurantHeroBanner
         restaurant={restaurant}
         openStatus={openStatus}
@@ -81,8 +81,10 @@ export const RestaurantDetailPage = () => {
       />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <ContactInfoCard restaurant={restaurant} />
-        <OpeningHoursCard openingHours={openingHours} />
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+          <ContactInfoCard restaurant={restaurant} />
+          <OpeningHoursCard openingHours={openingHours} />
+        </div>
         <MenuItemsSection menuItems={menuItems} />
       </div>
     </div>

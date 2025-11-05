@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
-import { orderService } from '../services';
-import { OrderCard } from '../components/orders/OrderCard';
-import { Loading } from '../components/common';
+import { useState, useEffect } from "react";
+import { orderService } from "../services";
+import { OrderCard } from "../components/orders/OrderCard";
+import { Loading } from "../components/common";
 
 export const OrdersPage = () => {
   const [orders, setOrders] = useState([]);
@@ -17,7 +17,7 @@ export const OrdersPage = () => {
       const data = await orderService.getOrders();
       setOrders(data.results || data);
     } catch (error) {
-      console.error('Failed to fetch orders:', error);
+      console.error("Failed to fetch orders:", error);
     } finally {
       setLoading(false);
     }
@@ -25,13 +25,13 @@ export const OrdersPage = () => {
 
   const handleAction = async (action, orderId) => {
     try {
-      if (action === 'cancel') {
+      if (action === "cancel") {
         await orderService.cancelOrder(orderId);
         fetchOrders();
       }
     } catch (error) {
-      console.error('Failed to perform action:', error);
-      alert('Failed to perform action. Please try again.');
+      console.error("Failed to perform action:", error);
+      alert("Failed to perform action. Please try again.");
     }
   };
 
@@ -40,7 +40,9 @@ export const OrdersPage = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8 text-center">
           <h1 className="text-3xl font-bold mb-2">Mis Pedidos</h1>
-          <p className="text-gray-600">Rastrea tus pedidos y horarios de recogida</p>
+          <p className="text-gray-600">
+            Rastrea tus pedidos y horarios de recogida
+          </p>
         </div>
 
         {loading ? (
@@ -50,14 +52,17 @@ export const OrdersPage = () => {
             {orders.length === 0 ? (
               <div className="text-center py-16 px-8 text-gray-500">
                 <p>No has realizado ningún pedido todavía.</p>
-                <a href="/listings" className="inline-block mt-4 text-[#B21F1F] font-semibold hover:underline">
+                <a
+                  href="/menu"
+                  className="inline-block mt-4 text-[#B21F1F] font-semibold hover:underline"
+                >
                   Explora alimentos para comenzar
                 </a>
               </div>
             ) : (
               orders.map((order) => (
-                <OrderCard 
-                  key={order.id} 
+                <OrderCard
+                  key={order.id}
                   order={order}
                   onAction={handleAction}
                 />
