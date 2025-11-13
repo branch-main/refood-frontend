@@ -2,8 +2,6 @@ import { useNavigate } from "react-router-dom";
 import { Card } from "../common";
 import { formatDistance, formatRating } from "../../utils";
 import { FiMapPin, FiStar } from "react-icons/fi";
-import { useAsync } from "../../hooks";
-import { menuService, restaurantService } from "../../services";
 
 export const RestaurantCard = ({ restaurant, compact = false }) => {
   const navigate = useNavigate();
@@ -11,10 +9,6 @@ export const RestaurantCard = ({ restaurant, compact = false }) => {
   const getPlaceholderImage = () => {
     return `https://ui-avatars.com/api/?name=${encodeURIComponent(restaurant.name)}&size=400&background=f3f4f6&color=1f2937&bold=true`;
   };
-
-  const { value: stats } = useAsync(() => {
-    return restaurantService.getRestaurantStats(restaurant.id);
-  }, [restaurant.id]);
 
   return (
     <Card hover onClick={() => navigate(`/restaurants/${restaurant.id}`)}>
@@ -30,13 +24,6 @@ export const RestaurantCard = ({ restaurant, compact = false }) => {
               e.target.src = getPlaceholderImage();
             }}
           />
-          {restaurant.is_premium && (
-            <span
-              className={`absolute top-2 right-2 bg-gradient-to-br from-yellow-400 to-orange-500 text-white ${compact ? "px-2 py-1 text-xs" : "px-3 py-1.5 text-xs"} rounded-lg font-bold shadow-lg`}
-            >
-              ⭐ Premium
-            </span>
-          )}
         </div>
 
         <div
@@ -65,14 +52,14 @@ export const RestaurantCard = ({ restaurant, compact = false }) => {
             )}
           </div>
 
-          {!compact && stats && (
+          {!compact && restaurant.stats && (
             <div className="flex items-center gap-2 pt-3 border-t border-gray-200">
               <FiStar className="text-[#B21F1F] fill-[#B21F1F]" />
               <span className="text-[#B21F1F] font-bold text-base">
-                {formatRating(stats.rating)}
+                {formatRating(restaurant.stats.rating)}
               </span>
               <span className="text-gray-400 text-sm">
-                ({restaurant.total_reviews} reseñas)
+                ({restaurant.stats.total_reviews} reseñas)
               </span>
             </div>
           )}

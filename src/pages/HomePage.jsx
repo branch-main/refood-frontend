@@ -12,7 +12,6 @@ import {
   FiCheckCircle,
   FiGift,
   FiTrendingUp,
-  FiUsers,
   FiRefreshCw,
   FiHome,
 } from "react-icons/fi";

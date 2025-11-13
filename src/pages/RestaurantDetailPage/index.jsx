@@ -16,10 +16,6 @@ export const RestaurantDetailPage = () => {
     return restaurantService.getRestaurant(id);
   }, [id]);
 
-  const { value: openingHours } = useAsync(async () => {
-    return restaurantService.getRestaurantOpeningHours(id);
-  }, [id]);
-
   const { value: menuItems } = useAsync(async () => {
     return menuService.getRestaurantMenu(id);
   }, [id]);
@@ -33,8 +29,6 @@ export const RestaurantDetailPage = () => {
   };
 
   const isOpenNow = () => {
-    if (!openingHours || openingHours.length === 0) return null;
-
     const now = new Date();
     const currentDay = now.getDay();
     const currentTime = now.toLocaleTimeString("en-US", {
@@ -43,11 +37,13 @@ export const RestaurantDetailPage = () => {
       minute: "2-digit",
     });
 
-    const todayHours = openingHours.find((h) => h.day === currentDay);
+    const todayHours = restaurant.opening_hours.find(
+      (h) => h.day === currentDay,
+    );
     if (!todayHours) return false;
 
-    const openTime = todayHours.open_time.substring(0, 5);
-    const closeTime = todayHours.close_time.substring(0, 5);
+    const openTime = todayHours.opening_time.substring(0, 5);
+    const closeTime = todayHours.closing_time.substring(0, 5);
 
     return currentTime >= openTime && currentTime <= closeTime;
   };
@@ -83,7 +79,7 @@ export const RestaurantDetailPage = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
           <ContactInfoCard restaurant={restaurant} />
-          <OpeningHoursCard openingHours={openingHours} />
+          <OpeningHoursCard openingHours={restaurant.opening_hours} />
         </div>
         <MenuItemsSection menuItems={menuItems} />
       </div>

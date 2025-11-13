@@ -2,13 +2,13 @@ import { FiClock } from "react-icons/fi";
 
 const getDayName = (dayDisplay) => {
   const days = {
-    Monday: "Lunes",
-    Tuesday: "Martes",
-    Wednesday: "Miércoles",
-    Thursday: "Jueves",
-    Friday: "Viernes",
-    Saturday: "Sábado",
-    Sunday: "Domingo",
+    0: "Lunes",
+    1: "Martes",
+    2: "Miércoles",
+    3: "Jueves",
+    4: "Viernes",
+    5: "Sábado",
+    6: "Domingo",
   };
   return days[dayDisplay] || dayDisplay;
 };
@@ -34,20 +34,19 @@ export const OpeningHoursCard = ({ openingHours }) => {
               <div
                 key={hours.id}
                 className={`flex justify-between items-center py-2.5 px-3 rounded-lg transition-colors ${
-                  isToday
-                    ? "bg-[#B21F1F] text-white"
-                    : "hover:bg-gray-50"
+                  isToday ? "bg-[#B21F1F] text-white" : "hover:bg-gray-50"
                 }`}
               >
                 <span
                   className={`font-medium text-base ${isToday ? "text-white" : "text-gray-900"}`}
                 >
-                  {getDayName(hours.day_display)}
+                  {getDayName(hours.day)}
                 </span>
                 <span
                   className={`text-base font-medium ${isToday ? "text-white" : "text-gray-600"}`}
                 >
-                  {hours.open_time.substring(0, 5)} - {hours.close_time.substring(0, 5)}
+                  {hours.opening_time.substring(0, 5)} -{" "}
+                  {hours.closing_time.substring(0, 5)}
                 </span>
               </div>
             );
