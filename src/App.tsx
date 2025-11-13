@@ -1,3 +1,4 @@
+import { ReactNode } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuthContext } from "./contexts/AuthContext";
 import { Layout } from "./components/layout/Layout";
@@ -13,7 +14,7 @@ import { ProfilePage } from "./pages/ProfilePage";
 import { FavoritesPage } from "./pages/FavoritesPage";
 
 // Protected Route Component
-const ProtectedRoute = ({ children }) => {
+const ProtectedRoute = ({ children }: { children: ReactNode }) => {
   const { isAuthenticated, loading } = useAuthContext();
 
   if (loading) return <div>Loading...</div>;

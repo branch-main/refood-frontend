@@ -1,12 +1,11 @@
 import api from "./api";
+import { User, AuthResponse, RegisterData, ProfileData } from "../types";
 
 const authService = {
   /**
    * Register a new user
-   * @param {Object} userData - User registration data
-   * @returns {Promise} User object and token
    */
-  register: async (userData) => {
+  register: async (userData: RegisterData): Promise<AuthResponse> => {
     const response = await api.post("/auth/register/", userData);
     if (response.data.token) {
       localStorage.setItem("auth_token", response.data.token);
@@ -17,11 +16,8 @@ const authService = {
 
   /**
    * Login user
-   * @param {string} email - Email
-   * @param {string} password - Password
-   * @returns {Promise} User object and token
    */
-  login: async (email, password) => {
+  login: async (email: string, password: string): Promise<AuthResponse> => {
     const response = await api.post("/auth/login/", { email, password });
     if (response.data.token) {
       localStorage.setItem("auth_token", response.data.token);
@@ -32,9 +28,8 @@ const authService = {
 
   /**
    * Logout current user
-   * @returns {Promise}
    */
-  logout: async () => {
+  logout: async (): Promise<void> => {
     try {
       await api.post("/auth/logout/");
     } finally {
@@ -45,9 +40,8 @@ const authService = {
 
   /**
    * Get current authenticated user
-   * @returns {Promise} User object
    */
-  getCurrentUser: async () => {
+  getCurrentUser: async (): Promise<User> => {
     const response = await api.get("/auth/profile/");
     localStorage.setItem("user", JSON.stringify(response.data));
     return response.data;
@@ -55,10 +49,8 @@ const authService = {
 
   /**
    * Update user profile
-   * @param {Object} profileData - Profile data to update
-   * @returns {Promise} Updated user object
    */
-  updateProfile: async (profileData) => {
+  updateProfile: async (profileData: ProfileData): Promise<User> => {
     const response = await api.put("/auth/profile/", profileData);
     localStorage.setItem("user", JSON.stringify(response.data));
     return response.data;
@@ -66,26 +58,23 @@ const authService = {
 
   /**
    * Get stored token
-   * @returns {string|null} Token
    */
-  getToken: () => {
+  getToken: (): string | null => {
     return localStorage.getItem("auth_token");
   },
 
   /**
    * Get stored user
-   * @returns {Object|null} User object
    */
-  getStoredUser: () => {
+  getStoredUser: (): User | null => {
     const user = localStorage.getItem("user");
     return user ? JSON.parse(user) : null;
   },
 
   /**
    * Check if user is authenticated
-   * @returns {boolean}
    */
-  isAuthenticated: () => {
+  isAuthenticated: (): boolean => {
     return !!localStorage.getItem("auth_token");
   },
 };

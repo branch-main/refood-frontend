@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import { authService } from "../services";
+import { User, AuthResponse, RegisterData, ProfileData } from "../types";
 
 export const useAuth = () => {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 
   useEffect(() => {
     const checkAuth = () => {
@@ -21,21 +22,21 @@ export const useAuth = () => {
     checkAuth();
   }, []);
 
-  const login = async (email, password) => {
+  const login = async (email: string, password: string): Promise<AuthResponse> => {
     const response = await authService.login(email, password);
     setUser(response.user);
     setIsAuthenticated(true);
     return response;
   };
 
-  const register = async (userData) => {
+  const register = async (userData: RegisterData): Promise<AuthResponse> => {
     const response = await authService.register(userData);
     setUser(response.user);
     setIsAuthenticated(true);
     return response;
   };
 
-  const logout = async () => {
+  const logout = async (): Promise<void> => {
     try {
       await authService.logout();
       setUser(null);
@@ -46,13 +47,13 @@ export const useAuth = () => {
     }
   };
 
-  const refreshUser = async () => {
+  const refreshUser = async (): Promise<User> => {
     const updatedUser = await authService.getCurrentUser();
     setUser(updatedUser);
     return updatedUser;
   };
 
-  const updateUser = async (profileData) => {
+  const updateUser = async (profileData: ProfileData): Promise<User> => {
     const updatedUser = await authService.updateProfile(profileData);
     setUser(updatedUser);
     return updatedUser;

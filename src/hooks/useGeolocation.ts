@@ -1,12 +1,17 @@
 import { useState, useEffect } from 'react';
 
+interface Location {
+  lat: number;
+  lng: number;
+}
+
 /**
  * Custom hook for getting user's geolocation
  */
 export const useGeolocation = () => {
-  const [location, setLocation] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [location, setLocation] = useState<Location | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!navigator.geolocation) {
