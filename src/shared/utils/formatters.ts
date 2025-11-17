@@ -90,6 +90,23 @@ export const formatTime = (time: string): string => {
 };
 
 /**
+ * Format time in 24-hour format without AM/PM
+ * @param {string} time - Time in HH:MM:SS format in UTC (e.g., "09:00:00")
+ * @returns {string} Formatted time in 24-hour format (e.g., "04:00")
+ */
+export const formatTime24 = (time: string): string => {
+  if (!time) return "";
+  const [h, m, s] = time.split(":").map(Number);
+  const date = new Date();
+  date.setUTCHours(h!, m, s);
+  return date.toLocaleTimeString("en-US", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
+};
+
+/**
  * Get relative time (e.g., "2 hours ago")
  * @param {string|Date} date - Date to format
  * @returns {string} Relative time string
