@@ -10,7 +10,7 @@ export const RestaurantPreview = ({
   return (
     <Link
       to={`/restaurants/${restaurant.id}`}
-      className="flex flex-col items-center"
+      className="flex flex-col items-center transition-transform duration-300 hover:scale-110"
     >
       <img
         src={getFallbackImage(restaurant.name, restaurant.logo)}
