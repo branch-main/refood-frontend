@@ -7,7 +7,7 @@ export const RestaurantMap = ({ restaurant }: { restaurant: Restaurant }) => {
       : `https://www.google.com/maps?q=${encodeURIComponent(restaurant.address)}&output=embed`;
 
   return (
-    <div className="bg-white rounded-xl p-8 h-full flex flex-col">
+    <div className="bg-white shadow-xs rounded-xl p-8 h-full flex flex-col">
       <h2 className="text-xl font-bold text-gray-800 mb-2">
         ¿Dónde comprar en {restaurant.name}?
       </h2>

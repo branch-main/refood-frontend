@@ -13,7 +13,7 @@ export const MenuItem = ({ item }: { item: MenuItemDomain }) => {
   return (
     <Link
       to={`/menu/${item.id}`}
-      className="transition-color duration-500 bg-white p-4 rounded-lg hover:bg-red-50"
+      className="transition-color duration-500 bg-white p-4 shadow-xs rounded-lg hover:bg-red-50"
     >
       <div className="flex flex-col">
         <div className="flex justify-between gap-4 w-full">

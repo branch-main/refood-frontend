@@ -47,7 +47,7 @@ export const Restaurant = () => {
   return (
     <div className="min-h-screen bg-neutral-50 flex-col">
       <div className="flex mb-8">
-        <div className="bg-white hidden md:block rounded-br-xl overflow-clip w-72 sticky top-14 h-fit">
+        <div className="bg-white hidden md:block shadow-xs rounded-br-xl overflow-clip w-72 sticky top-14 h-fit">
           <RestaurantDetail restaurant={restaurant} />
           <RestaurantConcat restaurant={restaurant} />
           <RestaurantSchedule restaurant={restaurant} />
