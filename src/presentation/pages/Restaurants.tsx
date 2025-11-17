@@ -64,7 +64,7 @@ export const Restaurants = () => {
         </div>
       </div>
 
-      <div className="mx-auto px-4 sm:px-6 lg:px-4 flex flex-col gap-4">
+      <div className="mx-auto px-6 md:px-4 flex flex-col gap-4">
         <div className="flex flex-col justify-between md:flex-row items-end md:items-center px-4 md:px-8 gap-8 md:gap-16">
           <div className="w-full md:max-w-1/2">
             <SearchBar

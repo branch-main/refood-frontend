@@ -13,7 +13,7 @@ export const RestaurantConcat = ({
       </h3>
 
       <div className="space-y-3">
-        <div className="flex gap-3">
+        <div className="flex gap-3 items-center">
           <div className="shrink-0 pt-0.5">
             <FiMapPin className="text-base text-red-500" />
           </div>
@@ -29,7 +29,7 @@ export const RestaurantConcat = ({
           </div>
         </div>
 
-        <div className="flex gap-3">
+        <div className="flex gap-3 items-center">
           <div className="shrink-0 pt-0.5">
             <FiPhone className="text-base text-red-500" />
           </div>
@@ -41,7 +41,7 @@ export const RestaurantConcat = ({
           </a>
         </div>
 
-        <div className="flex gap-3">
+        <div className="flex gap-3 items-center">
           <div className="shrink-0 pt-0.5">
             <FiMail className="text-base text-red-500" />
           </div>

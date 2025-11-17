@@ -1,10 +1,9 @@
 import { useParams } from "react-router-dom";
 import { useAsync } from "../hooks";
-import { PageSkeleton } from "../components/common/PageSkeleton";
 import { RestaurantDetail } from "../components/restaurants/RestaurantDetail";
 import { RestaurantConcat } from "../components/restaurants/RestaurantContact";
 import { RestaurantSchedule } from "../components/restaurants/RestaurantSchedule";
-import { MenuItemsSection } from "../components/restaurants/MenuItemsSection";
+import { RestaurantMenu } from "../components/restaurants/RestaurantMenu";
 import { GetRestaurantUseCase } from "../../application/restaurants/getRestaurant";
 import { GetRestaurantMenuUseCase } from "../../application/menu/getRestaurantMenu";
 import { container } from "../../container";
@@ -45,16 +44,28 @@ export const Restaurant = () => {
 
   return (
     <div className="min-h-screen bg-neutral-50 flex">
-      <div className="hidden lg:flex lg:flex-col lg:w-72 bg-white border-r border-gray-200 overflow-y-auto">
+      <div className="hidden md:block w-72 bg-white border-r border-gray-200 overflow-y-auto">
         <RestaurantDetail restaurant={restaurant} />
         <RestaurantConcat restaurant={restaurant} />
         <RestaurantSchedule restaurant={restaurant} />
       </div>
-
-      <div className="flex-1">
-        <div className="mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <MenuItemsSection menuItems={menu} />
-        </div>
+      <div className="flex flex-col flex-1 gap-4 mx-8 my-4">
+        <RestaurantMenu
+          menu={(menu && [...menu, ...menu, ...menu, ...menu]) || []}
+          category="Comida criolla"
+        />
+        <RestaurantMenu
+          menu={(menu && [...menu, ...menu, ...menu, ...menu]) || []}
+          category="Ceviche"
+        />
+        <RestaurantMenu
+          menu={(menu && [...menu, ...menu, ...menu, ...menu]) || []}
+          category="Bebidas"
+        />
+        <RestaurantMenu
+          menu={(menu && [...menu, ...menu, ...menu, ...menu]) || []}
+          category="Hamburguesas"
+        />
       </div>
     </div>
   );
