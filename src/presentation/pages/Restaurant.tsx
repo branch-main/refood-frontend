@@ -44,7 +44,7 @@ export const Restaurant = () => {
 
   return (
     <div className="min-h-screen bg-neutral-50 flex">
-      <div className="hidden md:block w-72 bg-white border-r border-gray-200 overflow-y-auto">
+      <div className="hidden md:block w-72 bg-white border-r border-gray-200 sticky top-16 h-[calc(100vh-64px)] overflow-y-auto z-10">
         <RestaurantDetail restaurant={restaurant} />
         <RestaurantConcat restaurant={restaurant} />
         <RestaurantSchedule restaurant={restaurant} />
