@@ -1,15 +1,25 @@
 import { useMemo, useState } from "react";
 import { useAsync } from "../hooks";
 import { RestaurantList } from "../components/restaurants/RestaurantList";
-import { ApiRestaurantRepository } from "../../infrastructure/repositories/ApiRestaurantRepository";
-import { apiClient } from "../../infrastructure/api/axios.config";
+import { SearchBar } from "../components/common/SearchBar";
 import { GetRestaurantsUseCase } from "../../application/restaurants/getRestaurants";
-import { Input, Loading } from "../components/common";
+import { Select } from "../components/common/Select";
 import { Restaurant } from "../../domain/entities/Restaurant";
 import { useDebounced } from "../hooks";
+import { RestaurantPreview } from "../components/restaurants/RestaurantPreview";
+import { container } from "../../container";
 
-const restaurantRepository = new ApiRestaurantRepository(apiClient);
-const getRestaurants = new GetRestaurantsUseCase(restaurantRepository);
+const SORT_OPTIONS = [
+  { value: "relevance", label: "Relevancia" },
+  { value: "featured", label: "Promociones" },
+  { value: "rating", label: "Calificación" },
+  { value: "delivery_time", label: "Tiempo de Entrega" },
+  { value: "delivery_cost", label: "Costo de Envío" },
+];
+
+const getRestaurants = new GetRestaurantsUseCase(
+  container.resolve("RestaurantRepository"),
+);
 
 function filterRestaurants(restaurants: Restaurant[], search: string) {
   const searchLower = search.toLowerCase();
@@ -24,9 +34,10 @@ function filterRestaurants(restaurants: Restaurant[], search: string) {
 
 export const Restaurants = () => {
   const [search, setSearch] = useState("");
+  const [sortBy, setSortBy] = useState("Relevancia");
   const debouncedSearch = useDebounced(search, 300);
 
-  const { loading, value: restaurants } = useAsync(
+  const { value: restaurants } = useAsync(
     async () => getRestaurants.execute(),
     [],
   );
@@ -36,26 +47,50 @@ export const Restaurants = () => {
     return filterRestaurants(restaurants, debouncedSearch);
   }, [restaurants, debouncedSearch]);
 
+  const trending = restaurants ? [...restaurants, ...restaurants] : [];
+
   return (
     <div className="py-8 bg-neutral-50">
-      <div className="mx-auto px-4 sm:px-6 lg:px-4">
-        <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold mb-2">Restaurantes Asociados</h1>
-          <p className="text-gray-600">
-            Descubre restaurantes combatiendo el desperdicio de alimentos en tu
-            área
-          </p>
+      <div className="mx-auto px-4 sm:px-6 lg:px-4 flex flex-col gap-4">
+        <div className="flex flex-col justify-between md:flex-row items-end md:items-center px-4 md:px-8 gap-8 md:gap-16">
+          <div className="w-full md:max-w-1/2">
+            <SearchBar
+              placeholder="Buscar restaurantes..."
+              value={search}
+              onChange={setSearch}
+            />
+          </div>
+
+          <div className="flex items-center gap-4">
+            <span className="text-gray-800 text-sm font-bold whitespace-nowrap">
+              Ordenar por:
+            </span>
+            <Select
+              options={SORT_OPTIONS}
+              value={sortBy}
+              onChange={setSortBy}
+            />
+          </div>
         </div>
 
-        <Input
-          type="text"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Buscar restaurantes..."
-        />
+        {trending.length > 0 && (
+          <>
+            <h1 className="text-2xl font-bold text-gray-800 mt-4">
+              ¡Los {trending?.length} más elegidos!
+            </h1>
+            <div className="flex gap-8 overflow-x-auto py-4">
+              {trending.map((restaurant) => (
+                <RestaurantPreview restaurant={restaurant} />
+              ))}
+            </div>
+          </>
+        )}
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-8 mt-8">
-          {loading && <Loading />}
+        <h1 className="text-2xl font-bold text-gray-800">
+          Restaurantes encontrados {filtered ? `(${filtered.length})` : ""}
+        </h1>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-8">
           {filtered && <RestaurantList restaurants={filtered} />}
         </div>
       </div>

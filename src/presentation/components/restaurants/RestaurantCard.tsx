@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import {
   formatPrice,
   formatRating,
@@ -9,12 +9,10 @@ import { BsFillStarFill } from "react-icons/bs";
 import { RiMotorbikeFill, RiTimeLine } from "react-icons/ri";
 
 export const RestaurantCard = ({ restaurant }: { restaurant: Restaurant }) => {
-  const navigate = useNavigate();
-
   return (
-    <div
-      className="transition-transform duration-300 cursor-pointer hover:scale-105"
-      onClick={() => navigate(`/restaurants/${restaurant.id}`)}
+    <Link
+      to={`/restaurants/${restaurant.id}`}
+      className="transition-transform duration-300 hover:scale-105"
     >
       <div className="flex flex-col h-full">
         <img
@@ -58,6 +56,6 @@ export const RestaurantCard = ({ restaurant }: { restaurant: Restaurant }) => {
           </div>
         </div>
       </div>
-    </div>
+    </Link>
   );
 };
