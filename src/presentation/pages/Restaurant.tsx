@@ -4,6 +4,8 @@ import { RestaurantDetail } from "../components/restaurants/RestaurantDetail";
 import { RestaurantConcat } from "../components/restaurants/RestaurantContact";
 import { RestaurantSchedule } from "../components/restaurants/RestaurantSchedule";
 import { RestaurantMenu } from "../components/restaurants/RestaurantMenu";
+import { RestaurantMap } from "../components/restaurants/RestaurantMap";
+import { RestaurantReviews } from "../components/restaurants/RestaurantReviews";
 import { GetRestaurantUseCase } from "../../application/restaurants/getRestaurant";
 import { GetRestaurantMenuUseCase } from "../../application/menu/getRestaurantMenu";
 import { container } from "../../container";
@@ -44,8 +46,8 @@ export const Restaurant = () => {
 
   return (
     <div className="min-h-screen bg-neutral-50 flex-col">
-      <div className="flex">
-        <div className="bg-white border-r border-b border-gray-200 hidden md:block w-72 sticky top-14 h-fit">
+      <div className="flex mb-8">
+        <div className="bg-white hidden md:block rounded-br-xl overflow-clip w-72 sticky top-14 h-fit">
           <RestaurantDetail restaurant={restaurant} />
           <RestaurantConcat restaurant={restaurant} />
           <RestaurantSchedule restaurant={restaurant} />
@@ -69,7 +71,14 @@ export const Restaurant = () => {
           />
         </div>
       </div>
-      a
+      <div className="flex flex-col-reverse md:flex-row gap-8 mx-8 mb-8">
+        <div className="flex-1">
+          <RestaurantReviews restaurant={restaurant} />
+        </div>
+        <div className="w-full md:w-4/7">
+          <RestaurantMap restaurant={restaurant} />
+        </div>
+      </div>
     </div>
   );
 };

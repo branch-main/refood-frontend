@@ -27,7 +27,7 @@ export const RestaurantMenu = ({
           </div>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-4">
           {menu.map((item) => (
             <MenuItem key={item.id} item={item} />
           ))}
