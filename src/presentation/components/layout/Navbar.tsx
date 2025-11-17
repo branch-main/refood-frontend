@@ -64,9 +64,9 @@ export const Navbar = () => {
   }, []);
 
   return (
-    <nav className="bg-white/95 backdrop-blur-md sticky top-0 z-1000 border-b border-gray-200">
+    <nav className="bg-white/95 h-14 backdrop-blur-md sticky top-0 z-1000 border-b border-gray-200">
       <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+        <div className="flex justify-between items-center h-14">
           {/* Logo */}
           <Link
             to="/"

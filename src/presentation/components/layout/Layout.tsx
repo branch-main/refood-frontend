@@ -1,7 +1,8 @@
 import { Navbar } from "./Navbar";
 import { Footer } from "./Footer";
+import { ReactNode } from "react";
 
-export const Layout = ({ children }) => {
+export const Layout = ({ children }: { children?: ReactNode }) => {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
