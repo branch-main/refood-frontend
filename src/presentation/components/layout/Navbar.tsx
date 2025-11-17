@@ -64,16 +64,16 @@ export const Navbar = () => {
   }, []);
 
   return (
-    <nav className="bg-white/95 backdrop-blur-md shadow-sm sticky top-0 z-1000 border-b border-gray-200">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <nav className="bg-white/95 backdrop-blur-md sticky top-0 z-1000 border-b border-gray-200">
+      <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link
             to="/"
-            className="flex items-center gap-2 text-2xl font-extrabold text-[#B21F1F] no-underline transition-all duration-200 hover:scale-105"
+            className="flex items-center gap-2 no-underline transition-all duration-200 hover:scale-105"
             onClick={() => setIsMobileMenuOpen(false)}
           >
-            <span className="tracking-tight">ReFood</span>
+            <img src="/logo.png" alt="ReFood" className="h-10 w-auto" />
           </Link>
 
           {/* Mobile menu button */}

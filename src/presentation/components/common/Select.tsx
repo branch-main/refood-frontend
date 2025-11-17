@@ -39,7 +39,7 @@ export const Select = ({
         onClick={() => setIsOpen(!isOpen)}
         className={`flex gap-3 items-center justify-between px-3 py-2 rounded-lg transition-all w-48 bg-white border ${
           isOpen
-            ? "border-red-400 text-red-400"
+            ? "border-red-500 text-red-500"
             : "border-gray-300 text-gray-500"
         }`}
       >
@@ -60,7 +60,7 @@ export const Select = ({
           {options.map((option) => (
             <label
               key={option.value}
-              className="flex items-center px-4 py-2.5 hover:bg-red-50 text-sm text-gray-800 hover:text-red-400 cursor-pointer transition-colors"
+              className="flex items-center px-4 py-2.5 hover:bg-red-50 text-sm text-gray-800 hover:text-red-500 cursor-pointer transition-colors"
             >
               <input
                 type="radio"
@@ -71,7 +71,7 @@ export const Select = ({
                   onChange(e.target.value);
                   setIsOpen(false);
                 }}
-                className="mr-3 cursor-pointer accent-red-400"
+                className="mr-3 cursor-pointer accent-red-500"
               />
               {option.label}
             </label>
