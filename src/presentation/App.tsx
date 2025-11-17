@@ -2,16 +2,16 @@ import { ReactNode } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuthContext } from "./context/AuthContext";
 import { Layout } from "./components/layout/Layout";
-import { HomePage } from "./pages/HomePage";
-import { LoginPage } from "./pages/LoginPage";
-import { RegisterPage } from "./pages/RegisterPage";
-import { MenuItemsPage } from "./pages/MenuItemsPage";
-import { MenuItemDetailPage } from "./pages/MenuItemDetailPage";
-import { RestaurantsPage } from "./pages/RestaurantsPage";
-import { RestaurantDetailPage } from "./pages/RestaurantDetailPage";
-import { OrdersPage } from "./pages/OrdersPage";
-import { ProfilePage } from "./pages/ProfilePage";
-import { FavoritesPage } from "./pages/FavoritesPage";
+import { Home } from "./pages/Home";
+import { Login } from "./pages/Login";
+import { Register } from "./pages/Register";
+import { MenuItems } from "./pages/MenuItems";
+import { MenuItemDetail } from "./pages/MenuItemDetail";
+import { Restaurants } from "./pages/Restaurants";
+import { RestaurantDetail } from "./pages/RestaurantDetail";
+import { Orders } from "./pages/Orders";
+import { Profile } from "./pages/Profile";
+import { Favorites } from "./pages/Favorites";
 
 const ProtectedRoute = ({ children }: { children: ReactNode }) => {
   const { loading, user } = useAuthContext();
@@ -22,19 +22,19 @@ const ProtectedRoute = ({ children }: { children: ReactNode }) => {
 const AppRoutes = () => {
   return (
     <Routes>
-      <Route path="/" element={<HomePage />} />
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/register" element={<RegisterPage />} />
-      <Route path="/menu" element={<MenuItemsPage />} />
-      <Route path="/menu/:id" element={<MenuItemDetailPage />} />
-      <Route path="/restaurants" element={<RestaurantsPage />} />
-      <Route path="/restaurants/:id" element={<RestaurantDetailPage />} />
+      <Route path="/" element={<Home />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+      <Route path="/menu" element={<MenuItems />} />
+      <Route path="/menu/:id" element={<MenuItemDetail />} />
+      <Route path="/restaurants" element={<Restaurants />} />
+      <Route path="/restaurants/:id" element={<RestaurantDetail />} />
 
       <Route
         path="/orders"
         element={
           <ProtectedRoute>
-            <OrdersPage />
+            <Orders />
           </ProtectedRoute>
         }
       />
@@ -42,7 +42,7 @@ const AppRoutes = () => {
         path="/profile"
         element={
           <ProtectedRoute>
-            <ProfilePage />
+            <Profile />
           </ProtectedRoute>
         }
       />
@@ -50,7 +50,7 @@ const AppRoutes = () => {
         path="/favorites"
         element={
           <ProtectedRoute>
-            <FavoritesPage />
+            <Favorites />
           </ProtectedRoute>
         }
       />

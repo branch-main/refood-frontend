@@ -1,12 +1,12 @@
 import { useState, useMemo } from "react";
-import { FeaturedCarousel } from "./FeaturedCarousel";
-import { MenuItemsGrid } from "./MenuItemsGrid";
-import { Input, Loading } from "../../components/common";
-import { useAsync, useDebounced } from "../../hooks";
-import { GetMenuItemsUseCase } from "../../../application/menu/getMenuItems";
-import { container } from "../../../container";
-import { MenuItemRepository } from "../../../domain/repositories/MenuItemRepository";
-import { MenuItem } from "../../../domain/entities/MenuItem";
+import { FeaturedCarousel } from "../components/menu/FeaturedCarousel";
+import { MenuItemsGrid } from "../components/menu/MenuItemsGrid";
+import { Input, Loading } from "../components/common";
+import { useAsync, useDebounced } from "../hooks";
+import { GetMenuItemsUseCase } from "../../application/menu/getMenuItems";
+import { container } from "../../container";
+import { MenuItemRepository } from "../../domain/repositories/MenuItemRepository";
+import { MenuItem } from "../../domain/entities/MenuItem";
 
 const getMenuItems = new GetMenuItemsUseCase(
   container.resolve<MenuItemRepository>("MenuItemRepository"),
@@ -24,7 +24,7 @@ function filterMenuItems(items: MenuItem[], search: string): MenuItem[] {
   });
 }
 
-export const MenuItemsPage = () => {
+export const MenuItems = () => {
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounced(search, 300);
 

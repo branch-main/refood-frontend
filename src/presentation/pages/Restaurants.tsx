@@ -22,7 +22,7 @@ function filterRestaurants(restaurants: Restaurant[], search: string) {
   });
 }
 
-export const RestaurantsPage = () => {
+export const Restaurants = () => {
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounced(search, 300);
 
@@ -37,8 +37,8 @@ export const RestaurantsPage = () => {
   }, [restaurants, debouncedSearch]);
 
   return (
-    <div className="py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="py-8 bg-neutral-50">
+      <div className="mx-auto px-4 sm:px-6 lg:px-4">
         <div className="mb-8 text-center">
           <h1 className="text-3xl font-bold mb-2">Restaurantes Asociados</h1>
           <p className="text-gray-600">
@@ -54,7 +54,7 @@ export const RestaurantsPage = () => {
           placeholder="Buscar restaurantes..."
         />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-8 mt-8">
           {loading && <Loading />}
           {filtered && <RestaurantList restaurants={filtered} />}
         </div>

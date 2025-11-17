@@ -1,20 +1,25 @@
 import { useState } from "react";
 import { useParams } from "react-router-dom";
-import { menuService } from "../../services";
-import { Loading } from "../../components/common";
-import { useAsync } from "../../hooks";
-import { RestaurantHeroBanner } from "./RestaurantHeroBanner";
-import { ContactInfoCard } from "./ContactInfoCard";
-import { OpeningHoursCard } from "./OpeningHoursCard";
-import { MenuItemsSection } from "./MenuItemsSection";
-import { ApiRestaurantRepository } from "../../../infrastructure/repositories/ApiRestaurantRepository";
-import { apiClient } from "../../../infrastructure/api/axios.config";
-import { GetRestaurantUseCase } from "../../../application/restaurants/getRestaurant";
+import { Loading } from "../components/common";
+import { useAsync } from "../hooks";
+import { RestaurantHeroBanner } from "../components/restaurants/RestaurantHeroBanner";
+import { ContactInfoCard } from "../components/restaurants/ContactInfoCard";
+import { OpeningHoursCard } from "../components/restaurants/OpeningHoursCard";
+import { MenuItemsSection } from "../components/restaurants/MenuItemsSection";
+import { GetRestaurantUseCase } from "../../application/restaurants/getRestaurant";
+import { GetRestaurantMenuUseCase } from "../../application/menu/getRestaurantMenu";
+import { container } from "../../container";
+import { RestaurantRepository } from "../../domain/repositories/RestaurantRepository";
+import { MenuItemRepository } from "../../domain/repositories/MenuItemRepository";
 
-const restaurantRepository = new ApiRestaurantRepository(apiClient);
-const getRestaurant = new GetRestaurantUseCase(restaurantRepository);
+const getRestaurant = new GetRestaurantUseCase(
+  container.resolve<RestaurantRepository>("RestaurantRepository"),
+);
+const getRestaurantMenu = new GetRestaurantMenuUseCase(
+  container.resolve<MenuItemRepository>("MenuItemRepository"),
+);
 
-export const RestaurantDetailPage = () => {
+export const RestaurantDetail = () => {
   const { id } = useParams();
   const [isFavorite, setIsFavorite] = useState(false);
 
@@ -23,7 +28,7 @@ export const RestaurantDetailPage = () => {
   }, [id]);
 
   const { value: menuItems } = useAsync(async () => {
-    return menuService.getRestaurantMenu(id);
+    return getRestaurantMenu.execute(Number(id));
   }, [id]);
 
   const handleToggleFavorite = async () => {

@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuthContext } from "../../context/AuthContext";
-import { Button } from "../../components/common";
-import { AuthBrandingSide, FormInput, ErrorAlert } from "../../components/auth";
+import { useAuthContext } from "../context/AuthContext";
+import { Button } from "../components/common";
+import { AuthBrandingSide, FormInput, ErrorAlert } from "../components/auth";
 import { FiMail, FiLock } from "react-icons/fi";
 
 const LOGIN_FEATURES = [
@@ -20,7 +20,7 @@ const LOGIN_FEATURES = [
   },
 ];
 
-export const LoginPage = () => {
+export const Login = () => {
   const [formData, setFormData] = useState({
     email: "",
     password: "",

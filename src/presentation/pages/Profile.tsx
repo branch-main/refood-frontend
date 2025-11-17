@@ -2,10 +2,14 @@ import { useState, useEffect } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { useAuthContext } from "../context/AuthContext";
 import { Card, Button, Input, Loading } from "../components/common";
-import { formatDate } from "../../../shared/utils";
-import { orderService, favoriteService } from "../services";
+import { GetOrdersUseCase, CancelOrderUseCase } from "../../application/orders";
+import { GetFavoritesUseCase, RemoveFavoriteUseCase } from "../../application/favorites";
+import { container } from "../../container";
+import { OrderRepository } from "../../domain/repositories/OrderRepository";
+import { FavoriteRepository } from "../../domain/repositories/FavoriteRepository";
+import { Order } from "../../domain/entities/Order";
+import { Favorite } from "../../domain/entities/Favorite";
 import { OrderCard } from "../components/orders/OrderCard";
-import { RestaurantCard } from "../components/restaurants/RestaurantCard";
 import {
   FiMail,
   FiEdit3,
@@ -17,7 +21,20 @@ import {
   FiSettings,
 } from "react-icons/fi";
 
-export const ProfilePage = () => {
+const getOrders = new GetOrdersUseCase(
+  container.resolve<OrderRepository>("OrderRepository"),
+);
+const cancelOrder = new CancelOrderUseCase(
+  container.resolve<OrderRepository>("OrderRepository"),
+);
+const getFavorites = new GetFavoritesUseCase(
+  container.resolve<FavoriteRepository>("FavoriteRepository"),
+);
+const removeFavorite = new RemoveFavoriteUseCase(
+  container.resolve<FavoriteRepository>("FavoriteRepository"),
+);
+
+export const Profile = () => {
   const { user, updateUser } = useAuthContext();
   const [searchParams, setSearchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState(
@@ -25,13 +42,13 @@ export const ProfilePage = () => {
   );
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [orders, setOrders] = useState([]);
-  const [favorites, setFavorites] = useState([]);
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [favorites, setFavorites] = useState<Favorite[]>([]);
   const [ordersLoading, setOrdersLoading] = useState(false);
   const [favoritesLoading, setFavoritesLoading] = useState(false);
   const [formData, setFormData] = useState({
-    first_name: user?.first_name || "",
-    last_name: user?.last_name || "",
+    first_name: user?.firstName || "",
+    last_name: user?.lastName || "",
     phone: user?.phone || "",
     email: user?.email || "",
   });
@@ -39,8 +56,6 @@ export const ProfilePage = () => {
   useEffect(() => {
     const tab = searchParams.get("tab") || "profile";
     setActiveTab(tab);
-
-    // Always fetch orders and favorites count for stats
     fetchOrders();
     fetchFavorites();
   }, [searchParams]);
@@ -48,10 +63,11 @@ export const ProfilePage = () => {
   const fetchOrders = async () => {
     try {
       setOrdersLoading(true);
-      const data = await orderService.getOrders();
-      setOrders(data.results || data);
+      const data = await getOrders.execute();
+      setOrders(data);
     } catch (error) {
       console.error("Failed to fetch orders:", error);
+      setOrders([]);
     } finally {
       setOrdersLoading(false);
     }
@@ -60,9 +76,8 @@ export const ProfilePage = () => {
   const fetchFavorites = async () => {
     try {
       setFavoritesLoading(true);
-      const data = await favoriteService.getFavorites();
-      console.log("Favorites data:", data);
-      setFavorites(data.results || data);
+      const data = await getFavorites.execute();
+      setFavorites(data);
     } catch (error) {
       console.error("Failed to fetch favorites:", error);
       setFavorites([]);
@@ -71,19 +86,19 @@ export const ProfilePage = () => {
     }
   };
 
-  const handleRemoveFavorite = async (favoriteId) => {
+  const handleRemoveFavorite = async (favoriteId: number) => {
     try {
-      await favoriteService.removeFavorite(favoriteId);
+      await removeFavorite.execute(favoriteId);
       setFavorites(favorites.filter((fav) => fav.id !== favoriteId));
     } catch (error) {
       console.error("Failed to remove favorite:", error);
     }
   };
 
-  const handleOrderAction = async (action, orderId) => {
+  const handleOrderAction = async (action: string, orderId: number) => {
     try {
       if (action === "cancel") {
-        await orderService.cancelOrder(orderId);
+        await cancelOrder.execute(orderId);
         fetchOrders();
       }
     } catch (error) {
@@ -94,14 +109,14 @@ export const ProfilePage = () => {
 
   if (!user) return null;
 
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
     });
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     try {
@@ -117,24 +132,24 @@ export const ProfilePage = () => {
 
   const handleCancel = () => {
     setFormData({
-      first_name: user.first_name || "",
-      last_name: user.last_name || "",
+      first_name: user.firstName || "",
+      last_name: user.lastName || "",
       phone: user.phone || "",
       email: user.email || "",
     });
     setIsEditing(false);
   };
 
-  const changeTab = (tab) => {
+  const changeTab = (tab: string) => {
     setSearchParams({ tab });
   };
 
   const getUserInitials = () => {
-    if (user?.first_name && user?.last_name) {
-      return `${user.first_name[0]}${user.last_name[0]}`.toUpperCase();
+    if (user?.firstName && user?.lastName) {
+      return `${user.firstName[0]}${user.lastName[0]}`.toUpperCase();
     }
-    if (user?.first_name) {
-      return user.first_name.substring(0, 2).toUpperCase();
+    if (user?.firstName) {
+      return user.firstName.substring(0, 2).toUpperCase();
     }
     if (user?.email) {
       return user.email.substring(0, 2).toUpperCase();
@@ -155,16 +170,13 @@ export const ProfilePage = () => {
                   {getUserInitials()}
                 </div>
                 <h2 className="text-xl font-bold text-gray-900">
-                  {user.first_name && user.last_name
-                    ? `${user.first_name} ${user.last_name}`
+                  {user.firstName && user.lastName
+                    ? `${user.firstName} ${user.lastName}`
                     : user.email.split("@")[0]}
                 </h2>
                 <p className="text-sm text-gray-500 mt-1 break-all">
                   {user.email}
                 </p>
-                <div className="mt-3 inline-flex items-center gap-2 bg-red-50 text-[#B21F1F] px-3 py-1 rounded-full text-xs font-semibold">
-                  {user.user_type}
-                </div>
               </div>
 
               {/* Navigation */}
@@ -235,7 +247,7 @@ export const ProfilePage = () => {
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-gray-600">Miembro desde</span>
                     <span className="text-sm font-bold text-gray-900">
-                      {new Date(user.created_at).getFullYear()}
+                      {new Date(user.createdAt || "").getFullYear()}
                     </span>
                   </div>
                 </div>
@@ -260,7 +272,8 @@ export const ProfilePage = () => {
                     {!isEditing && (
                       <Button
                         onClick={() => setIsEditing(true)}
-                        className="bg-[#B21F1F] !text-white hover:!bg-[#8B1616] !px-6 !py-2.5 !rounded-lg"
+                        variant="primary"
+                        size="medium"
                       >
                         <FiEdit3 className="inline mr-2" /> Editar
                       </Button>
@@ -279,14 +292,15 @@ export const ProfilePage = () => {
                         <Button
                           onClick={handleCancel}
                           variant="outline"
-                          className="!px-5 !py-2 !rounded-lg"
+                          size="small"
                         >
                           <FiX className="inline mr-1" /> Cancelar
                         </Button>
                         <Button
                           onClick={handleSubmit}
                           loading={loading}
-                          className="bg-green-600 !text-white hover:!bg-green-700 !px-5 !py-2 !rounded-lg"
+                          variant="primary"
+                          size="small"
                         >
                           <FiSave className="inline mr-1" /> Guardar
                         </Button>
@@ -296,7 +310,6 @@ export const ProfilePage = () => {
 
                   <form onSubmit={handleSubmit}>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      {/* Email */}
                       <div className="md:col-span-2">
                         <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2">
                           <FiMail className="text-[#B21F1F]" />
@@ -310,7 +323,6 @@ export const ProfilePage = () => {
                         </p>
                       </div>
 
-                      {/* First Name */}
                       <div>
                         <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2">
                           <FiEdit3 className="text-[#B21F1F]" />
@@ -326,12 +338,11 @@ export const ProfilePage = () => {
                           />
                         ) : (
                           <p className="text-gray-900 bg-gray-50 px-4 py-3 rounded-lg">
-                            {user.first_name || "No especificado"}
+                            {user.firstName || "No especificado"}
                           </p>
                         )}
                       </div>
 
-                      {/* Last Name */}
                       <div>
                         <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2">
                           <FiEdit3 className="text-[#B21F1F]" />
@@ -347,12 +358,11 @@ export const ProfilePage = () => {
                           />
                         ) : (
                           <p className="text-gray-900 bg-gray-50 px-4 py-3 rounded-lg">
-                            {user.last_name || "No especificado"}
+                            {user.lastName || "No especificado"}
                           </p>
                         )}
                       </div>
 
-                      {/* Phone */}
                       <div className="md:col-span-2">
                         <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2">
                           <FiPhone className="text-[#B21F1F]" />
@@ -447,24 +457,25 @@ export const ProfilePage = () => {
                     </div>
                   ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {favorites.map((favorite) => {
-                        console.log("Favorite item:", favorite);
-                        const restaurantData =
-                          favorite.restaurant_info ||
-                          favorite.restaurant ||
-                          favorite;
-                        return (
-                          <RestaurantCard
-                            key={favorite.id}
-                            restaurant={restaurantData}
-                            onRemoveFavorite={() =>
-                              handleRemoveFavorite(favorite.id)
-                            }
-                            isFavorite={true}
-                            compact={true}
-                          />
-                        );
-                      })}
+                      {favorites.map((favorite) => (
+                        <div
+                          key={favorite.id}
+                          className="bg-white rounded-lg border border-gray-200 p-4"
+                        >
+                          <h3 className="text-lg font-bold mb-2">
+                            {favorite.restaurantName}
+                          </h3>
+                          <p className="text-gray-600 text-sm mb-4">
+                            {favorite.restaurantDescription}
+                          </p>
+                          <button
+                            onClick={() => handleRemoveFavorite(favorite.id)}
+                            className="w-full bg-red-50 text-red-600 px-4 py-2 rounded-lg font-semibold hover:bg-red-100 transition-colors"
+                          >
+                            Remover de Favoritos
+                          </button>
+                        </div>
+                      ))}
                     </div>
                   )}
                 </div>

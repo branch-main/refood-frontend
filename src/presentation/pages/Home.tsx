@@ -16,7 +16,7 @@ import {
   FiHome,
 } from "react-icons/fi";
 
-export const HomePage = () => {
+export const Home = () => {
   const navigate = useNavigate();
 
   return (

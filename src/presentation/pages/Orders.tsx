@@ -1,10 +1,20 @@
 import { useState, useEffect } from "react";
-import { orderService } from "../services";
+import { GetOrdersUseCase, CancelOrderUseCase } from "../../application/orders";
+import { container } from "../../container";
+import { OrderRepository } from "../../domain/repositories/OrderRepository";
+import { Order } from "../../domain/entities/Order";
 import { OrderCard } from "../components/orders/OrderCard";
 import { Loading } from "../components/common";
 
-export const OrdersPage = () => {
-  const [orders, setOrders] = useState([]);
+const getOrders = new GetOrdersUseCase(
+  container.resolve<OrderRepository>("OrderRepository"),
+);
+const cancelOrder = new CancelOrderUseCase(
+  container.resolve<OrderRepository>("OrderRepository"),
+);
+
+export const Orders = () => {
+  const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -14,19 +24,20 @@ export const OrdersPage = () => {
   const fetchOrders = async () => {
     try {
       setLoading(true);
-      const data = await orderService.getOrders();
-      setOrders(data.results || data);
+      const data = await getOrders.execute();
+      setOrders(data);
     } catch (error) {
       console.error("Failed to fetch orders:", error);
+      setOrders([]);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleAction = async (action, orderId) => {
+  const handleAction = async (action: string, orderId: number) => {
     try {
       if (action === "cancel") {
-        await orderService.cancelOrder(orderId);
+        await cancelOrder.execute(orderId);
         fetchOrders();
       }
     } catch (error) {

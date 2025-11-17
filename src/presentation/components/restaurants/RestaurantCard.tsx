@@ -1,76 +1,63 @@
 import { useNavigate } from "react-router-dom";
-import { Card } from "../common";
-import { formatDistance, formatRating } from "../../../shared/utils";
-import { FiMapPin, FiStar } from "react-icons/fi";
+import {
+  formatPrice,
+  formatRating,
+  getFallbackImage,
+} from "../../../shared/utils";
 import { Restaurant } from "../../../domain/entities/Restaurant";
+import { BsFillStarFill } from "react-icons/bs";
+import { RiMotorbikeFill, RiTimeLine } from "react-icons/ri";
 
-interface RestaurantCardProps {
-  restaurant: Restaurant;
-  compact?: boolean;
-}
-
-export const RestaurantCard = ({
-  restaurant,
-  compact = false,
-}: RestaurantCardProps) => {
+export const RestaurantCard = ({ restaurant }: { restaurant: Restaurant }) => {
   const navigate = useNavigate();
 
-  const getPlaceholderImage = () => {
-    return `https://ui-avatars.com/api/?name=${encodeURIComponent(restaurant.name)}&size=400&background=f3f4f6&color=1f2937&bold=true`;
-  };
-
-  const logoUrl = restaurant.logo || getPlaceholderImage();
-
   return (
-    <Card hover onClick={() => navigate(`/restaurants/${restaurant.id}`)}>
+    <div
+      className="transition-transform duration-300 cursor-pointer hover:scale-105"
+      onClick={() => navigate(`/restaurants/${restaurant.id}`)}
+    >
       <div className="flex flex-col h-full">
-        <div
-          className={`relative w-full ${compact ? "h-32" : "h-48"} rounded-t-xl overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200`}
-        >
-          <img
-            src={logoUrl}
-            alt={restaurant.name}
-            className="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
-          />
-        </div>
+        <img
+          src={getFallbackImage(restaurant.name, restaurant.banner)}
+          alt={restaurant.name}
+          className="aspect-video object-cover rounded-lg"
+        />
 
-        <div
-          className={`flex-1 flex flex-col gap-2 ${compact ? "p-3" : "p-4"}`}
-        >
-          <h3
-            className={`${compact ? "text-base" : "text-xl"} font-bold text-gray-900 m-0 leading-tight`}
-          >
-            {restaurant.name}
-          </h3>
-          {!compact && (
-            <p className="text-gray-600 text-sm m-0 leading-relaxed overflow-hidden text-ellipsis line-clamp-2">
-              {restaurant.description}
-            </p>
-          )}
-          <div
-            className={`flex flex-col ${compact ? "gap-1" : "gap-2"} text-gray-500 ${compact ? "text-xs" : "text-sm"} mt-auto`}
-          >
-            <span className="flex items-center gap-1.5 truncate">
-              <FiMapPin className="flex-shrink-0" /> {restaurant.address}
-            </span>
-            <span className="text-[#B21F1F] font-semibold">
-              {formatDistance(1)} de distancia
+        <div className="flex justify-between items-center">
+          <div className="flex items-center gap-2 pt-2">
+            <div className="flex flex-1 gap-2">
+              <img
+                src={getFallbackImage(restaurant.name, restaurant.logo)}
+                alt={restaurant.name}
+                className="w-8 h-8 rounded-full object-cover ml-1"
+              />
+
+              <div className="flex-1 text-gray-800 text-xs">
+                <h3 className="text-base font-bold line-clamp-1">
+                  {restaurant.name}
+                </h3>
+                <div className="flex items-center gap-2">
+                  <span className="flex items-center gap-1">
+                    <RiTimeLine className="w-3 h-3 fill-gray-500" />
+                    5-10 min
+                  </span>
+                  <span className="text-gray-500">•</span>
+                  <span className="flex items-center gap-1">
+                    <RiMotorbikeFill className="w-3 h-3 fill-gray-500" />
+                    {formatPrice(1.9)}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="flex items-center rounded-lg gap-1 px-2 py-1 bg-amber-100">
+            <BsFillStarFill className="fill-amber-500 w-3 h-3" />
+            <span className="font-bold text-xs text-gray-800">
+              {formatRating(restaurant.stats.rating)}
             </span>
           </div>
-
-          {!compact && restaurant.stats && (
-            <div className="flex items-center gap-2 pt-3 border-t border-gray-200">
-              <FiStar className="text-[#B21F1F] fill-[#B21F1F]" />
-              <span className="text-[#B21F1F] font-bold text-base">
-                {formatRating(restaurant.stats.rating)}
-              </span>
-              <span className="text-gray-400 text-sm">
-                ({restaurant.stats.totalReviews} reseñas)
-              </span>
-            </div>
-          )}
         </div>
       </div>
-    </Card>
+    </div>
   );
 };

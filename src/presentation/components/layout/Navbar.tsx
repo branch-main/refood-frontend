@@ -111,10 +111,18 @@ export const Navbar = () => {
 
             {!user ? (
               <div className="flex items-center gap-2 ml-3">
-                <Button variant="outline" size="small" onClick={() => navigate("/login")}>
+                <Button
+                  variant="outline"
+                  size="small"
+                  onClick={() => navigate("/login")}
+                >
                   Iniciar Sesión
                 </Button>
-                <Button variant="primary" size="small" onClick={() => navigate("/register")}>
+                <Button
+                  variant="primary"
+                  size="small"
+                  onClick={() => navigate("/register")}
+                >
                   Registrarse
                 </Button>
               </div>
@@ -315,10 +323,24 @@ export const Navbar = () => {
                 </>
               ) : (
                 <div className="flex flex-col gap-2 pt-4 mt-2 border-t border-gray-200">
-                  <Button variant="outline" fullWidth onClick={() => { navigate("/login"); setIsMobileMenuOpen(false); }}>
+                  <Button
+                    variant="outline"
+                    fullWidth
+                    onClick={() => {
+                      navigate("/login");
+                      setIsMobileMenuOpen(false);
+                    }}
+                  >
                     Iniciar Sesión
                   </Button>
-                  <Button variant="primary" fullWidth onClick={() => { navigate("/register"); setIsMobileMenuOpen(false); }}>
+                  <Button
+                    variant="primary"
+                    fullWidth
+                    onClick={() => {
+                      navigate("/register");
+                      setIsMobileMenuOpen(false);
+                    }}
+                  >
                     Registrarse
                   </Button>
                 </div>

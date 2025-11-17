@@ -1,19 +1,19 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { Loading } from "../../components/common";
+import { Loading } from "../components/common";
 import { FiArrowLeft } from "react-icons/fi";
-import { useAsync } from "../../hooks";
-import { ItemImage } from "./ItemImage";
-import { ItemHeader } from "./ItemHeader";
-import { ItemInfo } from "./ItemInfo";
-import { OrderSection } from "./OrderSection";
-import { GetMenuItemUseCase } from "../../../application/menu/getMenuItem";
-import { container } from "../../../container";
+import { useAsync } from "../hooks";
+import { ItemImage } from "../components/menu/ItemImage";
+import { ItemHeader } from "../components/menu/ItemHeader";
+import { ItemInfo } from "../components/menu/ItemInfo";
+import { OrderSection } from "../components/menu/OrderSection";
+import { GetMenuItemUseCase } from "../../application/menu/getMenuItem";
+import { container } from "../../container";
 
 const getMenuItem = new GetMenuItemUseCase(
   container.resolve("MenuItemRepository"),
 );
 
-export const MenuItemDetailPage = () => {
+export const MenuItemDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -22,8 +22,8 @@ export const MenuItemDetailPage = () => {
     [id],
   );
 
-  const handleOrder = (quantity) => {
-    console.log("Ordering:", quantity, "of item:", item.id);
+  const handleOrder = (quantity: number) => {
+    console.log("Ordering:", quantity, "of item:", item?.id);
   };
 
   const getPlaceholderImage = () => {

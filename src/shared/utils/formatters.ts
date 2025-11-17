@@ -135,12 +135,12 @@ export const formatPhone = (phone) => {
 };
 
 /**
- * Format rating to one decimal place
+ * Format rating to one decimal place (no decimals for whole numbers)
  * @param {number|string} rating - Rating value
  * @returns {string} Formatted rating
  */
 export const formatRating = (rating) => {
   const num = parseFloat(rating);
-  if (isNaN(num)) return "0.0";
-  return num.toFixed(1);
+  if (isNaN(num)) return "0";
+  return num % 1 === 0 ? num.toString() : num.toFixed(1);
 };

@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuthContext } from "../../context/AuthContext";
-import { Button } from "../../components/common";
-import { AuthBrandingSide, FormInput, FormSelect, ErrorAlert } from "../../components/auth";
-import { USER_TYPES } from "../../../shared/utils";
+import { useAuthContext } from "../context/AuthContext";
+import { Button } from "../components/common";
+import { AuthBrandingSide, FormInput, FormSelect, ErrorAlert } from "../components/auth";
+import { USER_TYPES } from "../../shared/utils";
 import { FiMail, FiLock, FiPhone, FiUser } from "react-icons/fi";
 
 const REGISTER_FEATURES = [
@@ -21,7 +21,7 @@ const REGISTER_FEATURES = [
   },
 ];
 
-export const RegisterPage = () => {
+export const Register = () => {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
