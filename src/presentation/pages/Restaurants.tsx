@@ -8,6 +8,7 @@ import { Restaurant } from "../../domain/entities/Restaurant";
 import { useDebounced } from "../hooks";
 import { RestaurantPreview } from "../components/restaurants/RestaurantPreview";
 import { container } from "../../container";
+import { IoMdHome } from "react-icons/io";
 
 const SORT_OPTIONS = [
   { value: "relevance", label: "Relevancia" },
@@ -34,7 +35,7 @@ function filterRestaurants(restaurants: Restaurant[], search: string) {
 
 export const Restaurants = () => {
   const [search, setSearch] = useState("");
-  const [sortBy, setSortBy] = useState("Relevancia");
+  const [sortBy, setSortBy] = useState("relevance");
   const debouncedSearch = useDebounced(search, 300);
 
   const { value: restaurants } = useAsync(
@@ -50,7 +51,19 @@ export const Restaurants = () => {
   const trending = restaurants ? [...restaurants, ...restaurants] : [];
 
   return (
-    <div className="py-8 bg-neutral-50">
+    <div className="pb-8 bg-neutral-50">
+      <div className="flex flex-col bg-red-50 w-full mb-8 px-4 pt-2 pb-4 gap-1">
+        <span className="text-red-500 font-bold text-lg">
+          Restaurantes cerca de mí
+        </span>
+        <div className="flex items-center gap-2 text-xs text-gray-800">
+          <IoMdHome className="w-4 h-4" />
+          <span>ReFood</span>
+          <span>•</span>
+          <span>Restaurantes cerca de mí</span>
+        </div>
+      </div>
+
       <div className="mx-auto px-4 sm:px-6 lg:px-4 flex flex-col gap-4">
         <div className="flex flex-col justify-between md:flex-row items-end md:items-center px-4 md:px-8 gap-8 md:gap-16">
           <div className="w-full md:max-w-1/2">
