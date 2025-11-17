@@ -74,15 +74,18 @@ export const formatDateTime = (datetime) => {
 
 /**
  * Format time to readable string
- * @param {string|Date} time - Time to format
- * @returns {string} Formatted time
+ * @param {string} time - Time in HH:MM:SS format in UTC (e.g., "09:00:00")
+ * @returns {string} Formatted time in local timezone (e.g., "9:00 AM")
  */
-export const formatTime = (time) => {
+export const formatTime = (time: string): string => {
   if (!time) return "";
-  const d = new Date(time);
-  return d.toLocaleTimeString("en-US", {
-    hour: "2-digit",
+  const [h, m, s] = time.split(":").map(Number);
+  const date = new Date();
+  date.setUTCHours(h!, m, s);
+  return date.toLocaleTimeString("en-US", {
+    hour: "numeric",
     minute: "2-digit",
+    hour12: true,
   });
 };
 

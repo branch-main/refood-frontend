@@ -7,52 +7,58 @@ interface OpeningHoursCardProps {
 
 const getDayName = (day: DayOfWeek) => {
   const days = {
-    0: "Lunes",
-    1: "Martes",
-    2: "Miércoles",
-    3: "Jueves",
-    4: "Viernes",
-    5: "Sábado",
-    6: "Domingo",
+    0: "Lun",
+    1: "Mar",
+    2: "Mié",
+    3: "Jue",
+    4: "Vie",
+    5: "Sáb",
+    6: "Dom",
   };
   return days[day];
 };
 
 export const OpeningHoursCard = ({ openingHours }: OpeningHoursCardProps) => {
   return (
-    <div className="bg-white border border-gray-200 rounded-lg shadow-sm h-full">
-      <div className="p-6">
-        <h2 className="text-xl font-bold text-gray-900 mb-5 flex items-center gap-2">
-          <FiClock className="text-xl text-[#B21F1F]" />
-          Horario de Apertura
-        </h2>
-        <div className="space-y-2">
-          {openingHours.map((hours) => {
-            const today = new Date().getDay();
-            const isToday = hours.day === today;
+    <div className="bg-white rounded-lg border border-gray-200 p-4">
+      <div className="flex items-center gap-2 mb-3">
+        <FiClock className="text-base text-[#B21F1F]" />
+        <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wide">
+          Horario
+        </h3>
+      </div>
 
-            return (
-              <div
-                key={hours.day}
-                className={`flex justify-between items-center py-2.5 px-3 rounded-lg transition-colors ${
-                  isToday ? "bg-[#B21F1F] text-white" : "hover:bg-gray-50"
+      <div className="space-y-2">
+        {openingHours.map((hours) => {
+          const today = new Date().getDay();
+          const isToday = hours.day === today;
+
+          return (
+            <div
+              key={hours.day}
+              className={`flex justify-between items-center px-2.5 py-2 rounded-md text-xs transition-colors ${
+                isToday
+                  ? "bg-red-50 border border-red-200"
+                  : "hover:bg-gray-50"
+              }`}
+            >
+              <span
+                className={`font-medium ${
+                  isToday ? "text-[#B21F1F]" : "text-gray-700"
                 }`}
               >
-                <span
-                  className={`font-medium text-base ${isToday ? "text-white" : "text-gray-900"}`}
-                >
-                  {getDayName(hours.day)}
-                </span>
-                <span
-                  className={`text-base font-medium ${isToday ? "text-white" : "text-gray-600"}`}
-                >
-                  {hours.openingTime.substring(0, 5)} -{" "}
-                  {hours.closingTime.substring(0, 5)}
-                </span>
-              </div>
-            );
-          })}
-        </div>
+                {getDayName(hours.day)}
+              </span>
+              <span
+                className={`font-medium ${
+                  isToday ? "text-[#B21F1F]" : "text-gray-600"
+                }`}
+              >
+                {hours.openingTime.substring(0, 5)} - {hours.closingTime.substring(0, 5)}
+              </span>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

@@ -8,7 +8,7 @@ import { Register } from "./pages/Register";
 import { MenuItems } from "./pages/MenuItems";
 import { MenuItemDetail } from "./pages/MenuItemDetail";
 import { Restaurants } from "./pages/Restaurants";
-import { RestaurantDetail } from "./pages/RestaurantDetail";
+import { Restaurant } from "./pages/Restaurant";
 import { Orders } from "./pages/Orders";
 import { Profile } from "./pages/Profile";
 import { Favorites } from "./pages/Favorites";
@@ -28,7 +28,7 @@ const AppRoutes = () => {
       <Route path="/menu" element={<MenuItems />} />
       <Route path="/menu/:id" element={<MenuItemDetail />} />
       <Route path="/restaurants" element={<Restaurants />} />
-      <Route path="/restaurants/:id" element={<RestaurantDetail />} />
+      <Route path="/restaurants/:id" element={<Restaurant />} />
 
       <Route
         path="/orders"

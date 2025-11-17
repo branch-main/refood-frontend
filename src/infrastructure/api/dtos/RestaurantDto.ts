@@ -28,6 +28,8 @@ export type RestaurantResponse = {
     opening_time: string;
     closing_time: string;
   }[];
+  is_open: boolean;
+  next_opening_time: string;
   created_at: string | null;
   updated_at: string | null;
 };
@@ -67,6 +69,8 @@ export function toRestaurant(dto: RestaurantResponse): Restaurant {
     dto.opening_hours.map(
       (oh) => new OpeningHours(oh.day, oh.opening_time, oh.closing_time),
     ),
+    dto.is_open,
+    dto.next_opening_time,
     dto.created_at,
     dto.updated_at,
   );

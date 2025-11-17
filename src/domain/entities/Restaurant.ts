@@ -11,8 +11,8 @@ export enum DayOfWeek {
 export class OpeningHours {
   constructor(
     public day: DayOfWeek = DayOfWeek.MONDAY,
-    public openingTime: string = "00:00",
-    public closingTime: string = "00:00",
+    public openingTime: string = "00:00:00",
+    public closingTime: string = "00:00:00",
   ) {}
 }
 
@@ -41,6 +41,8 @@ export class Restaurant {
     public isActive: boolean,
     public stats: RestaurantStats,
     public openingHours: OpeningHours[],
+    public isOpen: boolean,
+    public nextOpeningTime: string,
     public createdAt: string | null,
     public updatedAt: string | null,
   ) {}
