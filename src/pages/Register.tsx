@@ -8,7 +8,6 @@ import {
   FormSelect,
   ErrorAlert,
 } from "../features/auth/components";
-import { USER_TYPES } from "../shared/utils";
 import { FiMail, FiLock, FiPhone, FiUser } from "react-icons/fi";
 
 const REGISTER_FEATURES = [
@@ -31,7 +30,6 @@ export const Register = () => {
     email: "",
     password: "",
     password_confirm: "",
-    user_type: USER_TYPES.CONSUMER,
     first_name: "",
     last_name: "",
     phone: "",
@@ -135,18 +133,6 @@ export const Register = () => {
                 placeholder="Confirma tu contraseña"
                 required
               />
-
-              <FormSelect
-                label="Tipo de Cuenta"
-                name="user_type"
-                value={formData.user_type}
-                onChange={handleChange}
-                required
-              >
-                <option value={USER_TYPES.CONSUMER}>Consumidor</option>
-                <option value={USER_TYPES.RESTAURANT}>Restaurante</option>
-                <option value={USER_TYPES.NGO}>ONG/Banco de Alimentos</option>
-              </FormSelect>
 
               <div className="grid grid-cols-2 gap-4">
                 <FormInput

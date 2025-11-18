@@ -1,15 +1,14 @@
 /**
- * Utility functions for formatting data
- */
-
-/**
  * Format price with currency symbol
- * @param {number|string} price - Price value
+ * @param {number} price - Price value
  * @param {string} currency - Currency symbol
  * @returns {string} Formatted price
  */
-export const formatPrice = (price, currency = "S/ ") => {
-  const numPrice = parseFloat(price);
+export const formatPrice = (
+  price: number,
+  currency: string = "S/ ",
+): string => {
+  const numPrice = parseFloat(price.toString());
   if (isNaN(numPrice)) return `${currency}0.00`;
   return `${currency}${numPrice.toFixed(2)}`;
 };
@@ -20,9 +19,12 @@ export const formatPrice = (price, currency = "S/ ") => {
  * @param {number} discounted - Discounted price
  * @returns {number} Discount percentage
  */
-export const calculateDiscount = (original, discounted) => {
-  const originalPrice = parseFloat(original);
-  const discountedPrice = parseFloat(discounted);
+export const calculateDiscount = (
+  original: number,
+  discounted: number,
+): number => {
+  const originalPrice = parseFloat(original.toString());
+  const discountedPrice = parseFloat(discounted.toString());
   if (isNaN(originalPrice) || isNaN(discountedPrice) || originalPrice === 0)
     return 0;
   return Math.round(((originalPrice - discountedPrice) / originalPrice) * 100);
@@ -33,8 +35,8 @@ export const calculateDiscount = (original, discounted) => {
  * @param {number} distance - Distance in km
  * @returns {string} Formatted distance
  */
-export const formatDistance = (distance) => {
-  const dist = parseFloat(distance);
+export const formatDistance = (distance: number): string => {
+  const dist = parseFloat(distance.toString());
   if (isNaN(dist)) return "N/A";
   if (dist < 1) return `${Math.round(dist * 1000)}m`;
   return `${dist.toFixed(1)}km`;
@@ -45,30 +47,13 @@ export const formatDistance = (distance) => {
  * @param {string|Date} date - Date to format
  * @returns {string} Formatted date
  */
-export const formatDate = (date) => {
+export const formatDate = (date: string | Date): string => {
   if (!date) return "";
   const d = new Date(date);
   return d.toLocaleDateString("en-US", {
     year: "numeric",
     month: "short",
     day: "numeric",
-  });
-};
-
-/**
- * Format datetime to readable string
- * @param {string|Date} datetime - Datetime to format
- * @returns {string} Formatted datetime
- */
-export const formatDateTime = (datetime) => {
-  if (!datetime) return "";
-  const d = new Date(datetime);
-  return d.toLocaleString("en-US", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
   });
 };
 
@@ -111,7 +96,7 @@ export const formatTime24 = (time: string): string => {
  * @param {string|Date} date - Date to format
  * @returns {string} Relative time string
  */
-export const getRelativeTime = (date) => {
+export const getRelativeTime = (date: string | Date): string => {
   if (!date) return "";
   const d = new Date(date);
   const now = new Date();
@@ -130,37 +115,12 @@ export const getRelativeTime = (date) => {
 };
 
 /**
- * Truncate text to specified length
- * @param {string} text - Text to truncate
- * @param {number} length - Maximum length
- * @returns {string} Truncated text
- */
-export const truncateText = (text, length = 100) => {
-  if (!text || text.length <= length) return text;
-  return `${text.substring(0, length)}...`;
-};
-
-/**
- * Format phone number
- * @param {string} phone - Phone number
- * @returns {string} Formatted phone number
- */
-export const formatPhone = (phone) => {
-  if (!phone) return "";
-  const cleaned = phone.replace(/\D/g, "");
-  if (cleaned.length === 10) {
-    return `(${cleaned.slice(0, 3)}) ${cleaned.slice(3, 6)}-${cleaned.slice(6)}`;
-  }
-  return phone;
-};
-
-/**
  * Format rating to one decimal place (no decimals for whole numbers)
- * @param {number|string} rating - Rating value
+ * @param {number} rating - Rating value
  * @returns {string} Formatted rating
  */
-export const formatRating = (rating) => {
-  const num = parseFloat(rating);
+export const formatRating = (rating: number): string => {
+  const num = parseFloat(rating.toString());
   if (isNaN(num)) return "0";
   return num % 1 === 0 ? num.toString() : num.toFixed(1);
 };
