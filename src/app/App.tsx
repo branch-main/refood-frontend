@@ -1,5 +1,10 @@
-import { ReactNode } from "react";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import {
+  createBrowserRouter,
+  RouterProvider,
+  Navigate,
+  Outlet,
+  ScrollRestoration,
+} from "react-router-dom";
 import { useAuth } from "@/features/auth/hooks";
 import { Layout } from "@/shared/components/layout";
 import {
@@ -15,49 +20,48 @@ import {
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AuthProvider } from "@/features/auth/contexts";
 
-const ProtectedRoute = ({ children }: { children: ReactNode }) => {
+const ProtectedRoute = () => {
   const { user, loading } = useAuth();
   if (loading) return <div>Loading...</div>;
-  return user ? children : <Navigate to="/login" />;
+  return user ? <Outlet /> : <Navigate to="/login" replace />;
 };
 
-const AppRoutes = () => {
+const RootLayout = () => {
   return (
-    <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
-      <Route path="/menu" element={<MenuItems />} />
-      <Route path="/menu/:id" element={<MenuItemPage />} />
-      <Route path="/restaurants" element={<Restaurants />} />
-      <Route path="/restaurants/:id" element={<Restaurant />} />
-
-      <Route
-        path="/profile"
-        element={
-          <ProtectedRoute>
-            <Profile />
-          </ProtectedRoute>
-        }
-      />
-    </Routes>
+    <AuthProvider>
+      <Layout>
+        <Outlet />
+        <ScrollRestoration />
+      </Layout>
+    </AuthProvider>
   );
 };
+
+const router = createBrowserRouter([
+  {
+    element: <RootLayout />,
+    children: [
+      { path: "/", element: <Home /> },
+      { path: "/login", element: <Login /> },
+      { path: "/register", element: <Register /> },
+      { path: "/menu", element: <MenuItems /> },
+      { path: "/menu/:id", element: <MenuItemPage /> },
+      { path: "/restaurants", element: <Restaurants /> },
+      { path: "/restaurants/:id", element: <Restaurant /> },
+      {
+        element: <ProtectedRoute />,
+        children: [{ path: "/profile", element: <Profile /> }],
+      },
+    ],
+  },
+]);
 
 const queryClient = new QueryClient();
 
-function App() {
-  return (
-    <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <AuthProvider>
-          <Layout>
-            <AppRoutes />
-          </Layout>
-        </AuthProvider>
-      </BrowserRouter>
-    </QueryClientProvider>
-  );
-}
+export const App = () => (
+  <QueryClientProvider client={queryClient}>
+    <RouterProvider router={router} />
+  </QueryClientProvider>
+);
 
 export default App;

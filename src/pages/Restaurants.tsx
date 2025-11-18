@@ -1,7 +1,5 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { SearchBar, Select } from "@/shared/components/common";
-import { Restaurant } from "@/entities";
-import { useDebounced } from "@/shared/hooks";
 import {
   RestaurantPreview,
   RestaurantList,
@@ -18,32 +16,15 @@ const SORT_OPTIONS = [
   { value: "delivery_cost", label: "Costo de Envío" },
 ];
 
-function filterRestaurants(restaurants: Restaurant[], search: string) {
-  const searchLower = search.toLowerCase();
-  return restaurants.filter((restaurant) => {
-    return (
-      restaurant.name.toLowerCase().includes(searchLower) ||
-      restaurant.address.toLowerCase().includes(searchLower) ||
-      restaurant.description.toLowerCase().includes(searchLower)
-    );
-  });
-}
-
 export const Restaurants = () => {
   const [search, setSearch] = useState("");
   const [sortBy, setSortBy] = useState("relevance");
-  const debouncedSearch = useDebounced(search, 300);
 
   const { isLoading: restaurantsLoading, data: restaurants } = useRestaurants();
   const { isLoading: trendingLoading, data: trending } = useRestaurants();
 
-  const filtered = useMemo(() => {
-    if (!restaurants) return null;
-    return filterRestaurants(restaurants, debouncedSearch);
-  }, [restaurants, debouncedSearch]);
-
   return (
-    <div className="pb-8 bg-neutral-50">
+    <div className="pb-8">
       <div className="flex flex-col bg-red-50 w-full mb-8 px-4 pt-2 pb-4 gap-1">
         <span className="text-red-500 font-bold text-lg">
           Restaurantes cerca de mí
@@ -92,14 +73,16 @@ export const Restaurants = () => {
 
         <h1 className="text-2xl font-bold text-gray-800">
           {restaurantsLoading && <Skeleton className="w-48 h-8 rounded-lg" />}
-          {filtered && <span>Todos los restaurantes ({filtered.length})</span>}
+          {restaurants && (
+            <span>Todos los restaurantes ({restaurants.length})</span>
+          )}
         </h1>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-8">
           {restaurantsLoading && (
-            <Skeleton count={10} className="w-full h-48 rounded-lg" />
+            <Skeleton count={12} className="w-full h-48 rounded-lg" />
           )}
-          {filtered && <RestaurantList restaurants={filtered} />}
+          {restaurants && <RestaurantList restaurants={restaurants} />}
         </div>
       </div>
     </div>

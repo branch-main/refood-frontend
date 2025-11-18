@@ -22,6 +22,12 @@ export const RestaurantMenu = ({
         {menu?.map((item) => (
           <MenuItem key={item.id} item={item} />
         ))}
+        {menu?.map((item) => (
+          <MenuItem key={item.id * 10} item={item} />
+        ))}
+        {menu?.map((item) => (
+          <MenuItem key={item.id * 100} item={item} />
+        ))}
       </div>
     </div>
   );
