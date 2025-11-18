@@ -3,6 +3,7 @@ import { formatPrice, formatRating, getFallbackImage } from "@/shared/utils";
 import { Restaurant } from "@/entities";
 import { BsFillStarFill } from "react-icons/bs";
 import { RiMotorbikeFill, RiTimeLine } from "react-icons/ri";
+import { Skeleton } from "@/shared/components/ui";
 
 export const RestaurantCard = ({ restaurant }: { restaurant: Restaurant }) => {
   return (
@@ -53,5 +54,27 @@ export const RestaurantCard = ({ restaurant }: { restaurant: Restaurant }) => {
         </div>
       </div>
     </Link>
+  );
+};
+
+RestaurantCard.Skeleton = () => {
+  return (
+    <div className="flex flex-col h-full">
+      <Skeleton className="aspect-video w-full rounded-lg" />
+
+      <div className="flex justify-between items-center">
+        <div className="flex items-center gap-2 pt-2">
+          <div className="flex flex-1 gap-2">
+            <Skeleton className="w-8 h-8 rounded-full ml-1 shrink-0" />
+
+            <div className="flex-1 space-y-2">
+              <Skeleton className="h-4 w-32" />
+              <Skeleton className="h-3 w-42" />
+            </div>
+          </div>
+        </div>
+        <Skeleton className="w-12 h-6 rounded-lg" />
+      </div>
+    </div>
   );
 };

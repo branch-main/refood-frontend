@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { SearchBar, Select } from "@/shared/components/common";
 import {
-  RestaurantPreview,
+  RestaurantCompact,
   RestaurantList,
+  RestaurantCard,
 } from "@/features/restaurants/components";
 import { IoMdHome } from "react-icons/io";
 import { useRestaurants } from "@/features/restaurants/hooks";
@@ -65,10 +66,16 @@ export const Restaurants = () => {
         </h1>
 
         <div className="flex gap-8 overflow-x-auto py-4">
-          {(trending &&
-            trending.map((restaurant) => (
-              <RestaurantPreview restaurant={restaurant} />
-            ))) || <Skeleton count={5} className="w-20 h-20 rounded-full" />}
+          {trendingLoading
+            ? Array.from({ length: 5 }).map((_, i) => (
+                <RestaurantCompact.Skeleton key={i} />
+              ))
+            : trending?.map((restaurant) => (
+                <RestaurantCompact
+                  key={restaurant.id}
+                  restaurant={restaurant}
+                />
+              ))}
         </div>
 
         <h1 className="text-2xl font-bold text-gray-800">
@@ -79,10 +86,11 @@ export const Restaurants = () => {
         </h1>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-8">
-          {restaurantsLoading && (
-            <Skeleton count={12} className="w-full h-48 rounded-lg" />
-          )}
-          {restaurants && <RestaurantList restaurants={restaurants} />}
+          {restaurantsLoading
+            ? Array.from({ length: 10 }).map((_, i) => (
+                <RestaurantCard.Skeleton key={i} />
+              ))
+            : restaurants && <RestaurantList restaurants={restaurants} />}
         </div>
       </div>
     </div>

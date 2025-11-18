@@ -1,8 +1,9 @@
 import { Link } from "react-router-dom";
 import { Restaurant } from "@/entities";
 import { getFallbackImage } from "@/shared/utils";
+import { Skeleton } from "@/shared/components/ui";
 
-export const RestaurantPreview = ({
+export const RestaurantCompact = ({
   restaurant,
 }: {
   restaurant: Restaurant;
@@ -19,5 +20,14 @@ export const RestaurantPreview = ({
       />
       <span className="text-xs font-bold text-red-500">{restaurant.name}</span>
     </Link>
+  );
+};
+
+RestaurantCompact.Skeleton = () => {
+  return (
+    <div className="flex flex-col items-center shrink-0">
+      <Skeleton className="w-20 h-20 rounded-full mb-4" />
+      <Skeleton className="h-3 w-16" />
+    </div>
   );
 };
