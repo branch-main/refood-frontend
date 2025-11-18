@@ -1,5 +1,6 @@
 import { Restaurant } from "@/entities";
 import { FiStar } from "react-icons/fi";
+import { Skeleton } from "@/shared/components/ui";
 
 interface Review {
   id: number;
@@ -123,6 +124,45 @@ export const RestaurantReviews = ({
       <button className="w-full mt-4 py-2 text-sm font-semibold text-red-600 hover:text-red-700 transition-colors">
         Ver todas las reseñas ({restaurant.stats.totalReviews})
       </button>
+    </div>
+  );
+};
+
+RestaurantReviews.Skeleton = () => {
+  return (
+    <div className="bg-white shadow-xs rounded-xl p-8 h-full">
+      <Skeleton className="h-6 w-40 mb-4" />
+
+      <div className="flex flex-col gap-4">
+        {Array.from({ length: 4 }).map((_, index) => (
+          <div
+            key={index}
+            className="border-b border-gray-100 last:border-0 pb-4 last:pb-0"
+          >
+            <div className="flex items-start gap-3">
+              <Skeleton className="w-10 h-10 rounded-full flex-shrink-0" />
+
+              <div className="flex-1 space-y-2">
+                <div className="flex items-center justify-between">
+                  <Skeleton className="h-4 w-32" />
+                  <Skeleton className="h-3 w-20" />
+                </div>
+
+                <div className="flex items-center gap-1">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <Skeleton key={i} className="w-4 h-4 rounded-sm" />
+                  ))}
+                </div>
+
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-4/5" />
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <Skeleton className="w-full mt-4 h-9 rounded-md" />
     </div>
   );
 };

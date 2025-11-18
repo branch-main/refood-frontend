@@ -1,5 +1,6 @@
 import { FiPhone, FiMail, FiMapPin } from "react-icons/fi";
 import { Restaurant } from "@/entities";
+import { Skeleton } from "@/shared/components/ui";
 
 export const RestaurantContact = ({
   restaurant,
@@ -52,6 +53,23 @@ export const RestaurantContact = ({
             {restaurant.email}
           </a>
         </div>
+      </div>
+    </div>
+  );
+};
+
+RestaurantContact.Skeleton = () => {
+  return (
+    <div className="bg-white p-4">
+      <Skeleton className="h-4 w-20 mb-3" />
+
+      <div className="space-y-3">
+        {Array.from({ length: 3 }).map((_, i) => (
+          <div key={i} className="flex gap-3 items-center">
+            <Skeleton className="w-4 h-4 rounded-full shrink-0" />
+            <Skeleton className="h-3 flex-1" />
+          </div>
+        ))}
       </div>
     </div>
   );

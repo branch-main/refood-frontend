@@ -1,5 +1,6 @@
 import { DayOfWeek, Restaurant } from "@/entities";
 import { formatTime24 } from "@/shared/utils";
+import { Skeleton } from "@/shared/components/ui";
 
 const getDayName = (day: DayOfWeek) => {
   const days = {
@@ -57,6 +58,26 @@ export const RestaurantSchedule = ({
             </div>
           );
         })}
+      </div>
+    </div>
+  );
+};
+
+RestaurantSchedule.Skeleton = () => {
+  return (
+    <div className="bg-white p-4">
+      <Skeleton className="h-4 w-40 mb-3" />
+
+      <div className="space-y-2">
+        {Array.from({ length: 7 }).map((_, i) => (
+          <div
+            key={i}
+            className="flex justify-between items-center px-2.5 py-2"
+          >
+            <Skeleton className="h-3 w-16" />
+            <Skeleton className="h-3 w-28" />
+          </div>
+        ))}
       </div>
     </div>
   );

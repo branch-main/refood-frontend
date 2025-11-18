@@ -1,9 +1,9 @@
 import { useState, useMemo } from "react";
 import { MenuItemsGrid } from "@/features/menu/components";
-import { Input, Loading } from "@/shared/components/ui";
+import { Input, Skeleton } from "@/shared/components/ui";
 import { useDebounced } from "@/shared/hooks";
 import { MenuItem } from "@/entities";
-import { useMenuItems } from "@/features/menu/hooks/useMenuItems";
+import { useMenu } from "@/features/menu/hooks";
 
 function filterMenuItems(items: MenuItem[], search: string): MenuItem[] {
   const searchLower = search.toLowerCase();
@@ -19,7 +19,7 @@ export const MenuItems = () => {
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounced(search, 300);
 
-  const { isLoading, data: menu } = useMenuItems();
+  let { isLoading, data: menu } = useMenu();
 
   const filtered = useMemo(() => {
     if (!menu) return null;
@@ -37,16 +37,18 @@ export const MenuItems = () => {
             Descubre excelente comida a precios con descuento cerca de ti
           </p>
         </div>
-
         <Input
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Buscar alimentos..."
         />
-
         <div className="mt-8">
-          {isLoading && <Loading />}
+          {isLoading && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              <Skeleton count={12} className="h-34 rounded-lg" />
+            </div>
+          )}
           {filtered && <MenuItemsGrid items={filtered} />}
         </div>
       </div>

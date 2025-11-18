@@ -3,6 +3,7 @@
     background-color: #e5e7eb;
     background-position: -1000px 0;
   }
+
   100% {
     background-color: #f3f4f6;
     background-position: 1000px 0;
@@ -11,12 +12,10 @@
 
 .skeleton {
   animation: shimmer 2s infinite;
-  background: linear-gradient(
-    90deg,
-    #e5e7eb 0%,
-    #f3f4f6 50%,
-    #e5e7eb 100%
-  );
+  background: linear-gradient(90deg,
+      #e5e7eb 0%,
+      #f3f4f6 50%,
+      #e5e7eb 100%);
   background-size: 1000px 100%;
   background-repeat: repeat-x;
 }

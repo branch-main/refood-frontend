@@ -1,1 +1,1 @@
-export * from "./menuItemService";
+export * from "./menuService";

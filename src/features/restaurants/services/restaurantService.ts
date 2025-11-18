@@ -50,10 +50,6 @@ class RestaurantService {
     return apiClient.get(`/restaurants/${id}/`).then(toRestaurant);
   }
 
-  async getRestaurantMenu(id: number): Promise<any> {
-    return apiClient.get(`/menu?restaurant_id=${id}`);
-  }
-
   async getRestaurants(): Promise<Restaurant[]> {
     return apiClient
       .get<any[]>("/restaurants/")

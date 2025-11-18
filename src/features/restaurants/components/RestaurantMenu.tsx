@@ -1,38 +1,37 @@
 import { MenuItem } from "@/features/menu/components";
-import { MenuItem as MenuItemDomain } from "@/entities";
+import { useRestaurantMenu } from "@/features/menu/hooks";
+import { Skeleton } from "@/shared/components/ui";
 
 export const RestaurantMenu = ({
-  menu,
+  restaurantId,
   category,
 }: {
-  menu: MenuItemDomain[];
+  restaurantId: number;
   category: string;
 }) => {
-  return (
-    <div className="w-full mx-auto">
-      <h2 className="text-2xl font-bold text-gray-800 mb-4 gap-2">
-        {category}
-      </h2>
+  const { isLoading, data: menu } = useRestaurantMenu(restaurantId);
 
-      {menu.length === 0 ? (
-        <div className="bg-white border border-gray-200 rounded-lg shadow-sm">
-          <div className="text-center py-16 px-8">
-            <div className="text-5xl mb-4">🍴</div>
-            <p className="text-gray-600 text-base font-medium mb-2">
-              No hay alimentos disponibles
-            </p>
-            <p className="text-gray-500 text-sm">
-              Este restaurante no tiene alimentos disponibles en este momento
-            </p>
-          </div>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-4">
-          {menu.map((item) => (
-            <MenuItem key={item.id} item={item} />
-          ))}
-        </div>
-      )}
+  if (isLoading) {
+    return <RestaurantMenu.Skeleton />;
+  }
+
+  return (
+    <div>
+      <h2 className="text-2xl font-bold text-gray-800 mb-4">{category}</h2>
+      <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-4">
+        {menu?.map((item) => (
+          <MenuItem key={item.id} item={item} />
+        ))}
+      </div>
     </div>
   );
 };
+
+RestaurantMenu.Skeleton = () => (
+  <div>
+    <Skeleton className="w-48 h-8 mb-4 rounded-md" />
+    <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-4">
+      <Skeleton count={4} className="w-full h-32 rounded-md" />
+    </div>
+  </div>
+);

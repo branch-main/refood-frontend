@@ -8,6 +8,7 @@ import {
 } from "@/features/restaurants/components";
 import { IoMdHome } from "react-icons/io";
 import { useRestaurants } from "@/features/restaurants/hooks";
+import { Skeleton } from "@/shared/components/ui";
 
 const SORT_OPTIONS = [
   { value: "relevance", label: "Relevancia" },
@@ -33,14 +34,13 @@ export const Restaurants = () => {
   const [sortBy, setSortBy] = useState("relevance");
   const debouncedSearch = useDebounced(search, 300);
 
-  const { data: restaurants } = useRestaurants();
+  const { isLoading: restaurantsLoading, data: restaurants } = useRestaurants();
+  const { isLoading: trendingLoading, data: trending } = useRestaurants();
 
   const filtered = useMemo(() => {
     if (!restaurants) return null;
     return filterRestaurants(restaurants, debouncedSearch);
   }, [restaurants, debouncedSearch]);
-
-  const trending = restaurants ? [...restaurants, ...restaurants] : [];
 
   return (
     <div className="pb-8 bg-neutral-50">
@@ -78,24 +78,27 @@ export const Restaurants = () => {
           </div>
         </div>
 
-        {trending.length > 0 && (
-          <>
-            <h1 className="text-2xl font-bold text-gray-800 mt-4">
-              ¡Los {trending?.length} más elegidos!
-            </h1>
-            <div className="flex gap-8 overflow-x-auto py-4">
-              {trending.map((restaurant) => (
-                <RestaurantPreview restaurant={restaurant} />
-              ))}
-            </div>
-          </>
-        )}
+        <h1 className="text-2xl font-bold text-gray-800 mt-4">
+          {trendingLoading && <Skeleton className="w-64 h-8 rounded-lg" />}
+          {trending && <span>¡Los {trending.length} más elegidos!</span>}
+        </h1>
+
+        <div className="flex gap-8 overflow-x-auto py-4">
+          {(trending &&
+            trending.map((restaurant) => (
+              <RestaurantPreview restaurant={restaurant} />
+            ))) || <Skeleton count={5} className="w-20 h-20 rounded-full" />}
+        </div>
 
         <h1 className="text-2xl font-bold text-gray-800">
-          Restaurantes encontrados {filtered ? `(${filtered.length})` : ""}
+          {restaurantsLoading && <Skeleton className="w-48 h-8 rounded-lg" />}
+          {filtered && <span>Todos los restaurantes ({filtered.length})</span>}
         </h1>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-8">
+          {restaurantsLoading && (
+            <Skeleton count={10} className="w-full h-48 rounded-lg" />
+          )}
           {filtered && <RestaurantList restaurants={filtered} />}
         </div>
       </div>

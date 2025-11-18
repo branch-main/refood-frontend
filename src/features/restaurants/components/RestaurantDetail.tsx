@@ -7,6 +7,7 @@ import {
   getFallbackImage,
 } from "@/shared/utils";
 import { Restaurant } from "@/entities";
+import { Skeleton } from "@/shared/components/ui";
 
 export const RestaurantDetail = ({
   restaurant,
@@ -94,6 +95,42 @@ export const RestaurantDetail = ({
                 </span>
               </span>
             </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+RestaurantDetail.Skeleton = () => {
+  return (
+    <div className="bg-white">
+      <div className="relative aspect-video overflow-visible">
+        <Skeleton className="w-full h-full" />
+
+        <div className="absolute left-12 -translate-x-1/2 -bottom-8">
+          <Skeleton className="w-16 h-16 rounded-full" />
+        </div>
+
+        <Skeleton className="absolute right-3 -bottom-10 w-20 h-8 rounded-lg" />
+      </div>
+
+      <div className="p-4 mt-8">
+        <Skeleton className="h-8 w-3/4 mb-1" />
+        <Skeleton className="h-4 w-full mb-4" />
+
+        <div className="w-full border border-gray-200 rounded-2xl">
+          <div className="flex justify-between items-center px-4 py-2 border-b border-gray-200">
+            <Skeleton className="h-4 w-28" />
+            <Skeleton className="h-4 w-20" />
+          </div>
+          <div className="flex justify-between items-center px-4 py-2 border-b border-gray-200">
+            <Skeleton className="h-4 w-24" />
+            <Skeleton className="h-4 w-16" />
+          </div>
+          <div className="flex justify-between items-center px-4 py-2">
+            <Skeleton className="h-4 w-24" />
+            <Skeleton className="h-4 w-24" />
           </div>
         </div>
       </div>

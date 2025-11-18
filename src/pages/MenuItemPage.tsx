@@ -2,7 +2,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { Loading } from "@/shared/components/ui";
 import { FiArrowLeft } from "react-icons/fi";
 import { ItemHeader, ItemInfo, OrderSection } from "@/features/menu/components";
-import { useMenuItem } from "@/features/menu/hooks/useMenuItem";
+import { useMenuItem } from "@/features/menu/hooks";
 import { getFallbackImage } from "@/shared/utils";
 
 export const MenuItemPage = () => {

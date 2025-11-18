@@ -34,11 +34,17 @@ class MenuItemService {
     return apiClient.get(`/menu/${id}`).then(toMenuItem);
   }
 
-  async getMenuItems(): Promise<MenuItem[]> {
+  async getMenu(): Promise<MenuItem[]> {
     return apiClient
       .get<any[]>("/menu/")
       .then((items) => items.map(toMenuItem));
   }
+
+  async getRestaurantMenu(restaurantId: number): Promise<MenuItem[]> {
+    return apiClient
+      .get<any[]>(`/menu?restaurant_id=${restaurantId}`)
+      .then((items) => items.map(toMenuItem));
+  }
 }
 
-export const menuItemService = new MenuItemService();
+export const menuService = new MenuItemService();
