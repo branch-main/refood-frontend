@@ -80,7 +80,7 @@ export const Modal = ({
             animate={{ scale: 1, rotate: "0deg" }}
             exit={{ scale: 1.025, rotate: "0deg" }}
             onClick={(e) => e.stopPropagation()}
-            className="bg-white rounded-lg will-change-transform"
+            className="bg-white rounded-lg will-change-transform max-w-screen max-h-screen"
           >
             {children}
           </motion.div>

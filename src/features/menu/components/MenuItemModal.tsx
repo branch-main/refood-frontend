@@ -186,7 +186,7 @@ export const MenuItemModal = ({
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
-      <div className="w-lg flex flex-col items-center pt-2 pb-4 px-4 gap-4">
+      <div className="w-lg flex flex-col items-center pt-2 pb-4 px-4 gap-4 max-h-[85vh]">
         <div className="flex flex-col w-full items-center relative">
           <span className="text-gray-800 font-bold mb-2">{item.name}</span>
           <IoClose
@@ -232,26 +232,28 @@ export const MenuItemModal = ({
           </div>
         </div>
 
-        {OPTIONS.map((option) => (
-          <MenuItemOption key={option.id} option={option} />
-        ))}
+        <div className="w-full min-h-0 overflow-y-auto flex flex-col gap-4">
+          {OPTIONS.map((option) => (
+            <MenuItemOption key={option.id} option={option} />
+          ))}
 
-        <div className="flex flex-col w-full">
-          <span className="text-gray-800 font-bold">
-            Notas para este producto
-          </span>
-          <span className="text-gray-600 text-xs mb-4">
-            El local intentará seguirlas cuando lo prepare.
-          </span>
-          <Textarea
-            maxCharacters={250}
-            value={notes}
-            onChange={(e) => setNotes(e.target.value)}
-            placeholder="Escribe las instrucciones que necesites."
-          />
+          <div className="flex flex-col w-full">
+            <span className="text-gray-800 font-bold">
+              Notas para este producto
+            </span>
+            <span className="text-gray-600 text-xs mb-4">
+              El local intentará seguirlas cuando lo prepare.
+            </span>
+            <Textarea
+              maxCharacters={250}
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              placeholder="Escribe las instrucciones que necesites."
+            />
+          </div>
         </div>
 
-        <div className="flex w-full gap-4">
+        <div className="flex w-full gap-4 flex-shrink-0">
           <div className="flex items-center bg-neutral-200 text-sm rounded-lg py-2.5 px-4 gap-6">
             <button
               onClick={() => setCount(Math.max(1, count - 1))}
