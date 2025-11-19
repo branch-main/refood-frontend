@@ -18,7 +18,7 @@ import { IoIosArrowDown } from "react-icons/io";
 import { IoClose } from "react-icons/io5";
 
 // TODO: use actual values
-const DISCOUNTED_PRICE: number | null = null;
+const DISCOUNTED_PRICE: number | null = 10;
 const OPTIONS = [
   new MenuItemOptionDomain(1, "Elige Salsas", 2, 3, true, [
     new MenuItemChoiceDomain(1, "Mayonesa", 1.99, true),
@@ -220,108 +220,106 @@ export const MenuItemModal = ({
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
-      <div className="w-lg flex flex-col items-center pt-2 pb-4 px-4 gap-4 max-h-[85vh]">
-        <div className="flex flex-col w-full items-center relative">
-          <span className="text-gray-800 font-bold mb-2">{item.name}</span>
-          <IoClose
-            size={24}
-            className="absolute right-0 cursor-pointer"
-            onClick={onClose}
+      <div className="flex items-center justify-between border-b border-gray-200 px-4 py-3">
+        <span className="text-gray-800 font-bold text-xl">{item.name}</span>
+        <div className="flex justify-between items-start relative">
+          <IoClose size={24} className="cursor-pointer" onClick={onClose} />
+        </div>
+      </div>
+
+      <div className="w-4xl flex p-4 gap-4 max-h-[85vh]">
+        <div className="w-96 flex flex-col gap-5">
+          <img
+            src={getFallbackImage(item.name, item.image)}
+            alt={item.name}
+            className="object-cover bg-gray-200 shadow-md aspect-square"
           />
-          <div className="relative w-32 h-32 shadow-md bg-gray-200">
-            <img
-              src={getFallbackImage(item.name, item.image)}
-              alt={item.name}
-              className="w-full h-full object-cover"
-            />
-          </div>
-        </div>
 
-        <div className="w-full flex justify-between items-start gap-8">
-          <div>
-            <span className="text-gray-800 font-bold text-xl">{item.name}</span>
+          <div className="flex justify-between items-start gap-4">
             <p className="text-gray-600 text-sm">{item.description}</p>
-          </div>
 
-          <div className="flex flex-col items-end text-nowrap leading-none">
-            {(DISCOUNTED_PRICE && (
-              <div className="flex flex-col gap-2">
+            <div className="flex flex-col items-start text-nowrap leading-none">
+              {(DISCOUNTED_PRICE && (
+                <div className="flex flex-col gap-1 items-end">
+                  <div className="font-bold text-xl text-gray-800">
+                    {formatPrice(DISCOUNTED_PRICE)}
+                  </div>
+                  <div className="flex gap-2 items-center">
+                    <div className="text-sm font-bold bg-red-100 px-2 py-0.5 rounded-lg text-red-500">
+                      -{calculateDiscount(item.price, DISCOUNTED_PRICE)}%
+                    </div>
+                    <div className="text-sm text-gray-500 line-through">
+                      {formatPrice(item.price)}
+                    </div>
+                  </div>
+                </div>
+              )) || (
                 <div className="font-bold text-gray-800">
-                  {formatPrice(DISCOUNTED_PRICE)}
+                  {formatPrice(item.price)}
                 </div>
-                <div className="flex gap-2 items-center">
-                  <div className="text-sm font-bold bg-red-100 px-2 py-0.5 rounded-lg text-red-500">
-                    -{calculateDiscount(item.price, DISCOUNTED_PRICE)}%
-                  </div>
-                  <div className="text-sm text-gray-500 line-through">
-                    {formatPrice(item.price)}
-                  </div>
-                </div>
-              </div>
-            )) || (
-              <div className="font-bold text-gray-800">
-                {formatPrice(item.price)}
-              </div>
-            )}
+              )}
+            </div>
           </div>
         </div>
 
-        <div className="w-full min-h-0 overflow-y-auto flex flex-col gap-4">
-          {OPTIONS.map((option) => (
-            <MenuItemOption
-              key={option.id}
-              option={option}
-              selected={optionSelections.get(option.id) || new Set()}
-              onSelectionChange={(selected) => {
-                const newSelections = new Map(optionSelections);
-                newSelections.set(option.id, selected);
-                setOptionSelections(newSelections);
-              }}
-            />
-          ))}
-
-          <div className="flex flex-col w-full">
-            <span className="text-gray-800 font-bold">
-              Notas para este producto
-            </span>
-            <span className="text-gray-600 text-xs mb-4">
-              El local intentará seguirlas cuando lo prepare.
-            </span>
-            <Textarea
-              maxCharacters={250}
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              placeholder="Escribe las instrucciones que necesites."
-            />
-          </div>
-        </div>
-
-        <div className="flex w-full gap-4">
-          <div className="flex items-center bg-neutral-200 text-sm rounded-lg py-2.5 px-4 gap-6">
-            <button
-              onClick={() => setCount(Math.max(1, count - 1))}
-              className="cursor-pointer"
-            >
-              <FaMinus
-                className={`transition-colors ${count > 1 ? "fill-gray-700" : "fill-gray-400"}`}
+        <div className="flex flex-col flex-1 min-w-0 gap-4">
+          <div className="flex-1 min-h-0 overflow-y-auto flex flex-col gap-4 pr-2">
+            {OPTIONS.map((option) => (
+              <MenuItemOption
+                key={option.id}
+                option={option}
+                selected={optionSelections.get(option.id) || new Set()}
+                onSelectionChange={(selected) => {
+                  const newSelections = new Map(optionSelections);
+                  newSelections.set(option.id, selected);
+                  setOptionSelections(newSelections);
+                }}
               />
-            </button>
-            <span className="text-gray-800 font-semibold">{count}</span>
-            <button
-              onClick={() => setCount(count + 1)}
-              className="cursor-pointer"
-            >
-              <FaPlus className="fill-gray-700" />
-            </button>
+            ))}
+
+            <div className="flex flex-col w-full">
+              <span className="text-gray-800 font-bold">
+                Notas para este producto
+              </span>
+              <span className="text-gray-600 text-xs mb-4">
+                El local intentará seguirlas cuando lo prepare.
+              </span>
+              <Textarea
+                maxCharacters={250}
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                placeholder="Escribe las instrucciones que necesites."
+              />
+            </div>
           </div>
 
-          <button
-            disabled={canAddToCart}
-            className="disabled:bg-gray-200 disabled:text-gray-400 cursor-pointer disabled:cursor-default flex-1 text-sm rounded-lg py-2.5 transition-colors bg-red-500 hover:bg-red-700 text-white font-semibold"
-            onClick={() => onClose()}
-          >
-            Agregar {formatPrice(totalPrice)}
-          </button>
+          <div className="flex w-full gap-4">
+            <div className="flex items-center bg-neutral-200 text-sm rounded-lg py-2.5 px-4 gap-6">
+              <button
+                onClick={() => setCount(Math.max(1, count - 1))}
+                className="cursor-pointer"
+              >
+                <FaMinus
+                  className={`transition-colors ${count > 1 ? "fill-gray-700" : "fill-gray-400"}`}
+                />
+              </button>
+              <span className="text-gray-800 font-semibold">{count}</span>
+              <button
+                onClick={() => setCount(count + 1)}
+                className="cursor-pointer"
+              >
+                <FaPlus className="fill-gray-700" />
+              </button>
+            </div>
+
+            <button
+              disabled={canAddToCart}
+              className="disabled:bg-gray-200 disabled:text-gray-400 cursor-pointer disabled:cursor-default flex-1 text-sm rounded-lg py-2.5 transition-colors bg-red-500 hover:bg-red-700 text-white font-semibold"
+              onClick={() => onClose()}
+            >
+              Agregar {formatPrice(totalPrice)}
+            </button>
+          </div>
         </div>
       </div>
     </Modal>
