@@ -84,9 +84,16 @@ const MenuItemChoice = ({
   );
 };
 
-const MenuItemOption = ({ option }: { option: MenuItemOptionDomain }) => {
-  const [isExpanded, setIsExpanded] = useState(false);
-  const [selected, setCheckedItems] = useState<Set<number>>(new Set());
+const MenuItemOption = ({
+  option,
+  selected,
+  onSelectionChange,
+}: {
+  option: MenuItemOptionDomain;
+  selected: Set<number>;
+  onSelectionChange: (selected: Set<number>) => void;
+}) => {
+  const [isExpanded, setIsExpanded] = useState(true);
 
   const isMulti = option.maxChoices > 1;
   const isRequired = option.isRequired || option.minChoices > 0;
@@ -98,15 +105,15 @@ const MenuItemOption = ({ option }: { option: MenuItemOptionDomain }) => {
     const newSelected = new Set(selected);
     if (newSelected.has(id)) {
       newSelected.delete(id);
-      setCheckedItems(newSelected);
+      onSelectionChange(newSelected);
     } else if (!maxReached) {
       newSelected.add(id);
-      setCheckedItems(newSelected);
+      onSelectionChange(newSelected);
     }
   };
 
   const selectChoice = (id: number) => {
-    setCheckedItems(new Set([id]));
+    onSelectionChange(new Set([id]));
   };
 
   return (
@@ -175,13 +182,40 @@ export const MenuItemModal = ({
 }) => {
   const [count, setCount] = useState(1);
   const [notes, setNotes] = useState("");
+  const [optionSelections, setOptionSelections] = useState<
+    Map<number, Set<number>>
+  >(new Map());
 
-  const totalPrice = (DISCOUNTED_PRICE ?? item.price) * count;
+  const canAddToCart = OPTIONS.some((option) => {
+    if (!option.isRequired && option.minChoices === 0) return false;
+    const selected = optionSelections.get(option.id) || new Set();
+    return selected.size < Math.max(option.minChoices, 1);
+  });
+
+  const additionalPrice = Array.from(optionSelections.entries()).reduce(
+    (total, [optionId, selectedIds]) => {
+      const option = OPTIONS.find((o) => o.id === optionId);
+      if (!option) return total;
+
+      const choicePrice = Array.from(selectedIds).reduce((sum, choiceId) => {
+        const choice = option.choices.find((c) => c.id === choiceId);
+        return sum + (choice?.price || 0);
+      }, 0);
+
+      return total + choicePrice;
+    },
+    0,
+  );
+
+  // TODO: shouldn't need Number() here if types are correct
+  const price = DISCOUNTED_PRICE ?? item.price;
+  const totalPrice = (Number(price) + additionalPrice) * count;
 
   useEffect(() => {
     if (!isOpen) return;
     setCount(1);
     setNotes("");
+    setOptionSelections(new Map());
   }, [isOpen]);
 
   return (
@@ -234,7 +268,16 @@ export const MenuItemModal = ({
 
         <div className="w-full min-h-0 overflow-y-auto flex flex-col gap-4">
           {OPTIONS.map((option) => (
-            <MenuItemOption key={option.id} option={option} />
+            <MenuItemOption
+              key={option.id}
+              option={option}
+              selected={optionSelections.get(option.id) || new Set()}
+              onSelectionChange={(selected) => {
+                const newSelections = new Map(optionSelections);
+                newSelections.set(option.id, selected);
+                setOptionSelections(newSelections);
+              }}
+            />
           ))}
 
           <div className="flex flex-col w-full">
@@ -253,7 +296,7 @@ export const MenuItemModal = ({
           </div>
         </div>
 
-        <div className="flex w-full gap-4 flex-shrink-0">
+        <div className="flex w-full gap-4">
           <div className="flex items-center bg-neutral-200 text-sm rounded-lg py-2.5 px-4 gap-6">
             <button
               onClick={() => setCount(Math.max(1, count - 1))}
@@ -272,7 +315,11 @@ export const MenuItemModal = ({
             </button>
           </div>
 
-          <button className="disabled:bg-gray-200 disabled:text-gray-400 flex-1 text-sm rounded-lg py-2.5 transition-colors bg-red-500 hover:bg-red-700 text-white font-semibold">
+          <button
+            disabled={canAddToCart}
+            className="disabled:bg-gray-200 disabled:text-gray-400 cursor-pointer disabled:cursor-default flex-1 text-sm rounded-lg py-2.5 transition-colors bg-red-500 hover:bg-red-700 text-white font-semibold"
+            onClick={() => onClose()}
+          >
             Agregar {formatPrice(totalPrice)}
           </button>
         </div>
