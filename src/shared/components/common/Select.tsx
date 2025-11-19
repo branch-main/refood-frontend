@@ -64,7 +64,6 @@ export const Select = ({
             >
               <input
                 type="radio"
-                name="select-dropdown"
                 value={option.value}
                 checked={value === option.value}
                 onChange={(e) => {
