@@ -1,14 +1,21 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
 import { useAuth } from "@/features/auth/hooks";
-import { FiMenu, FiX } from "react-icons/fi";
+import { useRestaurantContext } from "@/features/restaurants/contexts";
+import { useCart } from "@/features/cart/contexts";
+import { FiMenu, FiX, FiShoppingCart } from "react-icons/fi";
+import { ImSearch } from "react-icons/im";
 import { Button } from "../ui";
 
 export const Navbar = () => {
   const { user, logout } = useAuth();
+  const restaurantContext = useRestaurantContext();
+  const currentRestaurant = restaurantContext?.currentRestaurant || null;
+  const { itemCount, setIsOpen: setCartOpen } = useCart();
   const navigate = useNavigate();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [searchValue, setSearchValue] = useState("");
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const handleLogout = async () => {
@@ -16,6 +23,17 @@ export const Navbar = () => {
     setIsMobileMenuOpen(false);
     navigate("/login");
   };
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchValue.trim()) {
+      console.log("Searching for:", searchValue);
+    }
+  };
+
+  const searchPlaceholder = currentRestaurant
+    ? `Buscar en ${currentRestaurant.name}...`
+    : "Buscar restaurantes o productos...";
 
   const getUserInitials = () => {
     if (user?.firstName && user?.lastName) {
@@ -64,7 +82,7 @@ export const Navbar = () => {
   }, []);
 
   return (
-    <nav className="bg-white/95 h-14 backdrop-blur-md sticky top-0 z-99 border-b border-gray-200">
+    <nav className="bg-white h-14 sticky top-0 z-99 border-b border-gray-200">
       <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-14">
           {/* Logo */}
@@ -75,6 +93,25 @@ export const Navbar = () => {
           >
             <img src="/logo.png" alt="ReFood" className="h-10 w-auto" />
           </Link>
+
+          {/* Search Bar */}
+          <form
+            onSubmit={handleSearch}
+            className="hidden md:flex flex-1 max-w-xl items-center rounded-xl bg-neutral-100 text-gray-800 px-4 gap-3 ml-8"
+          >
+            <input
+              type="search"
+              placeholder={searchPlaceholder}
+              value={searchValue}
+              onChange={(e) => setSearchValue(e.target.value)}
+              className="w-full h-10 text-sm focus:outline-none caret-red-500"
+            />
+            <button type="submit">
+              <ImSearch
+                className={`h-4 w-4 transition-colors ${searchValue.trim() === "" ? "fill-gray-400" : "fill-gray-500"}`}
+              />
+            </button>
+          </form>
 
           {/* Mobile menu button */}
           <button
@@ -89,38 +126,20 @@ export const Navbar = () => {
           </button>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-1">
-            <Link
-              to="/"
-              className="text-gray-600 no-underline font-medium text-sm px-3 py-2 rounded-lg transition-all hover:text-[#B21F1F] hover:bg-red-50"
-            >
-              Inicio
-            </Link>
-            <Link
-              to="/menu"
-              className="text-gray-600 no-underline font-medium text-sm px-3 py-2 rounded-lg transition-all hover:text-[#B21F1F] hover:bg-red-50"
-            >
-              Explorar
-            </Link>
-            <Link
-              to="/restaurants"
-              className="text-gray-600 no-underline font-medium text-sm px-3 py-2 rounded-lg transition-all hover:text-[#B21F1F] hover:bg-red-50"
-            >
-              Restaurantes
-            </Link>
-
+          <div className="hidden md:flex items-center gap-1 flex-shrink-0">
+            {/* Cart Button */}
             {!user ? (
               <div className="flex items-center gap-2 ml-3">
                 <Button
                   variant="outline"
-                  size="small"
+                  size="sm"
                   onClick={() => navigate("/login")}
                 >
                   Iniciar Sesión
                 </Button>
                 <Button
                   variant="primary"
-                  size="small"
+                  size="sm"
                   onClick={() => navigate("/register")}
                 >
                   Registrarse
@@ -128,43 +147,16 @@ export const Navbar = () => {
               </div>
             ) : (
               <>
-                <Link
-                  to="/orders"
-                  className="text-gray-600 no-underline font-medium text-sm px-3 py-2 rounded-lg transition-all hover:text-[#B21F1F] hover:bg-red-50"
-                >
-                  Mis Pedidos
-                </Link>
-                <Link
-                  to="/favorites"
-                  className="text-gray-600 no-underline font-medium text-sm px-3 py-2 rounded-lg transition-all hover:text-[#B21F1F] hover:bg-red-50"
-                >
-                  Favoritos
-                </Link>
-
                 {/* Profile Dropdown */}
                 <div className="relative ml-3" ref={dropdownRef}>
                   <button
                     onClick={() => setIsProfileOpen(!isProfileOpen)}
                     className="flex items-center gap-2 px-2 py-2 rounded-lg transition-all hover:bg-red-50"
                   >
-                    <div className="w-8 h-8 rounded-full bg-linear-to-br from-[#B21F1F] to-[#8B1616] flex items-center justify-center text-white font-bold text-xs shadow-md">
+                    <div className="w-9 h-9 rounded-full bg-linear-to-br bg-red-100 flex items-center justify-center text-red-500 font-bold text-xs">
                       {getUserInitials()}
                     </div>
-                    <svg
-                      className={`w-4 h-4 text-gray-600 transition-transform ${isProfileOpen ? "rotate-180" : ""}`}
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M19 9l-7 7-7-7"
-                      />
-                    </svg>
                   </button>
-
                   {isProfileOpen && (
                     <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-gray-200 py-2 animate-[fadeIn_0.2s_ease-out]">
                       <div className="px-4 py-3 border-b border-gray-100">
@@ -219,6 +211,20 @@ export const Navbar = () => {
                 </div>
               </>
             )}
+
+            <div className="w-px h-8 bg-gray-200 mx-1"></div>
+
+            <button
+              onClick={() => setCartOpen(true)}
+              className="relative p-2 rounded-lg transition-all hover:bg-red-50 text-gray-600 hover:text-[#B21F1F]"
+            >
+              <FiShoppingCart className="w-5 h-5" />
+              {itemCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-gradient-to-r from-red-600 to-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center shadow-md">
+                  {itemCount}
+                </span>
+              )}
+            </button>
           </div>
         </div>
 
@@ -226,6 +232,24 @@ export const Navbar = () => {
         {isMobileMenuOpen && (
           <div className="md:hidden py-4 border-t border-gray-200 animate-[fadeIn_0.2s_ease-out]">
             <div className="flex flex-col space-y-2">
+              {/* Mobile Search Bar */}
+              <form onSubmit={handleSearch} className="px-4 pb-2">
+                <div className="flex items-center rounded-xl shadow-sm bg-white text-gray-800 px-4 gap-3">
+                  <input
+                    type="search"
+                    placeholder={searchPlaceholder}
+                    value={searchValue}
+                    onChange={(e) => setSearchValue(e.target.value)}
+                    className="w-full h-10 text-sm focus:outline-none caret-red-500"
+                  />
+                  <button type="submit">
+                    <ImSearch
+                      className={`h-4 w-4 transition-colors ${searchValue.trim() === "" ? "fill-gray-400" : "fill-gray-500"}`}
+                    />
+                  </button>
+                </div>
+              </form>
+
               <Link
                 to="/"
                 className="text-gray-600 no-underline font-medium text-sm px-4 py-3 rounded-lg transition-all hover:text-[#B21F1F] hover:bg-red-50"

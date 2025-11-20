@@ -17,8 +17,8 @@ export const RestaurantMenu = ({
 
   return (
     <div>
-      <h2 className="text-2xl font-bold text-gray-800 mb-4">{category}</h2>
-      <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-4">
+      <h2 className="text-2xl font-bold text-gray-800 mb-8">{category}</h2>
+      <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-8">
         {menu?.map((item) => (
           <MenuItem key={item.id} item={item} />
         ))}
@@ -37,7 +37,9 @@ RestaurantMenu.Skeleton = () => (
   <div>
     <Skeleton className="w-48 h-8 mb-4 rounded-md" />
     <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-4">
-      <Skeleton count={4} className="w-full h-32 rounded-md" />
+      {Array.from({ length: 6 }).map((_, i) => (
+        <MenuItem.Skeleton key={i} />
+      ))}
     </div>
   </div>
 );

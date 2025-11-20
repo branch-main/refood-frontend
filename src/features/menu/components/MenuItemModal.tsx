@@ -3,6 +3,7 @@ import {
   MenuItem as MenuItemDomain,
   MenuItemOption as MenuItemOptionDomain,
 } from "@/entities";
+import { useCart } from "@/features/cart/contexts";
 import { Textarea } from "@/shared/components/ui";
 import { Checkbox } from "@/shared/components/ui/Checkbox";
 import { Modal } from "@/shared/components/ui/Modal";
@@ -180,6 +181,7 @@ export const MenuItemModal = ({
   isOpen: boolean;
   onClose: () => void;
 }) => {
+  const { addItem, setIsOpen: setCartOpen } = useCart();
   const [count, setCount] = useState(1);
   const [notes, setNotes] = useState("");
   const [optionSelections, setOptionSelections] = useState<
@@ -218,6 +220,19 @@ export const MenuItemModal = ({
     setOptionSelections(new Map());
   }, [isOpen]);
 
+  const handleAddToCart = () => {
+    addItem({
+      id: item.id,
+      name: item.name,
+      price: Number(price) + additionalPrice,
+      quantity: count,
+      image: item.image,
+      notes: notes || undefined,
+    });
+    onClose();
+    setCartOpen(true);
+  };
+
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <div className="flex items-center justify-between border-b border-gray-200 px-4 py-3">
@@ -228,7 +243,7 @@ export const MenuItemModal = ({
       </div>
 
       <div className="w-4xl flex p-4 gap-4 max-h-[85vh]">
-        <div className="w-96 flex flex-col gap-5">
+        <div className="w-84 2xl:w-96 flex flex-col gap-5">
           <img
             src={getFallbackImage(item.name, item.image)}
             alt={item.name}
@@ -315,7 +330,7 @@ export const MenuItemModal = ({
             <button
               disabled={canAddToCart}
               className="disabled:bg-gray-200 disabled:text-gray-400 cursor-pointer disabled:cursor-default flex-1 text-sm rounded-lg py-2.5 transition-colors bg-red-500 hover:bg-red-700 text-white font-semibold"
-              onClick={() => onClose()}
+              onClick={handleAddToCart}
             >
               Agregar {formatPrice(totalPrice)}
             </button>

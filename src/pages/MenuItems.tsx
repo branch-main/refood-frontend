@@ -1,9 +1,10 @@
 import { useState, useMemo } from "react";
 import { MenuItemsGrid } from "@/features/menu/components";
-import { Input, Skeleton } from "@/shared/components/ui";
+import { Input } from "@/shared/components/ui";
 import { useDebounced } from "@/shared/hooks";
 import { MenuItem } from "@/entities";
 import { useMenu } from "@/features/menu/hooks";
+import { MenuItem as MenuItemComponent } from "@/features/menu/components";
 
 function filterMenuItems(items: MenuItem[], search: string): MenuItem[] {
   const searchLower = search.toLowerCase();
@@ -46,7 +47,9 @@ export const MenuItems = () => {
         <div className="mt-8">
           {isLoading && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              <Skeleton count={12} className="h-34 rounded-lg" />
+              {Array.from({ length: 12 }).map((_, i) => (
+                <MenuItemComponent.Skeleton />
+              ))}
             </div>
           )}
           {filtered && <MenuItemsGrid items={filtered} />}

@@ -47,14 +47,14 @@ export const Home = () => {
 
               <div className="flex flex-col sm:flex-row gap-4 mb-12 justify-center lg:justify-start">
                 <Button
-                  size="large"
+                  size="lg"
                   variant="primary"
                   onClick={() => navigate("/menu")}
                 >
                   Explorar Alimentos
                 </Button>
                 <Button
-                  size="large"
+                  size="lg"
                   variant="secondary"
                   onClick={() => navigate("/restaurants")}
                 >
@@ -222,7 +222,7 @@ export const Home = () => {
           {/* CTA Below Steps */}
           <div className="mt-16 text-center">
             <Button
-              size="large"
+              size="lg"
               variant="primary"
               onClick={() => navigate("/register")}
             >

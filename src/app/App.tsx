@@ -19,6 +19,8 @@ import {
 } from "@/pages";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AuthProvider } from "@/features/auth/contexts";
+import { RestaurantProvider } from "@/features/restaurants/contexts";
+import { CartProvider } from "@/features/cart/contexts";
 
 const ProtectedRoute = () => {
   const { user, loading } = useAuth();
@@ -29,10 +31,14 @@ const ProtectedRoute = () => {
 const RootLayout = () => {
   return (
     <AuthProvider>
-      <Layout>
-        <Outlet />
-        <ScrollRestoration />
-      </Layout>
+      <RestaurantProvider>
+        <CartProvider>
+          <Layout>
+            <Outlet />
+            <ScrollRestoration />
+          </Layout>
+        </CartProvider>
+      </RestaurantProvider>
     </AuthProvider>
   );
 };

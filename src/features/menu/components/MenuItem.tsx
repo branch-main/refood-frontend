@@ -6,6 +6,7 @@ import {
 } from "@/shared/utils";
 import { MenuItem as MenuItemDomain } from "@/entities";
 import { MenuItemModal } from "./MenuItemModal";
+import { Skeleton } from "@/shared/components/ui";
 
 // TODO: use actual values
 const DISCOUNTED_PRICE = 10;
@@ -17,7 +18,7 @@ export const MenuItem = ({ item }: { item: MenuItemDomain }) => {
     <>
       <div
         onClick={() => setIsModalOpen(true)}
-        className="cursor-pointer transition-color duration-500 bg-white p-4 shadow-xs rounded-lg hover:bg-red-50"
+        className="cursor-pointer transition-transform duration-500 hover:scale-105 border-b border-gray-200 pb-5"
       >
         <div className="flex flex-col">
           <div className="flex justify-between gap-4 w-full">
@@ -64,5 +65,29 @@ export const MenuItem = ({ item }: { item: MenuItemDomain }) => {
         onClose={() => setIsModalOpen(false)}
       />
     </>
+  );
+};
+
+MenuItem.Skeleton = () => {
+  return (
+    <div className="border-b border-gray-200 pb-5">
+      <div className="flex justify-between gap-4 w-full">
+        <div className="flex flex-col justify-between flex-1 gap-4">
+          <div className="flex flex-col gap-1 space-y-2">
+            <Skeleton className="h-5 w-3/4" />
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-5/6" />
+          </div>
+
+          <div className="flex gap-2.5 items-end leading-none space-x-2">
+            <Skeleton className="h-5 w-12" />
+            <Skeleton className="h-6 w-16" />
+            <Skeleton className="h-5 w-14" />
+          </div>
+        </div>
+
+        <Skeleton className="w-25 h-25 rounded-xl" />
+      </div>
+    </div>
   );
 };
