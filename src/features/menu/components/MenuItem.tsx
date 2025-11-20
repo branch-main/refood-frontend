@@ -13,11 +13,22 @@ const DISCOUNTED_PRICE = 10;
 
 export const MenuItem = ({ item }: { item: MenuItemDomain }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [shouldMount, setShouldMount] = useState(false);
+
+  const handleOpen = () => {
+    setShouldMount(true);
+    setIsModalOpen(true);
+  };
+
+  const handleClose = () => {
+    setIsModalOpen(false);
+    setTimeout(() => setShouldMount(false), 300);
+  };
 
   return (
     <>
       <div
-        onClick={() => setIsModalOpen(true)}
+        onClick={handleOpen}
         className="cursor-pointer transition-transform duration-500 hover:scale-105 border-b border-gray-200 pb-5"
       >
         <div className="flex flex-col">
@@ -59,11 +70,13 @@ export const MenuItem = ({ item }: { item: MenuItemDomain }) => {
         </div>
       </div>
 
-      <MenuItemModal
-        item={item}
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-      />
+      {shouldMount && (
+        <MenuItemModal
+          item={item}
+          isOpen={isModalOpen}
+          onClose={handleClose}
+        />
+      )}
     </>
   );
 };

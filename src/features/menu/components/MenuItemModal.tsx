@@ -213,13 +213,6 @@ export const MenuItemModal = ({
   const price = DISCOUNTED_PRICE ?? Number(item.price);
   const totalPrice = (Number(price) + additionalPrice) * count;
 
-  useEffect(() => {
-    if (!isOpen) return;
-    setCount(1);
-    setNotes("");
-    setOptionSelections(new Map());
-  }, [isOpen]);
-
   const handleAddToCart = () => {
     addItem({
       id: item.id,
