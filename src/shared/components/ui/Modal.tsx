@@ -1,32 +1,20 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+
+type Animation = "scale" | "slide-right" | "slide-left";
 
 export const Modal = ({
   isOpen,
   onClose,
   children,
+  animation = "scale",
 }: {
   isOpen: boolean;
   onClose: () => void;
   children: React.ReactNode;
+  animation?: Animation;
 }) => {
   const modalRef = useRef<HTMLDivElement>(null);
-  const [isAnimating, setIsAnimating] = useState(false);
-  const [shouldRender, setShouldRender] = useState(isOpen);
-
-  useEffect(() => {
-    if (isOpen) {
-      setShouldRender(true);
-      setIsAnimating(false);
-      const timer = setTimeout(() => {
-        setIsAnimating(true);
-      }, 10);
-      return () => clearTimeout(timer);
-    } else {
-      setIsAnimating(false);
-      const timer = setTimeout(() => setShouldRender(false), 300);
-      return () => clearTimeout(timer);
-    }
-  }, [isOpen]);
 
   useEffect(() => {
     document.body.style.overflow = isOpen ? "hidden" : "auto";
@@ -80,28 +68,66 @@ export const Modal = ({
     };
   }, [isOpen, onClose]);
 
-  if (!shouldRender) return null;
+  const getModalVariants = () => {
+    if (animation === "slide-right") {
+      return {
+        hidden: { x: "100%" },
+        visible: { x: 0 },
+        exit: { x: "100%" },
+      };
+    }
+    if (animation === "slide-left") {
+      return {
+        hidden: { x: "-100%" },
+        visible: { x: 0 },
+        exit: { x: "-100%" },
+      };
+    }
+    return {
+      hidden: { scale: 1.05, opacity: 0 },
+      visible: { scale: 1, opacity: 1 },
+      exit: { scale: 1.05, opacity: 0 },
+    };
+  };
+
+  const containerClassName =
+    animation === "slide-right" || animation === "slide-left"
+      ? "fixed inset-0 z-999"
+      : "fixed inset-0 z-999 flex items-center justify-center";
+
+  const modalClassName =
+    animation === "slide-right"
+      ? "bg-white h-screen fixed right-0"
+      : animation === "slide-left"
+        ? "bg-white h-screen fixed left-0"
+        : "bg-white rounded-lg max-w-screen max-h-screen";
 
   return (
-    <div
-      style={{
-        opacity: isAnimating ? 1 : 0,
-        transition: "opacity 300ms ease-in-out",
-      }}
-      className="bg-black/50 fixed inset-0 z-999 flex items-center justify-center"
-      onClick={onClose}
-    >
-      <div
-        ref={modalRef}
-        style={{
-          transform: isAnimating ? "scale(1)" : "scale(1.05)",
-          transition: "transform 300ms ease",
-        }}
-        onClick={(e) => e.stopPropagation()}
-        className="bg-white rounded-lg will-change-transform max-w-screen max-h-screen"
-      >
-        {children}
-      </div>
-    </div>
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.3, ease: "easeInOut" }}
+          className={containerClassName}
+          onClick={onClose}
+          style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}
+        >
+          <motion.div
+            ref={modalRef}
+            variants={getModalVariants()}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            transition={{ duration: 0.3, ease: "easeOut" }}
+            onClick={(e) => e.stopPropagation()}
+            className={modalClassName}
+          >
+            {children}
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 };

@@ -13,7 +13,7 @@ import {
   calculateDiscount,
   getFallbackImage,
 } from "@/shared/utils";
-import { ChangeEvent, useEffect, useState } from "react";
+import { ChangeEvent, useState } from "react";
 import { FaMinus, FaPlus } from "react-icons/fa6";
 import { IoIosArrowDown } from "react-icons/io";
 import { IoClose } from "react-icons/io5";
@@ -181,7 +181,7 @@ export const MenuItemModal = ({
   isOpen: boolean;
   onClose: () => void;
 }) => {
-  const { addItem, setIsOpen: setCartOpen } = useCart();
+  const { addItem } = useCart();
   const [count, setCount] = useState(1);
   const [notes, setNotes] = useState("");
   const [optionSelections, setOptionSelections] = useState<
@@ -210,7 +210,7 @@ export const MenuItemModal = ({
   );
 
   // TODO: shouldn't need Number() here if types are correct
-  const price = DISCOUNTED_PRICE ?? item.price;
+  const price = DISCOUNTED_PRICE ?? Number(item.price);
   const totalPrice = (Number(price) + additionalPrice) * count;
 
   useEffect(() => {
@@ -224,13 +224,12 @@ export const MenuItemModal = ({
     addItem({
       id: item.id,
       name: item.name,
-      price: Number(price) + additionalPrice,
+      price: price + additionalPrice,
       quantity: count,
-      image: item.image,
+      image: item.image || undefined,
       notes: notes || undefined,
     });
     onClose();
-    setCartOpen(true);
   };
 
   return (

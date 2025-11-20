@@ -8,6 +8,7 @@ import { Link } from "react-router-dom";
 import { useRestaurant } from "@/features/restaurants/hooks";
 import { BsFillStarFill } from "react-icons/bs";
 import { useMenuItem } from "../hooks";
+import { Modal } from "@/shared/components/ui/Modal";
 
 const EmptyCart = () => {
   const { setIsOpen } = useCart();
@@ -101,23 +102,16 @@ export const MenuCart = () => {
 
   const deliveryFee = items.length > 0 ? 2.5 : 0;
 
-  const firstItemId = items[0]?.id;
-  const { data: firstItem } = useMenuItem(firstItemId ?? -1);
-  const { data: restaurant } = useRestaurant(firstItem?.restaurantId ?? -1);
-
-  if (!isOpen) {
-    return null;
-  }
+  const { data: firstItem } = useMenuItem(items[0]?.id);
+  const { data: restaurant } = useRestaurant(firstItem?.restaurantId);
 
   return (
-    <div
-      className={`transition-all fixed inset-0 bg-black/50 z-99 ${isOpen ? "opacity-100" : "opacity-0"}`}
-      onClick={() => setIsOpen(false)}
+    <Modal
+      isOpen={isOpen}
+      onClose={() => setIsOpen(false)}
+      animation="slide-right"
     >
-      <div
-        className="flex flex-col fixed right-0 p-4 bg-white w-[350px] h-screen"
-        onClick={(e) => e.stopPropagation()}
-      >
+      <div className="flex flex-col p-4 w-[350px] h-full">
         <div className="">
           <div className="flex justify-between items-center mb-4">
             <span className="text-gray-800 font-semibold text-2xl">
@@ -214,6 +208,6 @@ export const MenuCart = () => {
           )}
         </div>
       </div>
-    </div>
+    </Modal>
   );
 };
