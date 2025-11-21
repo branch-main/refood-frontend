@@ -6,7 +6,7 @@ export const MenuItemTable = ({ items }: { items: MenuItem[] }) => {
   const navigate = useNavigate();
 
   return (
-    <div className="overflow-x-auto p-4">
+    <div className="overflow-x-auto">
       <table className="min-w-full border-collapse overflow-hidden">
         <thead className="text-center text-gray-400 text-xs uppercase">
           <th className="pb-2 text-left">Producto</th>
@@ -14,7 +14,7 @@ export const MenuItemTable = ({ items }: { items: MenuItem[] }) => {
           <th className="pb-2">Estado</th>
           <th className="pb-2">Opciones</th>
         </thead>
-        <tbody className="divide-y divide-gray-200">
+        <tbody>
           {items.map((item) => (
             <tr key={item.id} className="text-sm">
               <td
@@ -56,3 +56,5 @@ export const MenuItemTable = ({ items }: { items: MenuItem[] }) => {
     </div>
   );
 };
+
+MenuItemTable.Skeleton = () => {};
