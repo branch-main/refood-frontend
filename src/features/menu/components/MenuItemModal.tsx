@@ -235,12 +235,10 @@ export const MenuItemModal = ({
   const totalPrice = (Number(price) + additionalPrice) * count;
 
   const handleAddToCart = () => {
-    addItem({
+    addItem(item.restaurantId, {
       id: item.id,
-      name: item.name,
       price: price + additionalPrice,
       quantity: count,
-      image: item.image || undefined,
       notes: notes || undefined,
     });
     onClose();

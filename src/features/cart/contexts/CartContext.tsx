@@ -2,19 +2,18 @@ import { createContext, useContext, useState, ReactNode } from "react";
 
 export interface CartItem {
   id: number;
-  name: string;
   price: number;
   quantity: number;
-  image?: string;
   notes?: string;
-  options?: { name: string; choices: string[] }[];
+  options?: { name: string; value: string }[];
 }
 
 interface CartContextType {
+  restaurant?: number;
   items: CartItem[];
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
-  addItem: (item: Omit<CartItem, "quantity"> & { quantity?: number }) => void;
+  addItem: (restaurantId: number, item: CartItem) => void;
   removeItem: (id: number) => void;
   updateQuantity: (id: number, quantity: number) => void;
   clearCart: () => void;
@@ -28,25 +27,29 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [items, setItems] = useState<CartItem[]>([]);
   const [isOpen, setIsOpen] = useState(false);
+  const [restaurantId, setRestaurantId] = useState<number | undefined>(
+    undefined,
+  );
 
-  const addItem = (
-    newItem: Omit<CartItem, "quantity"> & { quantity?: number },
-  ) => {
+  const addItem = (restaurant: number, newItem: CartItem) => {
+    if (restaurantId && restaurantId !== restaurant) {
+      alert(
+        "No puedes agregar productos de diferentes restaurantes al carrito.",
+      );
+      return;
+    }
+
+    setRestaurantId(restaurant);
     setItems((prev) => {
-      const existingItem = prev.find((item) => item.id === newItem.id);
-      if (existingItem) {
-        return prev.map((item) =>
-          item.id === newItem.id
-            ? { ...item, quantity: item.quantity + (newItem.quantity || 1) }
-            : item,
-        );
-      }
       return [...prev, { ...newItem, quantity: newItem.quantity || 1 }];
     });
   };
 
   const removeItem = (id: number) => {
     setItems((prev) => prev.filter((item) => item.id !== id));
+    if (items.length === 0) {
+      setRestaurantId(undefined);
+    }
   };
 
   const updateQuantity = (id: number, quantity: number) => {
@@ -60,6 +63,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const clearCart = () => {
+    setRestaurantId(undefined);
     setItems([]);
   };
 
@@ -74,6 +78,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   return (
     <CartContext.Provider
       value={{
+        restaurant: restaurantId,
         items,
         isOpen,
         setIsOpen,

@@ -4,7 +4,7 @@ import { useCart } from "@/features/cart/contexts";
 import { LiaCartPlusSolid } from "react-icons/lia";
 import { IoMdCloseCircle } from "react-icons/io";
 import { FaLocationDot } from "react-icons/fa6";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { BsFillStarFill } from "react-icons/bs";
 import { Modal } from "@/shared/components/ui/Modal";
 import { useMenuItem, useRestaurant } from "@/shared/hooks";
@@ -97,12 +97,20 @@ const CartItem = ({
 };
 
 export const MenuCart = () => {
-  const { items, isOpen, setIsOpen, subtotal, total } = useCart();
+  const {
+    restaurant: restaurantId,
+    items,
+    isOpen,
+    setIsOpen,
+    subtotal,
+    total,
+  } = useCart();
 
   const deliveryFee = items.length > 0 ? 2.5 : 0;
 
-  const { data: firstItem } = useMenuItem(items[0]?.id);
-  const { data: restaurant } = useRestaurant(firstItem?.restaurantId);
+  const { data: restaurant } = useRestaurant(restaurantId);
+
+  const navigate = useNavigate();
 
   return (
     <Modal
@@ -199,6 +207,10 @@ export const MenuCart = () => {
                 <button
                   className="cursor-pointer mt-2 w-full bg-green-500 text-white text-sm font-semibold py-3
               rounded-lg hover:bg-green-600 transition-all duration-200"
+                  onClick={() => {
+                    setIsOpen(false);
+                    navigate("/checkout");
+                  }}
                 >
                   Proceder al pago
                 </button>

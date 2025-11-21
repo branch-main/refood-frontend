@@ -12,6 +12,7 @@ import {
   Restaurants,
   Restaurant,
   Profile,
+  Checkout,
 } from "@/pages";
 import { Layout } from "@/shared/components/layout";
 import { authService } from "@/shared/services";
@@ -46,6 +47,7 @@ export const routes: RouteObject = {
     { index: true, element: <Home /> },
     { path: "login", element: <Login /> },
     { path: "register", element: <Register /> },
+    { path: "checkout", element: <Checkout />, loader: requireAuth },
     { path: "menu", element: <Menu /> },
     { path: "restaurants", element: <Restaurants /> },
     { path: "restaurants/:id", element: <Restaurant /> },
