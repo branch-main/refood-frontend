@@ -4,10 +4,10 @@ import {
   DashboardCard,
   StatIndicator,
   WeeklyEarningsChart,
+  RecentReviews,
 } from "../features/dashboard/components";
 import { MenuItemTable } from "../features/menu/components";
 import { OrderTable } from "../features/orders/components";
-import { RestaurantCard } from "../features/restaurants/components/RestaurantCard";
 import { formatPrice } from "@/shared/utils";
 
 const order: Order = {
@@ -43,11 +43,11 @@ export const PartnerDashboard = () => {
         </DashboardCard>
 
         <DashboardCard title="Ganancias semanales">
-          <WeeklyEarningsChart data={[120, 200, 180, 240, 300, 280, 350]} />
+          <WeeklyEarningsChart data={[120, 200, 180, 240, 300, 280, 0]} />
         </DashboardCard>
 
         <DashboardCard title="Opiniones recientes">
-          <span>PLACEHOLDER</span>
+          <RecentReviews />
         </DashboardCard>
 
         <DashboardCard title="Más vendidos" className="col-span-2">
