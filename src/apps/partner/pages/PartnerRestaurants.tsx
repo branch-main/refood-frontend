@@ -8,7 +8,7 @@ const RestaurantCard = ({ restaurant }: { restaurant: Restaurant }) => {
   return (
     <Link
       to={`/restaurants/${restaurant.id}`}
-      className="bg-neutral-50 border border-gray-200 rounded-xl overflow-hidden"
+      className="bg-neutral-50  border border-gray-200 rounded-xl overflow-hidden"
     >
       <img
         alt={restaurant.name}
@@ -64,7 +64,7 @@ export const PartnerRestaurants = () => {
   return (
     <>
       <h1 className="text-2xl font-medium text-black mb-7">Restaurantes</h1>
-      <div className="bg-white rounded-4xl p-8 shadow-xs">
+      <div className="bg-white rounded-4xl p-8 shadow-[0_0_20px_rgba(0,0,0,0.02)] card">
         {restaurants && restaurants.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {restaurants.map((restaurant) => (

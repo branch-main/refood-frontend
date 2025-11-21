@@ -11,6 +11,7 @@ import {
   PartnerOrders,
   PartnerAnalytics,
   PartnerSettings,
+  CreateMenuItem,
 } from "./pages";
 import { AuthProvider } from "@/shared/contexts";
 import { authService } from "@/shared/services";
@@ -42,5 +43,6 @@ export const routes: RouteObject = {
     { path: "orders", element: <PartnerOrders /> },
     { path: "analytics", element: <PartnerAnalytics /> },
     { path: "settings", element: <PartnerSettings /> },
+    { path: "menu/create", element: <CreateMenuItem /> },
   ],
 };
