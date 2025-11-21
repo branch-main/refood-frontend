@@ -3,9 +3,9 @@ import { PartnerSidebar } from "../components/PartnerSidebar";
 
 export const PartnerLayout = ({ children }: { children?: ReactNode }) => {
   return (
-    <div className="min-h-screen flex bg-neutral-50">
+    <div className="min-h-screen flex bg-gray-100">
       <PartnerSidebar />
-      <main className="flex-1 pt-5 pb-4 pl-4 pr-8">{children}</main>
+      <main className="flex-1 pt-5 pb-4 px-12">{children}</main>
     </div>
   );
 };

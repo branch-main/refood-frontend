@@ -21,7 +21,7 @@ export const PartnerSidebar = () => {
   };
 
   return (
-    <aside className="sticky top-0 w-[250px] p-4 flex flex-col justify-between h-screen">
+    <aside className="bg-white sticky top-0 w-[250px] p-4 flex flex-col justify-between h-screen">
       <div>
         <h1 className="py-2 flex items-start gap-2 font-bold text-lg uppercase text-black mb-4 tracking-wide">
           <Link to="/" className="flex items-center gap-2 no-underline">
