@@ -271,6 +271,13 @@ export const Navbar = () => {
               >
                 Restaurantes
               </Link>
+              <Link
+                to="/partners"
+                className="text-gray-600 no-underline font-medium text-sm px-4 py-3 rounded-lg transition-all hover:text-[#B21F1F] hover:bg-red-50"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Para Restaurantes
+              </Link>
 
               {user ? (
                 <>

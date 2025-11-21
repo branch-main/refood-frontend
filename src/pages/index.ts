@@ -2,6 +2,7 @@ export * from "./Home";
 export * from "./Login";
 export * from "./MenuItemPage";
 export * from "./MenuItems";
+export * from "./Partners";
 export * from "./Profile";
 export * from "./Register";
 export * from "./Restaurant";

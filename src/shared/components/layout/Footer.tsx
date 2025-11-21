@@ -56,6 +56,14 @@ export const Footer = () => (
             </li>
             <li>
               <Link
+                to="/partners"
+                className="text-gray-500 text-sm no-underline transition-colors duration-200 hover:text-red-500"
+              >
+                Para Restaurantes
+              </Link>
+            </li>
+            <li>
+              <Link
                 to="/about"
                 className="text-gray-500 text-sm no-underline transition-colors duration-200 hover:text-red-500"
               >
