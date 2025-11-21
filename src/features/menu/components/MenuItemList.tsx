@@ -1,7 +1,7 @@
 import { MenuItem } from "@/features/menu/components";
-import { MenuItem as MenuItemDomain } from "@/entities";
+import { MenuItem as MenuItemDomain } from "@/shared/types";
 
-export const MenuItemsGrid = ({ items }: { items: MenuItemDomain[] }) => {
+export const MenuItemList = ({ items }: { items: MenuItemDomain[] }) => {
   if (items.length === 0) {
     return (
       <div className="col-span-full text-center py-16 px-8 text-gray-500">

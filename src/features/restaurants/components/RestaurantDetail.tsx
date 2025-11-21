@@ -6,7 +6,7 @@ import {
   formatTime,
   getFallbackImage,
 } from "@/shared/utils";
-import { Restaurant } from "@/entities";
+import { Restaurant } from "@/shared/types";
 import { Skeleton } from "@/shared/components/ui";
 
 export const RestaurantDetail = ({

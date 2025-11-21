@@ -1,58 +1,62 @@
-import { apiClient } from "../api/client";
-import { mockAuthAPI, useMockAPI } from "../api/mockAuth";
+import { apiClient } from "../api";
+import { User } from "../types";
 
-export interface LoginCredentials {
-  email: string;
-  password: string;
-}
-
-export interface RegisterData {
-  email: string;
-  password: string;
+export interface RegisterRequest {
   firstName: string;
   lastName: string;
+  email: string;
+  phone: string;
+  password: string;
+  password2: string;
 }
 
 export interface AuthResponse {
   token: string;
-  user: {
-    id: number;
-    email: string;
-    firstName: string;
-    lastName: string;
-    role: "customer" | "partner";
-  };
+  user: User;
 }
 
+const toUser = (data: any): User => ({
+  id: data.id,
+  firstName: data.first_name,
+  lastName: data.last_name,
+  email: data.email,
+  phone: data.phone,
+  image: data.image,
+  role: data.role,
+  addresses: [],
+  favorites: data.favorites,
+  createdAt: data.created_at,
+  updatedAt: data.updated_at,
+});
+
 export const authService = {
-  // Customer Auth
-  login: async (credentials: LoginCredentials): Promise<AuthResponse> => {
-    if (useMockAPI()) {
-      return mockAuthAPI.customerLogin(credentials.email, credentials.password);
-    }
-    const { data } = await apiClient.post("/auth/login/", credentials);
-    return data;
+  register: async (request: RegisterRequest): Promise<AuthResponse> => {
+    return apiClient
+      .post<any>("/auth/register/", {
+        first_name: request.firstName,
+        last_name: request.lastName,
+        email: request.email,
+        phone: request.phone,
+        password: request.password,
+        password2: request.password2,
+      })
+      .then(({ token, user }) => ({ token, user: toUser(user) }));
   },
 
-  register: async (registerData: RegisterData): Promise<AuthResponse> => {
-    const { data } = await apiClient.post("/auth/register/", registerData);
-    return data;
+  login: async (email: string, password: string): Promise<AuthResponse> => {
+    return apiClient
+      .post<any>("/auth/login/", { email, password })
+      .then(({ token, user }) => ({ token, user: toUser(user) }));
   },
 
   logout: async () => {
     await apiClient.post("/auth/logout/");
     localStorage.removeItem("auth_token");
-    localStorage.removeItem("partner_user");
-    localStorage.removeItem("customer_user");
   },
 
   getCurrentUser: async () => {
-    if (useMockAPI()) {
-      const token = localStorage.getItem("auth_token");
-      if (!token) throw new Error("No token");
-      return mockAuthAPI.getCurrentUser(token);
-    }
-    const { data } = await apiClient.get("/auth/me");
-    return data;
+    const token = localStorage.getItem("auth_token");
+    if (!token) throw new Error("No token");
+    return apiClient.get<any>("/users/me").then(toUser);
   },
 };

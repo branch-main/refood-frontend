@@ -1,6 +1,6 @@
 import { MenuItem } from "@/features/menu/components";
-import { useRestaurantMenu } from "@/features/menu/hooks";
 import { Skeleton } from "@/shared/components/ui";
+import { useMenuByRestaurant } from "@/shared/hooks";
 
 export const RestaurantMenu = ({
   restaurantId,
@@ -9,7 +9,7 @@ export const RestaurantMenu = ({
   restaurantId: number;
   category: string;
 }) => {
-  const { isLoading, data: menu } = useRestaurantMenu(restaurantId);
+  const { isLoading, data: menu } = useMenuByRestaurant(restaurantId);
 
   if (isLoading) {
     return <RestaurantMenu.Skeleton />;

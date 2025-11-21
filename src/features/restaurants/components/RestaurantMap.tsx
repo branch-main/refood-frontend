@@ -1,4 +1,4 @@
-import { Restaurant } from "@/entities";
+import { Restaurant } from "@/shared/types";
 import { Skeleton } from "@/shared/components/ui";
 
 export const RestaurantMap = ({ restaurant }: { restaurant: Restaurant }) => {

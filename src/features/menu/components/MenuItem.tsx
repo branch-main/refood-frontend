@@ -4,14 +4,14 @@ import {
   calculateDiscount,
   getFallbackImage,
 } from "@/shared/utils";
-import { MenuItem as MenuItemDomain } from "@/entities";
 import { MenuItemModal } from "./MenuItemModal";
 import { Skeleton } from "@/shared/components/ui";
+import { MenuItem as MenuItemType } from "@/shared/types";
 
 // TODO: use actual values
 const DISCOUNTED_PRICE = 10;
 
-export const MenuItem = ({ item }: { item: MenuItemDomain }) => {
+export const MenuItem = ({ item }: { item: MenuItemType }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [shouldMount, setShouldMount] = useState(false);
 
@@ -71,11 +71,7 @@ export const MenuItem = ({ item }: { item: MenuItemDomain }) => {
       </div>
 
       {shouldMount && (
-        <MenuItemModal
-          item={item}
-          isOpen={isModalOpen}
-          onClose={handleClose}
-        />
+        <MenuItemModal item={item} isOpen={isModalOpen} onClose={handleClose} />
       )}
     </>
   );

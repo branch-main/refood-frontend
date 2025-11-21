@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
-import { useAuth } from "@/features/auth/hooks";
+import { useAuth } from "@/shared/hooks";
 import { useRestaurantContext } from "@/features/restaurants/contexts";
 import { useCart } from "@/features/cart/contexts";
 import { FiMenu, FiX, FiShoppingCart } from "react-icons/fi";

@@ -1,44 +1,59 @@
-import { Navigate } from "react-router-dom";
-import { CustomerLayout } from "./layout/CustomerLayout";
+import {
+  Outlet,
+  redirect,
+  RouteObject,
+  ScrollRestoration,
+} from "react-router-dom";
 import {
   Home,
   Login,
   Register,
-  MenuItems,
-  MenuItemPage,
+  Menu,
   Restaurants,
   Restaurant,
   Profile,
-  Partners,
 } from "@/pages";
+import { Layout } from "@/shared/components/layout";
+import { authService } from "@/shared/services";
+import { AuthProvider } from "@/shared/contexts";
+import { CartProvider } from "@/features/cart/contexts";
+import { RestaurantProvider } from "@/features/restaurants/contexts";
 
-// Protected route wrapper
-const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  // TODO: Implement auth check
-  const isAuthenticated = true; // Replace with actual auth check
-  return isAuthenticated ? <>{children}</> : <Navigate to="/login" replace />;
+const requireAuth = async () => {
+  const user = await authService.getCurrentUser().catch(() => null);
+  if (!user) {
+    return redirect("/login");
+  }
+  return null;
 };
 
-export const routes = [
-  {
-    element: <CustomerLayout />,
-    children: [
-      { path: "/", element: <Home /> },
-      { path: "/login", element: <Login /> },
-      { path: "/register", element: <Register /> },
-      { path: "/partners", element: <Partners /> },
-      { path: "/menu", element: <MenuItems /> },
-      { path: "/menu/:id", element: <MenuItemPage /> },
-      { path: "/restaurants", element: <Restaurants /> },
-      { path: "/restaurants/:id", element: <Restaurant /> },
-      {
-        path: "/profile",
-        element: (
-          <ProtectedRoute>
-            <Profile />
-          </ProtectedRoute>
-        ),
-      },
-    ],
-  },
-];
+const RootLayout = () => (
+  <AuthProvider>
+    <CartProvider>
+      <RestaurantProvider>
+        <Layout>
+          <Outlet />
+          <ScrollRestoration />
+        </Layout>
+      </RestaurantProvider>
+    </CartProvider>
+  </AuthProvider>
+);
+
+export const routes: RouteObject = {
+  element: <RootLayout />,
+  children: [
+    { index: true, element: <Home /> },
+    { path: "login", element: <Login /> },
+    { path: "register", element: <Register /> },
+    { path: "menu", element: <Menu /> },
+    { path: "restaurants", element: <Restaurants /> },
+    { path: "restaurants/:id", element: <Restaurant /> },
+
+    {
+      path: "profile",
+      loader: requireAuth,
+      element: <Profile />,
+    },
+  ],
+};

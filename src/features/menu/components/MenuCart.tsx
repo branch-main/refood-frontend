@@ -5,10 +5,9 @@ import { LiaCartPlusSolid } from "react-icons/lia";
 import { IoMdCloseCircle } from "react-icons/io";
 import { FaLocationDot } from "react-icons/fa6";
 import { Link } from "react-router-dom";
-import { useRestaurant } from "@/features/restaurants/hooks";
 import { BsFillStarFill } from "react-icons/bs";
-import { useMenuItem } from "../hooks";
 import { Modal } from "@/shared/components/ui/Modal";
+import { useMenuItem, useRestaurant } from "@/shared/hooks";
 
 const EmptyCart = () => {
   const { setIsOpen } = useCart();

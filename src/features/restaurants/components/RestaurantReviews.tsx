@@ -1,4 +1,4 @@
-import { Restaurant } from "@/entities";
+import { Restaurant } from "@/shared/types";
 import { FiStar } from "react-icons/fi";
 import { Skeleton } from "@/shared/components/ui";
 
@@ -11,8 +11,8 @@ interface Review {
   userInitials: string;
 }
 
-// Mock data - replace with actual API call
-const mockReviews: Review[] = [
+// TODO: replace with actual API call
+const REVIEWS: Review[] = [
   {
     id: 1,
     userName: "María González",
@@ -77,13 +77,13 @@ export const RestaurantReviews = ({
       </h2>
 
       <div className="flex flex-col gap-4">
-        {mockReviews.map((review) => (
+        {REVIEWS.map((review) => (
           <div
             key={review.id}
             className="border-b border-gray-100 last:border-0 pb-4 last:pb-0"
           >
             <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
+              <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center shrink-0">
                 <span className="text-red-600 font-bold text-sm">
                   {review.userInitials}
                 </span>
@@ -140,7 +140,7 @@ RestaurantReviews.Skeleton = () => {
             className="border-b border-gray-100 last:border-0 pb-4 last:pb-0"
           >
             <div className="flex items-start gap-3">
-              <Skeleton className="w-10 h-10 rounded-full flex-shrink-0" />
+              <Skeleton className="w-10 h-10 rounded-full shrink-0" />
 
               <div className="flex-1 space-y-2">
                 <div className="flex items-center justify-between">

@@ -1,8 +1,8 @@
 import {
-  MenuItemChoice as MenuItemChoiceDomain,
-  MenuItem as MenuItemDomain,
-  MenuItemOption as MenuItemOptionDomain,
-} from "@/entities";
+  MenuItemChoice as MenuItemChoiceType,
+  MenuItem as MenuItemType,
+  MenuItemOption as MenuItemOptionType,
+} from "@/shared/types";
 import { useCart } from "@/features/cart/contexts";
 import { Textarea } from "@/shared/components/ui";
 import { Checkbox } from "@/shared/components/ui/Checkbox";
@@ -20,29 +20,50 @@ import { IoClose } from "react-icons/io5";
 
 // TODO: use actual values
 const DISCOUNTED_PRICE: number | null = 10;
-const OPTIONS = [
-  new MenuItemOptionDomain(1, "Elige Salsas", 2, 3, true, [
-    new MenuItemChoiceDomain(1, "Mayonesa", 1.99, true),
-    new MenuItemChoiceDomain(2, "Mayonesa", 1.99, false),
-    new MenuItemChoiceDomain(3, "Mayonesa", 1.99, true),
-    new MenuItemChoiceDomain(4, "Mayonesa", 1.99, true),
-    new MenuItemChoiceDomain(5, "Mayonesa", 1.99, true),
-    new MenuItemChoiceDomain(6, "Mayonesa", 1.99, true),
-    new MenuItemChoiceDomain(7, "Mayonesa", 1.99, true),
-    new MenuItemChoiceDomain(8, "Mayonesa", 1.99, true),
-  ]),
+const OPTIONS: MenuItemOptionType[] = [
+  {
+    id: 1,
+    name: "Elige Salsas",
+    minChoices: 2,
+    maxChoices: 3,
+    isRequired: true,
+    choices: [
+      { id: 1, name: "Mayonesa", price: 1.99, isAvailable: true },
+      { id: 2, name: "Kétchup", price: 0, isAvailable: true },
+      { id: 3, name: "Mostaza", price: 0, isAvailable: false },
+      { id: 4, name: "Barbacoa", price: 0.5, isAvailable: true },
+      { id: 5, name: "Ajo", price: 0, isAvailable: true },
+      { id: 6, name: "Curry", price: 0.75, isAvailable: true },
+      { id: 7, name: "Buffalo", price: 1.0, isAvailable: true },
+      { id: 8, name: "Chipotle", price: 1.25, isAvailable: true },
+    ],
+  },
 
-  new MenuItemOptionDomain(2, "Elige Salsas", 1, 1, true, [
-    new MenuItemChoiceDomain(2, "Mayonesa", 1.99, true),
-    new MenuItemChoiceDomain(3, "Mayonesa", 1.99, false),
-    new MenuItemChoiceDomain(4, "Mayonesa", 1.99, true),
-  ]),
+  {
+    id: 2,
+    name: "Elige Bebida",
+    minChoices: 1,
+    maxChoices: 1,
+    isRequired: true,
+    choices: [
+      { id: 2, name: "Coca-Cola", price: 0, isAvailable: true },
+      { id: 3, name: "Pepsi", price: 0, isAvailable: false },
+      { id: 4, name: "Sprite", price: 0, isAvailable: true },
+    ],
+  },
 
-  new MenuItemOptionDomain(3, "Elige Salsas", 1, 1, true, [
-    new MenuItemChoiceDomain(2, "Mayonesa", 1.99, true),
-    new MenuItemChoiceDomain(3, "Mayonesa", 1.99, false),
-    new MenuItemChoiceDomain(4, "Mayonesa", 1.99, true),
-  ]),
+  {
+    id: 3,
+    name: "Elige Acompañamiento",
+    minChoices: 1,
+    maxChoices: 1,
+    isRequired: true,
+    choices: [
+      { id: 2, name: "Papas Fritas", price: 0, isAvailable: true },
+      { id: 3, name: "Aros de Cebolla", price: 0, isAvailable: false },
+      { id: 4, name: "Ensalada", price: 0, isAvailable: true },
+    ],
+  },
 ];
 
 const MenuItemChoice = ({
@@ -52,7 +73,7 @@ const MenuItemChoice = ({
   disabled,
   onChange,
 }: {
-  choice: MenuItemChoiceDomain;
+  choice: MenuItemChoiceType;
   type: "checkbox" | "radio";
   checked: boolean;
   disabled?: boolean;
@@ -90,7 +111,7 @@ const MenuItemOption = ({
   selected,
   onSelectionChange,
 }: {
-  option: MenuItemOptionDomain;
+  option: MenuItemOptionType;
   selected: Set<number>;
   onSelectionChange: (selected: Set<number>) => void;
 }) => {
@@ -177,7 +198,7 @@ export const MenuItemModal = ({
   isOpen,
   onClose,
 }: {
-  item: MenuItemDomain;
+  item: MenuItemType;
   isOpen: boolean;
   onClose: () => void;
 }) => {

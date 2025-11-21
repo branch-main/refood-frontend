@@ -7,7 +7,7 @@ import {
   RestaurantDetail,
   RestaurantSchedule,
 } from "@/features/restaurants/components";
-import { useRestaurant } from "@/features/restaurants/hooks";
+import { useRestaurant } from "@/shared/hooks";
 
 const CATEGORIES = ["Comida criolla", "Ceviche", "Bebidas", "Hamburguesas"];
 

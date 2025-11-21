@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { formatPrice, formatRating, getFallbackImage } from "@/shared/utils";
-import { Restaurant } from "@/entities";
+import { Restaurant } from "@/shared/types";
 import { BsFillStarFill } from "react-icons/bs";
 import { RiMotorbikeFill, RiTimeLine } from "react-icons/ri";
 import { Skeleton } from "@/shared/components/ui";

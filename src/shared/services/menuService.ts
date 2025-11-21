@@ -1,58 +1,31 @@
-import { apiClient } from "../api/client";
+import { apiClient } from "../api";
+import { MenuItem } from "../types";
 
-export interface MenuItem {
-  id: number;
-  name: string;
-  description: string;
-  price: number;
-  image?: string;
-  category: string;
-  available: boolean;
-  restaurantId: number;
-}
-
-export interface CreateMenuItemData {
-  name: string;
-  description: string;
-  price: number;
-  image?: string;
-  category: string;
-  available?: boolean;
-}
+const toMenuItem = (data: any): MenuItem => ({
+  id: data.id,
+  restaurantId: data.restaurant_id,
+  name: data.name,
+  description: data.description,
+  price: data.price,
+  image: data.image,
+  isAvailable: data.is_available,
+  options: [],
+});
 
 export const menuService = {
-  // Customer - Get menu items
-  getMenuItems: async (restaurantId?: number) => {
-    const params = restaurantId ? { restaurantId } : {};
-    const { data } = await apiClient.get("/menu-items", { params });
-    return data;
-  },
-
   getMenuItem: async (id: number) => {
-    const { data } = await apiClient.get(`/menu-items/${id}`);
-    return data;
+    return apiClient.get<any>(`/menu/${id}`).then(toMenuItem);
   },
 
-  // Partner - Manage menu items
-  createMenuItem: async (itemData: CreateMenuItemData) => {
-    const { data } = await apiClient.post("/partner/menu-items", itemData);
-    return data;
+  getMenu: async (): Promise<MenuItem[]> => {
+    return apiClient
+      .get<any[]>("/menu/")
+      .then((items) => items.map(toMenuItem));
   },
 
-  updateMenuItem: async (id: number, itemData: Partial<CreateMenuItemData>) => {
-    const { data } = await apiClient.put(`/partner/menu-items/${id}`, itemData);
-    return data;
-  },
-
-  deleteMenuItem: async (id: number) => {
-    const { data } = await apiClient.delete(`/partner/menu-items/${id}`);
-    return data;
-  },
-
-  toggleAvailability: async (id: number, available: boolean) => {
-    const { data } = await apiClient.patch(`/partner/menu-items/${id}/availability`, {
-      available,
-    });
-    return data;
+  getMenuByRestaurant: async (restaurantId: number): Promise<MenuItem[]> => {
+    return apiClient
+      .get<any[]>(`/menu?restaurant_id=${restaurantId}`)
+      .then((items) => items.map(toMenuItem));
   },
 };

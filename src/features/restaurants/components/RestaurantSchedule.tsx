@@ -1,4 +1,4 @@
-import { DayOfWeek, Restaurant } from "@/entities";
+import { DayOfWeek, Restaurant } from "@/shared/types";
 import { formatTime24 } from "@/shared/utils";
 import { Skeleton } from "@/shared/components/ui";
 

@@ -21,7 +21,7 @@ export const Home = () => {
 
   return (
     <div className="min-h-[calc(100vh-200px)]">
-      <section className="relative bg-gradient-to-br from-[#B21F1F] via-[#9B1919] to-[#8B1616] text-white overflow-hidden">
+      <section className="relative bg-linear-to-br from-[#B21F1F] via-[#9B1919] to-[#8B1616] text-white overflow-hidden">
         {/* Animated background patterns */}
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_50%,rgba(255,255,255,0.1)_0%,transparent_50%),radial-gradient(circle_at_80%_80%,rgba(255,255,255,0.08)_0%,transparent_50%)] pointer-events-none"></div>
         <div className="absolute inset-0 bg-[linear-gradient(90deg,transparent_0%,rgba(255,255,255,0.03)_50%,transparent_100%)] pointer-events-none"></div>

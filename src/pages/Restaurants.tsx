@@ -6,7 +6,7 @@ import {
   RestaurantCard,
 } from "@/features/restaurants/components";
 import { IoMdHome } from "react-icons/io";
-import { useRestaurants } from "@/features/restaurants/hooks";
+import { useRestaurants } from "@/shared/hooks";
 import { Skeleton } from "@/shared/components/ui";
 
 const SORT_OPTIONS = [

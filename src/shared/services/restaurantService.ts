@@ -1,60 +1,46 @@
-import { apiClient } from "../api/client";
+import { apiClient } from "../api";
+import { OpeningHours, Restaurant } from "../types";
 
-export interface Restaurant {
-  id: number;
-  name: string;
-  description: string;
-  logo?: string;
-  address: string;
-  phone: string;
-  email: string;
-  rating: number;
-  totalReviews: number;
-}
+const toOpeningHours = (data: any): OpeningHours => ({
+  day: data.day,
+  openingTime: data.opening_time,
+  closingTime: data.closing_time,
+});
 
-export interface UpdateRestaurantData {
-  name?: string;
-  description?: string;
-  logo?: string;
-  address?: string;
-  phone?: string;
-  email?: string;
-}
+const toRestaurant = (data: any): Restaurant => ({
+  id: data.id,
+  name: data.name,
+  description: data.description,
+  email: data.email,
+  phone: data.phone,
+  address: data.address,
+  latitude: data.latitude,
+  longitude: data.longitude,
+  logo: data.logo,
+  banner: data.banner,
+  isActive: data.is_active,
+  stats: {
+    totalSales: data.stats.total_sales,
+    totalOrders: data.stats.total_orders,
+    totalItemsSold: data.stats.total_items_sold,
+    rating: data.stats.rating,
+    totalReviews: data.stats.total_reviews,
+  },
+  openingHours: data.opening_hours.map(toOpeningHours),
+  isOpen: data.is_open,
+  nextOpeningTime: data.next_opening_time,
+  createdAt: data.created_at,
+  updatedAt: data.updated_at,
+});
 
 export const restaurantService = {
-  // Customer - Browse restaurants
-  getRestaurants: async () => {
-    const { data } = await apiClient.get("/restaurants");
-    return data;
+  getRestaurants: async (): Promise<Restaurant[]> => {
+    return apiClient
+      .get<any>("/restaurants/")
+      .then((restaurants) => restaurants.map(toRestaurant));
   },
 
   getRestaurant: async (id: number) => {
-    const { data } = await apiClient.get(`/restaurants/${id}`);
-    return data;
-  },
-
-  searchRestaurants: async (query: string) => {
-    const { data } = await apiClient.get("/restaurants/search", {
-      params: { q: query },
-    });
-    return data;
-  },
-
-  // Partner - Manage own restaurant
-  getMyRestaurant: async () => {
-    const { data } = await apiClient.get("/partner/restaurant");
-    return data;
-  },
-
-  updateMyRestaurant: async (restaurantData: UpdateRestaurantData) => {
-    const { data } = await apiClient.put("/partner/restaurant", restaurantData);
-    return data;
-  },
-
-  getRestaurantAnalytics: async (period: "week" | "month" | "year") => {
-    const { data } = await apiClient.get("/partner/restaurant/analytics", {
-      params: { period },
-    });
-    return data;
+    return apiClient.get<any>(`/restaurants/${id}/`).then(toRestaurant);
   },
 };

@@ -1,1 +1,1 @@
-export { RestaurantProvider, useRestaurantContext } from "./RestaurantContext";
+export * from "./RestaurantContext";

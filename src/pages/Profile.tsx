@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
-import { useAuth } from "@/features/auth/hooks";
+import { useAuth } from "@/shared/hooks";
 import { Card, Button, Input } from "@/shared/components/ui";
 import {
   FiMail,

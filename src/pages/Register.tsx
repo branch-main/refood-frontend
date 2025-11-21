@@ -1,11 +1,10 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "@/features/auth/hooks";
+import { useAuth } from "@/shared/hooks";
 import { Button } from "@/shared/components/ui";
 import {
   AuthBrandingSide,
   FormInput,
-  FormSelect,
   ErrorAlert,
 } from "../features/auth/components";
 import { FiMail, FiLock, FiPhone, FiUser } from "react-icons/fi";
@@ -27,12 +26,12 @@ const REGISTER_FEATURES = [
 
 export const Register = () => {
   const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
     email: "",
-    password: "",
-    password_confirm: "",
-    first_name: "",
-    last_name: "",
     phone: "",
+    password: "",
+    password2: "",
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -50,11 +49,6 @@ export const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-
-    if (formData.password !== formData.password_confirm) {
-      setError("Las contraseñas no coinciden");
-      return;
-    }
 
     setLoading(true);
 
@@ -126,8 +120,8 @@ export const Register = () => {
               <FormInput
                 label="Confirmar Contraseña"
                 type="password"
-                name="password_confirm"
-                value={formData.password_confirm}
+                name="password2"
+                value={formData.password2}
                 onChange={handleChange}
                 icon={FiLock}
                 placeholder="Confirma tu contraseña"
@@ -138,8 +132,8 @@ export const Register = () => {
                 <FormInput
                   label="Nombre"
                   type="text"
-                  name="first_name"
-                  value={formData.first_name}
+                  name="firstName"
+                  value={formData.firstName}
                   onChange={handleChange}
                   icon={FiUser}
                   placeholder="Tu nombre"
@@ -148,15 +142,15 @@ export const Register = () => {
                 <FormInput
                   label="Apellido"
                   type="text"
-                  name="last_name"
-                  value={formData.last_name}
+                  name="lastName"
+                  value={formData.lastName}
                   onChange={handleChange}
                   placeholder="Tu apellido"
                 />
               </div>
 
               <FormInput
-                label="Teléfono (Opcional)"
+                label="Teléfono"
                 type="tel"
                 name="phone"
                 value={formData.phone}
@@ -169,7 +163,7 @@ export const Register = () => {
                 type="submit"
                 fullWidth
                 loading={loading}
-                className="!bg-[#B21F1F] hover:!bg-[#8B1616] !text-white !py-3 !rounded-lg !text-base !font-semibold !mt-6 !transition-colors"
+                className="bg-[#B21F1F]! hover:bg-[#8B1616]! text-white! py-3! rounded-lg! text-base! font-semibold! mt-6! transition-colors!"
               >
                 Crear Cuenta Gratis
               </Button>

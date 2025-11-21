@@ -1,9 +1,9 @@
 import { useState, useMemo } from "react";
-import { MenuItemsGrid } from "@/features/menu/components";
+import { MenuItemList } from "@/features/menu/components";
 import { Input } from "@/shared/components/ui";
 import { useDebounced } from "@/shared/hooks";
-import { MenuItem } from "@/entities";
-import { useMenu } from "@/features/menu/hooks";
+import { MenuItem } from "@/shared/types";
+import { useMenu } from "@/shared/hooks";
 import { MenuItem as MenuItemComponent } from "@/features/menu/components";
 
 function filterMenuItems(items: MenuItem[], search: string): MenuItem[] {
@@ -16,7 +16,7 @@ function filterMenuItems(items: MenuItem[], search: string): MenuItem[] {
   });
 }
 
-export const MenuItems = () => {
+export const Menu = () => {
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounced(search, 300);
 
@@ -47,12 +47,12 @@ export const MenuItems = () => {
         <div className="mt-8">
           {isLoading && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {Array.from({ length: 12 }).map((_, i) => (
+              {Array.from({ length: 12 }).map(() => (
                 <MenuItemComponent.Skeleton />
               ))}
             </div>
           )}
-          {filtered && <MenuItemsGrid items={filtered} />}
+          {filtered && <MenuItemList items={filtered} />}
         </div>
       </div>
     </div>

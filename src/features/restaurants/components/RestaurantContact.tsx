@@ -1,5 +1,5 @@
 import { FiPhone, FiMail, FiMapPin } from "react-icons/fi";
-import { Restaurant } from "@/entities";
+import { Restaurant } from "@/shared/types";
 import { Skeleton } from "@/shared/components/ui";
 
 export const RestaurantContact = ({

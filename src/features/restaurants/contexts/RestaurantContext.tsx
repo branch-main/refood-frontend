@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, ReactNode } from "react";
-import { Restaurant } from "@/entities";
+import { Restaurant } from "@/shared/types";
 
 interface RestaurantContextType {
   currentRestaurant: Restaurant | null;

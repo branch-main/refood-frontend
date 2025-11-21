@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Restaurant } from "@/entities";
+import { Restaurant } from "@/shared/types";
 import { getFallbackImage } from "@/shared/utils";
 import { Skeleton } from "@/shared/components/ui";
 

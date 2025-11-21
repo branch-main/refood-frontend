@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "@/features/auth/hooks";
+import { useAuth } from "@/shared/hooks";
 import { Button } from "@/shared/components/ui";
 import {
   AuthBrandingSide,
@@ -112,7 +112,7 @@ export const Login = () => {
                 type="submit"
                 fullWidth
                 loading={loading}
-                className="!bg-[#B21F1F] hover:!bg-[#8B1616] !text-white !py-3 !rounded-lg !text-base !font-semibold !mt-6 !transition-colors"
+                className="bg-[#B21F1F]! hover:bg-[#8B1616]! text-white! py-3! rounded-lg! text-base! font-semibold! mt-6! transition-colors!"
               >
                 Iniciar Sesión
               </Button>

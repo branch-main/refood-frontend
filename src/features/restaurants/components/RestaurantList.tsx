@@ -1,4 +1,4 @@
-import { Restaurant } from "@/entities";
+import { Restaurant } from "@/shared/types";
 import { RestaurantCard } from "./RestaurantCard";
 
 export const RestaurantList = ({
