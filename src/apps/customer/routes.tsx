@@ -19,6 +19,7 @@ import { AuthProvider } from "@/shared/contexts";
 import { CartProvider } from "@/features/cart/contexts";
 import { RestaurantProvider } from "@/features/restaurants/contexts";
 import { ProfileLayout } from "@/features/profile/layouts";
+import { AuthLayout } from "@/features/auth/layouts";
 
 const requireAuth = async () => {
   const user = await authService.getCurrentUser().catch(() => null);
@@ -52,7 +53,7 @@ export const routes: RouteObject = {
     },
 
     {
-      element: <Layout />,
+      element: <AuthLayout />,
       children: [
         { path: "login", element: <Login /> },
         { path: "register", element: <Register /> },

@@ -1,33 +1,18 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/shared/hooks";
-import { Button } from "@/shared/components/ui";
+import { FiMail, FiLock, FiAlertCircle } from "react-icons/fi";
 import {
-  AuthBrandingSide,
-  FormInput,
-  ErrorAlert,
+  StyledInput,
+  PasswordInput,
+  SubmitButton,
 } from "@/features/auth/components";
-import { FiMail, FiLock } from "react-icons/fi";
-
-const LOGIN_FEATURES = [
-  {
-    title: "Ahorra Hasta 50%",
-    description: "En alimentos de alta calidad cada día",
-  },
-  {
-    title: "Impacto Ambiental",
-    description: "Reduce desperdicios y ayuda al planeta",
-  },
-  {
-    title: "Fácil y Rápido",
-    description: "Reserva en segundos, recoge cuando quieras",
-  },
-];
 
 export const Login = () => {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
+    rememberMe: false,
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -35,14 +20,15 @@ export const Login = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value, type, checked } = e.target;
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value,
+      [name]: type === "checkbox" ? checked : value,
     });
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setLoading(true);
@@ -50,7 +36,7 @@ export const Login = () => {
     try {
       await login(formData.email, formData.password);
       navigate("/");
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
       setError(
         err.response?.data?.detail ||
@@ -62,75 +48,83 @@ export const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center py-12 px-4 bg-gray-50">
-      <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-        <AuthBrandingSide
-          title="Bienvenido de Nuevo"
-          description="Continúa tu viaje para combatir el desperdicio de alimentos y descubrir comidas deliciosas a precios increíbles."
-          features={LOGIN_FEATURES}
+    <div className="bg-white rounded-2xl shadow-xl shadow-gray-200/50 p-8 sm:p-10">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold mb-2">¡Bienvenido de nuevo!</h1>
+        <p className="text-gray-500">Ingresa tus credenciales para acceder</p>
+      </div>
+
+      {error && (
+        <div className="mb-6 p-4 bg-red-50 border border-red-100 rounded-xl flex items-start gap-3">
+          <FiAlertCircle className="text-red-500 mt-0.5 shrink-0" size={20} />
+          <span className="text-sm text-red-700">{error}</span>
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit} className="space-y-5">
+        <StyledInput
+          label="Correo electrónico"
+          icon={FiMail}
+          type="email"
+          name="email"
+          value={formData.email}
+          onChange={handleChange}
+          placeholder="tu@email.com"
+          required
+          autoComplete="email"
         />
 
-        <div className="w-full">
-          <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-8 lg:p-10">
-            <div className="lg:hidden mb-6 text-center">
-              <h2 className="text-3xl font-bold text-[#B21F1F]">🍽️ ReeFood</h2>
-            </div>
+        <div className="space-y-1.5">
+          <PasswordInput
+            label="Contraseña"
+            icon={FiLock}
+            name="password"
+            value={formData.password}
+            onChange={handleChange}
+            placeholder="Ingresa tu contraseña"
+            required
+            autoComplete="current-password"
+          />
 
-            <h1 className="text-2xl font-bold mb-2 text-gray-900">
-              Iniciar Sesión
-            </h1>
-            <p className="text-gray-600 mb-6">
-              Accede a tu cuenta para continuar
-            </p>
-
-            <ErrorAlert message={error} />
-
-            <form onSubmit={handleSubmit} className="space-y-4 mt-6">
-              <FormInput
-                label="Correo Electrónico"
-                type="email"
-                name="email"
-                value={formData.email}
+          <div className="flex items-center justify-between pt-1">
+            <label className="flex items-center gap-2 cursor-pointer group">
+              <input
+                type="checkbox"
+                name="rememberMe"
+                checked={formData.rememberMe}
                 onChange={handleChange}
-                icon={FiMail}
-                placeholder="tu@email.com"
-                required
+                className="w-4 h-4 text-red-500 border-gray-300 rounded ring-red-500 cursor-pointer"
               />
-
-              <FormInput
-                label="Contraseña"
-                type="password"
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                icon={FiLock}
-                placeholder="Ingresa tu contraseña"
-                required
-              />
-
-              <Button
-                type="submit"
-                fullWidth
-                loading={loading}
-                className="bg-[#B21F1F]! hover:bg-[#8B1616]! text-white! py-3! rounded-lg! text-base! font-semibold! mt-6! transition-colors!"
-              >
-                Iniciar Sesión
-              </Button>
-            </form>
-
-            <div className="mt-6 text-center">
-              <p className="text-gray-600 text-sm">
-                ¿No tienes una cuenta?{" "}
-                <Link
-                  to="/register"
-                  className="text-[#B21F1F] font-semibold hover:underline"
-                >
-                  Regístrate gratis
-                </Link>
-              </p>
-            </div>
+              <span className="text-sm text-gray-600 group-hover:text-gray-900 transition-colors">
+                Recuérdame
+              </span>
+            </label>
+            <Link
+              to="/forgot-password"
+              className="text-sm font-medium text-red-500 hover:text-red-600 transition-colors"
+            >
+              ¿Olvidaste tu contraseña?
+            </Link>
           </div>
         </div>
+
+        <div className="pt-2">
+          <SubmitButton loading={loading} loadingText="Ingresando...">
+            Iniciar sesión
+          </SubmitButton>
+        </div>
+      </form>
+
+      <div className="mt-8 pt-6 border-t border-gray-200 text-center">
+        <p className="text-sm text-gray-600">
+          ¿No tienes una cuenta?{" "}
+          <Link
+            to="/register"
+            className="font-semibold text-red-500 hover:text-red-600 transition-colors"
+          >
+            Crear cuenta
+          </Link>
+        </p>
       </div>
     </div>
   );
