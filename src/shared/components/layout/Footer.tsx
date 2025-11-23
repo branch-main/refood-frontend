@@ -3,7 +3,7 @@ import { FaInstagram, FaYoutube } from "react-icons/fa";
 import { Link } from "react-router-dom";
 
 export const Footer = () => (
-  <footer className="bg-white">
+  <footer className="bg-white shadow-[0px_0px_25px_2px_rgba(0,0,0,0.025)]">
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
         <div className="flex flex-col gap-4">

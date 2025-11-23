@@ -82,7 +82,7 @@ export const Navbar = () => {
   }, []);
 
   return (
-    <nav className="bg-white h-14 fixed top-0 left-0 right-0 z-99 border-b border-gray-200">
+    <nav className="bg-white h-14 fixed top-0 left-0 right-0 z-99 border-b border-gray-200 shadow-[0px_0px_25px_2px_rgba(0,0,0,0.025)]">
       <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-14">
           {/* Logo */}
@@ -97,7 +97,7 @@ export const Navbar = () => {
           {/* Search Bar */}
           <form
             onSubmit={handleSearch}
-            className="hidden md:flex flex-1 max-w-xl items-center rounded-xl bg-neutral-100 text-gray-800 px-4 gap-3 ml-8"
+            className="h-10 hidden md:flex flex-1 max-w-xl items-center rounded-full bg-neutral-50 text-gray-800 px-4 gap-3"
           >
             <input
               type="search"

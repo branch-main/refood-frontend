@@ -71,7 +71,7 @@ export const RestaurantReviews = ({
   restaurant: Restaurant;
 }) => {
   return (
-    <div className="bg-white shadow-xs rounded-xl p-8 h-full">
+    <div className="bg-white shadow-[0px_0px_25px_2px_rgba(0,0,0,0.025)] rounded-xl p-8 h-full">
       <h2 className="text-xl font-bold text-gray-800 mb-4">
         Reseñas recientes
       </h2>

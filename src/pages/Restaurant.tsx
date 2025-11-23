@@ -26,7 +26,7 @@ export const Restaurant = () => {
   return (
     <div className="flex-col">
       <div className="flex mb-8">
-        <div className="hidden md:block w-72 shadow-xs rounded-br-xl overflow-hidden sticky top-14 h-fit">
+        <div className="hidden md:block w-72 shadow-[0px_0px_25px_2px_rgba(0,0,0,0.025)] rounded-br-xl overflow-hidden sticky top-14 h-fit">
           <RestaurantDetail restaurant={restaurant} />
           <RestaurantContact restaurant={restaurant} />
           <RestaurantSchedule restaurant={restaurant} />
