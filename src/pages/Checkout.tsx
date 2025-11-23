@@ -111,8 +111,8 @@ export const Checkout = () => {
   };
 
   return (
-    <div className="max-w-[58%] mx-auto py-8 flex gap-4">
-      <div className="w-full space-y-4">
+    <>
+      <div className="flex-1 space-y-4">
         <div className="bg-white rounded-lg shadow-[0_0_15px_rgba(0,0,0,0.03)] p-4 flex flex-col gap-4">
           <span className="text-gray-800 font-bold text-lg border-b border-gray-200 pb-4">
             Dirección de entrega
@@ -195,27 +195,12 @@ export const Checkout = () => {
                 🅿️ PayPal (Próximamente)
               </span>
             </label>
-
-            <label
-              className={`flex items-center gap-3 p-3 border rounded-lg cursor-not-allowed opacity-50 transition ${selectedMethod === "YAPE" ? "border-green-400 bg-green-50" : "border-gray-200"}`}
-            >
-              <input
-                type="radio"
-                name="payment"
-                value="YAPE"
-                disabled
-                className="w-4 h-4"
-              />
-              <span className="text-gray-800 font-medium">
-                📱 Yape (Próximamente)
-              </span>
-            </label>
           </div>
         </div>
       </div>
 
-      <div className="space-y-4 sticky top-18 h-fit">
-        <div className="p-4 bg-white rounded-lg shadow-[0_0_15px_rgba(0,0,0,0.03)] w-[450px] space-y-4 border-gray-200">
+      <div className="w-3/8 space-y-4 sticky top-19 h-fit">
+        <div className="p-4 bg-white rounded-lg shadow-[0_0_15px_rgba(0,0,0,0.03)] space-y-4 border-gray-200">
           <h1 className="text-lg text-gray-800 font-bold border-b border-gray-200 pb-4">
             Resumen
           </h1>
@@ -268,6 +253,6 @@ export const Checkout = () => {
           )}
         </button>
       </div>
-    </div>
+    </>
   );
 };

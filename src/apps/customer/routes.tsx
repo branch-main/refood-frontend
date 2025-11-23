@@ -20,6 +20,7 @@ import { CartProvider } from "@/features/cart/contexts";
 import { RestaurantProvider } from "@/features/restaurants/contexts";
 import { ProfileLayout } from "@/features/profile/layouts";
 import { AuthLayout } from "@/features/auth/layouts";
+import { CheckoutLayout } from "@/features/cart/layouts";
 
 const requireAuth = async () => {
   const user = await authService.getCurrentUser().catch(() => null);
@@ -62,8 +63,9 @@ export const routes: RouteObject = {
 
     {
       path: "checkout",
-      element: <Checkout />,
+      element: <CheckoutLayout />,
       loader: requireAuth,
+      children: [{ index: true, element: <Checkout /> }],
     },
 
     {
