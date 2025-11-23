@@ -81,6 +81,8 @@ const getPamentMethodText = (method: PaymentMethod) => {
 const OrderItem = ({ item }: { item: OrderItemType }) => {
   const { data: menuItem } = useMenuItem(item.menuItemId);
 
+  console.log(item);
+
   if (!menuItem) {
     return null;
   }

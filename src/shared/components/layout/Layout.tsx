@@ -1,7 +1,7 @@
 import { Navbar } from "./Navbar";
 import { Footer } from "./Footer";
 import { MenuCart } from "@/features/menu/components";
-import { Outlet } from "react-router-dom";
+import { Outlet, ScrollRestoration } from "react-router-dom";
 
 export const Layout = () => {
   return (
@@ -10,6 +10,7 @@ export const Layout = () => {
       <MenuCart />
       <main className="flex-1 mt-14">
         <Outlet />
+        <ScrollRestoration />
       </main>
       <Footer />
     </div>

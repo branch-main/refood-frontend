@@ -17,7 +17,7 @@ const CheckoutItem = ({ item }: { item: CartItem }) => {
 
   return (
     <div className="bg-gray-50 p-4 rounded-lg flex gap-4">
-      <span className="my-auto text-gray-800 text-sm">x{1}</span>
+      <span className="my-auto text-gray-800 text-sm">x{item.quantity}</span>
 
       <img
         alt={menuItem.name}
@@ -49,11 +49,10 @@ const CheckoutItem = ({ item }: { item: CartItem }) => {
 };
 
 export const Checkout = () => {
-  const subtotal = 10;
-  const shippingCost = 10;
   const serviceFee = 10;
+  const deliveryFee = 2;
 
-  const { restaurant: restaurantId, items } = useCart();
+  const { restaurant: restaurantId, items, subtotal, total } = useCart();
   const { data: restaurant } = useRestaurant(restaurantId);
   const { user } = useAuthContext();
   const [selectedMethod, setSelectedMethod] = useState<PaymentMethod>("STRIPE");
@@ -78,7 +77,7 @@ export const Checkout = () => {
           "Residencia Militar - EP, Jiron Simon Bolivar 119, Trujillo 13001, Peru",
         items: items.map((item) => ({
           menuItemId: item.id,
-          quantity: 1, // TODO: get from cart
+          quantity: item.quantity,
           options: [], // TODO: get from cart
         })),
       });
@@ -228,9 +227,9 @@ export const Checkout = () => {
               </span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-700 text-sm">Costo de envío</span>
+              <span className="text-gray-700 text-sm">Envío</span>
               <span className="text-gray-700 text-sm">
-                {formatPrice(shippingCost)}
+                {formatPrice(deliveryFee)}
               </span>
             </div>
             <div className="flex justify-between">
@@ -242,7 +241,7 @@ export const Checkout = () => {
             <div className="flex justify-between">
               <span className="text-gray-800 font-bold">Total</span>
               <span className="text-gray-800 font-bold">
-                {formatPrice(subtotal + shippingCost + serviceFee)}
+                {formatPrice(total)}
               </span>
             </div>
           </div>
