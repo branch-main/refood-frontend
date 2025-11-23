@@ -35,10 +35,10 @@ export const Register = () => {
     e.preventDefault();
     setError("");
 
-    if (formData.password !== formData.password2) {
-      setError("Las contraseñas no coinciden");
-      return;
-    }
+    // if (formData.password !== formData.password2) {
+    //   setError("Las contraseñas no coinciden");
+    //   return;
+    // }
 
     setLoading(true);
 

@@ -10,7 +10,6 @@ import { getFallbackImage, formatPrice } from "@/shared/utils";
 import { BsStripe, BsPaypal } from "react-icons/bs";
 import { FiClock, FiCheck, FiTruck, FiPackage } from "react-icons/fi";
 import { useNavigate, useParams } from "react-router-dom";
-import { TiArrowLeftOutline } from "react-icons/ti";
 import { SlArrowLeft } from "react-icons/sl";
 
 const getStatusIcon = (status: OrderStatus) => {
