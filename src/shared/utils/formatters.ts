@@ -43,17 +43,34 @@ export const formatDistance = (distance: number): string => {
 };
 
 /**
- * Format date to readable string
+ * Format date to readable Spanish string (e.g., "Martes, 18 de noviembre de 2025")
  * @param {string|Date} date - Date to format
  * @returns {string} Formatted date
  */
 export const formatDate = (date: string | Date): string => {
   if (!date) return "";
   const d = new Date(date);
-  return d.toLocaleDateString("en-US", {
+  const formatted = d.toLocaleDateString("es-ES", {
+    weekday: "long",
     year: "numeric",
-    month: "short",
+    month: "long",
     day: "numeric",
+  });
+  return formatted.charAt(0).toUpperCase() + formatted.slice(1);
+};
+
+/**
+ * Format datetime to time string (e.g., "18:33")
+ * @param {string|Date} datetime - DateTime to format
+ * @returns {string} Formatted time in 24-hour format
+ */
+export const formatTimeFromDate = (datetime: string | Date): string => {
+  if (!datetime) return "";
+  const d = new Date(datetime);
+  return d.toLocaleTimeString("es-ES", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
   });
 };
 

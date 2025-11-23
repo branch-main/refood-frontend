@@ -5,33 +5,9 @@ import {
   useRestaurant,
 } from "@/shared/hooks";
 import { OrderItem as OrderItemType } from "@/shared/types";
-import { PaymentMethod } from "@/shared/services";
-import { getFallbackImage, formatPrice, getStatusIcon, getStatusText, getStatusColor } from "@/shared/utils";
-import { BsStripe, BsPaypal } from "react-icons/bs";
+import { getFallbackImage, formatPrice, getStatusIcon, getStatusText, getStatusColor, getPaymentMethodIcon, getPaymentMethodText, formatDate, formatTimeFromDate } from "@/shared/utils";
 import { useNavigate, useParams } from "react-router-dom";
 import { SlArrowLeft } from "react-icons/sl";
-
-const getPaymentMethodIcon = (method: PaymentMethod) => {
-  switch (method) {
-    case "STRIPE":
-      return <BsStripe size={20} className="fill-[#6358f7]" />;
-    case "PAYPAL":
-      return <BsPaypal size={20} className="fill-blue-900" />;
-    case "YAPE":
-      return <span className="font-bold">Y</span>;
-  }
-};
-
-const getPamentMethodText = (method: PaymentMethod) => {
-  switch (method) {
-    case "STRIPE":
-      return "Stripe";
-    case "PAYPAL":
-      return "PayPal";
-    case "YAPE":
-      return "Yape";
-  }
-};
 
 const OrderItem = ({ item }: { item: OrderItemType }) => {
   const { data: menuItem } = useMenuItem(item.menuItemId);
@@ -112,14 +88,14 @@ export const Order = () => {
 
         <div className="flex flex-col border-b border-gray-200 pb-4 px-5">
           <span className="text-gray-800 text-lg font-bold">Inicio</span>
-          <span className="text-gray-800 text-sm">{order.createdAt}</span>
-          <span className="text-gray-800 text-sm">21:00</span>
+          <span className="text-gray-800 text-sm">{formatDate(order.createdAt)}</span>
+          <span className="text-gray-800 text-sm">{formatTimeFromDate(order.createdAt)}</span>
         </div>
 
         <div className="flex flex-col border-b border-gray-200 pb-4 px-5">
           <span className="text-gray-800 text-lg font-bold">Entrega</span>
-          <span className="text-gray-800 text-sm">{order.createdAt}</span>
-          <span className="text-gray-800 text-sm">21:00</span>
+          <span className="text-gray-800 text-sm">{formatDate(order.createdAt)}</span>
+          <span className="text-gray-800 text-sm">{formatTimeFromDate(order.createdAt)}</span>
           <span className="text-gray-800 text-sm mt-4">
             {order.deliveryAddress}
           </span>
@@ -140,7 +116,7 @@ export const Order = () => {
           </span>
           <span className="w-max flex items-center gap-3 text-gray-800 text-sm bg-neutral-50 px-3 py-2 rounded-lg">
             {getPaymentMethodIcon(payment.method)}
-            {getPamentMethodText(payment.method)}
+            {getPaymentMethodText(payment.method)}
           </span>
         </div>
 

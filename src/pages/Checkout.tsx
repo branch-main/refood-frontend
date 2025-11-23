@@ -1,13 +1,19 @@
 import { CartItem, useCart } from "@/features/cart/contexts";
 import { useMenuItem, useRestaurant } from "@/shared/hooks";
-import { formatPrice, getFallbackImage } from "@/shared/utils";
+import {
+  formatPrice,
+  getFallbackImage,
+  getPaymentMethodIcon,
+  getPaymentMethodText,
+} from "@/shared/utils";
 import { orderService } from "@/shared/services/orderService";
 import {
   paymentService,
   PaymentMethod,
 } from "@/shared/services/paymentService";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuthContext } from "@/shared/contexts";
+import { useNavigate } from "react-router-dom";
 
 const CheckoutItem = ({ item }: { item: CartItem }) => {
   const { data: menuItem } = useMenuItem(item.id);
@@ -35,9 +41,11 @@ const CheckoutItem = ({ item }: { item: CartItem }) => {
           </span>
         </div>
         <div className="flex gap-2 items-center">
-          <span className="text-gray-800 font-bold text-sm">{item.price}</span>
+          <span className="text-gray-800 font-bold text-sm">
+            {formatPrice(item.price)}
+          </span>
           <span className="text-gray-500 line-through text-sm">
-            {item.price}
+            {formatPrice(item.price)}
           </span>
         </div>
         <span className="text-gray-500 text-xs line-clamp-2">
@@ -55,9 +63,16 @@ export const Checkout = () => {
   const { restaurant: restaurantId, items, subtotal, total } = useCart();
   const { data: restaurant } = useRestaurant(restaurantId);
   const { user } = useAuthContext();
+  const navigate = useNavigate();
   const [selectedMethod, setSelectedMethod] = useState<PaymentMethod>("STRIPE");
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!items || items.length === 0) {
+      navigate("/restaurants");
+    }
+  }, [items, navigate]);
 
   const handleCheckout = async () => {
     if (!user || !restaurantId || !items || items.length === 0) {
@@ -178,21 +193,28 @@ export const Checkout = () => {
                 }
                 className="w-4 h-4 text-green-400"
               />
-              <span className="text-gray-800 font-medium">💳 Stripe</span>
+              <span className="text-gray-800 font-medium flex items-center gap-2">
+                {getPaymentMethodIcon("STRIPE")}
+                {getPaymentMethodText("STRIPE")}
+              </span>
             </label>
 
             <label
-              className={`flex items-center gap-3 p-3 border rounded-lg cursor-not-allowed opacity-50 transition ${selectedMethod === "PAYPAL" ? "border-green-400 bg-green-50" : "border-gray-200"}`}
+              className={`flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition ${selectedMethod === "PAYPAL" ? "border-green-400 bg-green-50" : "border-gray-200"}`}
             >
               <input
                 type="radio"
                 name="payment"
                 value="PAYPAL"
-                disabled
+                checked={selectedMethod === "PAYPAL"}
+                onChange={(e) =>
+                  setSelectedMethod(e.target.value as PaymentMethod)
+                }
                 className="w-4 h-4"
               />
-              <span className="text-gray-800 font-medium">
-                🅿️ PayPal (Próximamente)
+              <span className="text-gray-800 font-medium flex items-center gap-2">
+                {getPaymentMethodIcon("PAYPAL")}
+                {getPaymentMethodText("PAYPAL")}
               </span>
             </label>
           </div>
