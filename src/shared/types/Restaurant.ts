@@ -28,6 +28,8 @@ export type Restaurant = {
   description: string;
   email: string;
   phone: string;
+  minPreparationTime: number;
+  maxPreparationTime: number;
   address: string;
   latitude: number | null;
   longitude: number | null;

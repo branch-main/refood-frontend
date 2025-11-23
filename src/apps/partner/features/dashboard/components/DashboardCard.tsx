@@ -12,7 +12,7 @@ export const DashboardCard = ({
   return (
     <div
       className={twMerge(
-        "bg-white shadow-[0_0_20px_rgba(0,0,0,0.0225)] rounded-2xl p-4 space-y-4",
+        "bg-white shadow-[0px_0px_25px_2px_rgba(0,0,0,0.025)] rounded-2xl p-4 space-y-4",
         className,
       )}
     >

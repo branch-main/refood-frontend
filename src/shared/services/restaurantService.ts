@@ -13,6 +13,8 @@ const toRestaurant = (data: any): Restaurant => ({
   description: data.description,
   email: data.email,
   phone: data.phone,
+  minPreparationTime: data.min_preparation_time,
+  maxPreparationTime: data.max_preparation_time,
   address: data.address,
   latitude: data.latitude,
   longitude: data.longitude,

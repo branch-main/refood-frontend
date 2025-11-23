@@ -1,10 +1,13 @@
 import { CartItem, useCart } from "@/features/cart/contexts";
-import {
-  useMenuByRestaurant,
-  useMenuItem,
-  useRestaurant,
-} from "@/shared/hooks";
+import { useMenuItem, useRestaurant } from "@/shared/hooks";
 import { formatPrice, getFallbackImage } from "@/shared/utils";
+import { orderService } from "@/shared/services/orderService";
+import {
+  paymentService,
+  PaymentMethod,
+} from "@/shared/services/paymentService";
+import { useState } from "react";
+import { useAuthContext } from "@/shared/contexts";
 
 const CheckoutItem = ({ item }: { item: CartItem }) => {
   const { data: menuItem } = useMenuItem(item.id);
@@ -52,6 +55,61 @@ export const Checkout = () => {
 
   const { restaurant: restaurantId, items } = useCart();
   const { data: restaurant } = useRestaurant(restaurantId);
+  const { user } = useAuthContext();
+  const [selectedMethod, setSelectedMethod] = useState<PaymentMethod>("STRIPE");
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleCheckout = async () => {
+    if (!user || !restaurantId || !items || items.length === 0) {
+      setError("Missing required information");
+      return;
+    }
+
+    setIsProcessing(true);
+    setError(null);
+
+    try {
+      // 1. Create order
+      const order = await orderService.createOrder({
+        customerId: user.id,
+        restaurantId: restaurantId,
+        deliveryAddress:
+          "Residencia Militar - EP, Jiron Simon Bolivar 119, Trujillo 13001, Peru",
+        items: items.map((item) => ({
+          menuItemId: item.id,
+          quantity: 1, // TODO: get from cart
+          options: [], // TODO: get from cart
+        })),
+      });
+
+      // 2. Create payment
+      const payment = await paymentService.createPayment({
+        orderId: order.id,
+        customerId: user.id,
+        amount: order.totalPrice,
+        method: selectedMethod,
+      });
+
+      // 3. Redirect to Stripe Checkout if using Stripe
+      if (selectedMethod === "STRIPE") {
+        const stripe = (window as any).Stripe(
+          "pk_test_51RdcwWI7XGxEwOVvH5BeW0Vc8j9gd8Sywk5H4JFLTwtyfdCYenuNCgMSHgG2NDAU0Alxd7w22ywH8i3TCfESBLhS00LNXUkHoK",
+        );
+        const { error: stripeError } = await stripe.redirectToCheckout({
+          sessionId: payment.transactionId,
+        });
+
+        if (stripeError) {
+          throw new Error(stripeError.message);
+        }
+      }
+    } catch (err: any) {
+      console.error("Checkout error:", err);
+      setError(err.message || "Error processing payment");
+      setIsProcessing(false);
+    }
+  };
 
   return (
     <div className="max-w-[58%] mx-auto py-8 flex gap-4">
@@ -95,7 +153,10 @@ export const Checkout = () => {
 
           <div className="flex justify-between items-center pt-4 border-t border-gray-200">
             <span className="text-gray-800">Entrega estimada</span>
-            <span className="text-gray-800 font-bold">26 - 46 min</span>
+            <span className="text-gray-800 font-bold">
+              {restaurant?.minPreparationTime} -{" "}
+              {restaurant?.maxPreparationTime} min
+            </span>
           </div>
         </div>
 
@@ -104,9 +165,53 @@ export const Checkout = () => {
             Método de pago
           </span>
 
-          <span>Stripe</span>
-          <span>Paypal</span>
-          <span>Yape</span>
+          <div className="flex flex-col gap-2">
+            <label
+              className={`flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition ${selectedMethod === "STRIPE" ? "border-green-400 bg-green-50" : "border-gray-200"}`}
+            >
+              <input
+                type="radio"
+                name="payment"
+                value="STRIPE"
+                checked={selectedMethod === "STRIPE"}
+                onChange={(e) =>
+                  setSelectedMethod(e.target.value as PaymentMethod)
+                }
+                className="w-4 h-4 text-green-400"
+              />
+              <span className="text-gray-800 font-medium">💳 Stripe</span>
+            </label>
+
+            <label
+              className={`flex items-center gap-3 p-3 border rounded-lg cursor-not-allowed opacity-50 transition ${selectedMethod === "PAYPAL" ? "border-green-400 bg-green-50" : "border-gray-200"}`}
+            >
+              <input
+                type="radio"
+                name="payment"
+                value="PAYPAL"
+                disabled
+                className="w-4 h-4"
+              />
+              <span className="text-gray-800 font-medium">
+                🅿️ PayPal (Próximamente)
+              </span>
+            </label>
+
+            <label
+              className={`flex items-center gap-3 p-3 border rounded-lg cursor-not-allowed opacity-50 transition ${selectedMethod === "YAPE" ? "border-green-400 bg-green-50" : "border-gray-200"}`}
+            >
+              <input
+                type="radio"
+                name="payment"
+                value="YAPE"
+                disabled
+                className="w-4 h-4"
+              />
+              <span className="text-gray-800 font-medium">
+                📱 Yape (Próximamente)
+              </span>
+            </label>
+          </div>
         </div>
       </div>
 
@@ -143,8 +248,25 @@ export const Checkout = () => {
           </div>
         </div>
 
-        <button className="bg-green-400 text-white text-sm font-bold px-6 py-3 rounded-lg hover:bg-green-500 transition w-full">
-          Hacer pedido
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-600 p-3 rounded-lg text-sm">
+            <strong>Error:</strong> {error}
+          </div>
+        )}
+
+        <button
+          onClick={handleCheckout}
+          disabled={isProcessing || !user}
+          className="bg-green-400 text-white text-sm font-bold px-6 py-3 rounded-lg hover:bg-green-500 transition w-full disabled:bg-gray-300 disabled:cursor-not-allowed"
+        >
+          {isProcessing ? (
+            <span className="flex items-center justify-center gap-2">
+              <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+              Procesando...
+            </span>
+          ) : (
+            "Hacer pedido"
+          )}
         </button>
       </div>
     </div>

@@ -73,7 +73,10 @@ export const RestaurantDetail = ({
           <div className="w-full border border-gray-200 rounded-2xl text-sm">
             <div className="flex justify-between items-center px-4 py-2 border-b last:border-0 border-gray-200">
               <span className="text-gray-500">Tiempo estimado</span>
-              <span className="font-bold text-gray-800 mr-1">15-20 min</span>
+              <span className="font-bold text-gray-800 mr-1">
+                {restaurant.minPreparationTime} -{" "}
+                {restaurant.maxPreparationTime} min
+              </span>
             </div>
 
             <div className="flex justify-between items-center px-4 py-2 border-b last:border-0 border-gray-200">

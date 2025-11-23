@@ -34,7 +34,8 @@ export const RestaurantCard = ({ restaurant }: { restaurant: Restaurant }) => {
                 <div className="flex items-center gap-2">
                   <span className="flex items-center gap-1">
                     <RiTimeLine className="w-3 h-3 fill-gray-500" />
-                    5-10 min
+                    {restaurant.minPreparationTime} -{" "}
+                    {restaurant.maxPreparationTime} min
                   </span>
                   <span className="text-gray-500">•</span>
                   <span className="flex items-center gap-1">

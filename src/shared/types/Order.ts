@@ -1,8 +1,8 @@
 export enum OrderStatus {
-  PENDING,
-  CONFIRMED,
-  DELIVERYING,
-  COMPLETED,
+  PENDING = "PENDING",
+  CONFIRMED = "CONFIRMED",
+  DELIVERYING = "DELIVERYING",
+  COMPLETED = "COMPLETED",
 }
 
 export type OrderItemOption = {
@@ -19,7 +19,7 @@ export type OrderItem = {
 };
 
 export type Order = {
-  id: number;
+  id: string;
   customerId: number;
   restaurantId: number;
   deliveryDriverId: number | null;
@@ -27,4 +27,6 @@ export type Order = {
   items: OrderItem[];
   deliveryAddress: string;
   deliveryFee: number;
+  totalPrice: number;
+  createdAt: string;
 };

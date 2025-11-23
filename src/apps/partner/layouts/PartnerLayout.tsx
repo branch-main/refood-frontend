@@ -1,11 +1,15 @@
-import { ReactNode } from "react";
 import { PartnerSidebar } from "../components/PartnerSidebar";
+import { Outlet, ScrollRestoration } from "react-router-dom";
 
-export const PartnerLayout = ({ children }: { children?: ReactNode }) => {
+export const PartnerLayout = () => {
   return (
-    <div className="min-h-screen flex bg-gray-50">
+    <div className="min-h-screen flex">
       <PartnerSidebar />
-      <main className="flex-1 pt-5 pb-4 px-12">{children}</main>
+
+      <main className="flex-1 pt-5 pb-4 px-12">
+        <Outlet />
+        <ScrollRestoration />
+      </main>
     </div>
   );
 };

@@ -1,9 +1,4 @@
-import {
-  Outlet,
-  redirect,
-  RouteObject,
-  ScrollRestoration,
-} from "react-router-dom";
+import { Navigate, Outlet, redirect, RouteObject } from "react-router-dom";
 import {
   Home,
   Login,
@@ -11,14 +6,19 @@ import {
   Menu,
   Restaurants,
   Restaurant,
-  Profile,
   Checkout,
+  Profile,
+  Orders,
+  Order,
+  Notifications,
+  Favorites,
 } from "@/pages";
 import { Layout } from "@/shared/components/layout";
 import { authService } from "@/shared/services";
 import { AuthProvider } from "@/shared/contexts";
 import { CartProvider } from "@/features/cart/contexts";
 import { RestaurantProvider } from "@/features/restaurants/contexts";
+import { ProfileLayout } from "@/features/profile/layouts";
 
 const requireAuth = async () => {
   const user = await authService.getCurrentUser().catch(() => null);
@@ -28,34 +28,55 @@ const requireAuth = async () => {
   return null;
 };
 
-const RootLayout = () => (
+const RootProvider = () => (
   <AuthProvider>
     <CartProvider>
       <RestaurantProvider>
-        <Layout>
-          <Outlet />
-          <ScrollRestoration />
-        </Layout>
+        <Outlet />
       </RestaurantProvider>
     </CartProvider>
   </AuthProvider>
 );
 
 export const routes: RouteObject = {
-  element: <RootLayout />,
+  element: <RootProvider />,
   children: [
-    { index: true, element: <Home /> },
-    { path: "login", element: <Login /> },
-    { path: "register", element: <Register /> },
-    { path: "checkout", element: <Checkout />, loader: requireAuth },
-    { path: "menu", element: <Menu /> },
-    { path: "restaurants", element: <Restaurants /> },
-    { path: "restaurants/:id", element: <Restaurant /> },
+    {
+      element: <Layout />,
+      children: [
+        { index: true, element: <Home /> },
+        { path: "menu", element: <Menu /> },
+        { path: "restaurants", element: <Restaurants /> },
+        { path: "restaurants/:id", element: <Restaurant /> },
+      ],
+    },
+
+    {
+      element: <Layout />,
+      children: [
+        { path: "login", element: <Login /> },
+        { path: "register", element: <Register /> },
+      ],
+    },
+
+    {
+      path: "checkout",
+      element: <Checkout />,
+      loader: requireAuth,
+    },
 
     {
       path: "profile",
       loader: requireAuth,
-      element: <Profile />,
+      element: <ProfileLayout />,
+      children: [
+        { index: true, element: <Navigate to="settings" replace /> },
+        { path: "settings", element: <Profile /> },
+        { path: "notifications", element: <Notifications /> },
+        { path: "favorites", element: <Favorites /> },
+        { path: "orders", element: <Orders /> },
+        { path: "orders/:orderId", element: <Order /> },
+      ],
     },
   ],
 };

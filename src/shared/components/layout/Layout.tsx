@@ -1,14 +1,16 @@
 import { Navbar } from "./Navbar";
 import { Footer } from "./Footer";
 import { MenuCart } from "@/features/menu/components";
-import { ReactNode } from "react";
+import { Outlet } from "react-router-dom";
 
-export const Layout = ({ children }: { children?: ReactNode }) => {
+export const Layout = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
       <MenuCart />
-      <main className="flex-1 bg-gray-50">{children}</main>
+      <main className="flex-1">
+        <Outlet />
+      </main>
       <Footer />
     </div>
   );

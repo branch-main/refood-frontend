@@ -1,9 +1,4 @@
-import {
-  Outlet,
-  redirect,
-  RouteObject,
-  ScrollRestoration,
-} from "react-router-dom";
+import { redirect, RouteObject } from "react-router-dom";
 import { PartnerLayout } from "./layouts/PartnerLayout";
 import {
   PartnerDashboard,
@@ -26,10 +21,7 @@ const requireAuth = async () => {
 
 const RootLayout = () => (
   <AuthProvider>
-    <PartnerLayout>
-      <Outlet />
-      <ScrollRestoration />
-    </PartnerLayout>
+    <PartnerLayout />
   </AuthProvider>
 );
 
