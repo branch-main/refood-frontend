@@ -4,56 +4,12 @@ import {
   usePaymentByOrder,
   useRestaurant,
 } from "@/shared/hooks";
-import { OrderItem as OrderItemType, OrderStatus } from "@/shared/types";
+import { OrderItem as OrderItemType } from "@/shared/types";
 import { PaymentMethod } from "@/shared/services";
-import { getFallbackImage, formatPrice } from "@/shared/utils";
+import { getFallbackImage, formatPrice, getStatusIcon, getStatusText, getStatusColor } from "@/shared/utils";
 import { BsStripe, BsPaypal } from "react-icons/bs";
-import { FiClock, FiCheck, FiTruck, FiPackage } from "react-icons/fi";
 import { useNavigate, useParams } from "react-router-dom";
 import { SlArrowLeft } from "react-icons/sl";
-
-const getStatusIcon = (status: OrderStatus) => {
-  switch (status) {
-    case OrderStatus.PENDING:
-      return <FiClock className="w-4 h-4" />;
-    case OrderStatus.CONFIRMED:
-      return <FiCheck className="w-4 h-4" />;
-    case OrderStatus.DELIVERYING:
-      return <FiTruck className="w-4 h-4" />;
-    case OrderStatus.COMPLETED:
-      return <FiPackage className="w-4 h-4" />;
-    default:
-      return null;
-  }
-};
-
-const getStatusText = (status: OrderStatus) => {
-  switch (status) {
-    case OrderStatus.PENDING:
-      return "Pendiente";
-    case OrderStatus.CONFIRMED:
-      return "Confirmado";
-    case OrderStatus.DELIVERYING:
-      return "En camino";
-    case OrderStatus.COMPLETED:
-      return "Completado";
-    default:
-      return status;
-  }
-};
-
-const getStatusColor = (status: string) => {
-  switch (status) {
-    case OrderStatus.PENDING:
-      return "bg-yellow-50 text-yellow-400";
-    case OrderStatus.CONFIRMED:
-      return "bg-blue-50 text-blue-400";
-    case OrderStatus.DELIVERYING:
-      return "bg-orange-50 text-orange-400";
-    case OrderStatus.COMPLETED:
-      return "bg-green-50 text-green-400";
-  }
-};
 
 const getPaymentMethodIcon = (method: PaymentMethod) => {
   switch (method) {
