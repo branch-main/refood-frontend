@@ -280,7 +280,7 @@ export const Checkout = () => {
         customerId: user.id,
         amount: order.totalPrice,
         method: paymentMethod,
-        successUrl: `${window.location.origin}/payment-success?order_id=${order.id}`,
+        successUrl: `${window.location.origin}/profile/orders/${order.id}`,
         cancelUrl: `${window.location.origin}/payment-cancel?order_id=${order.id}`,
       });
 
