@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { FiStar, FiHeart, FiArrowLeft } from "react-icons/fi";
+import { useState } from "react";
 import {
   formatPrice,
   formatRating,
@@ -8,6 +9,7 @@ import {
 } from "@/shared/utils";
 import { Restaurant } from "@/shared/types";
 import { Skeleton } from "@/shared/components/ui";
+import { useFavorites, useAddFavorite, useRemoveFavorite } from "@/shared/hooks";
 
 export const RestaurantDetail = ({
   restaurant,
@@ -15,6 +17,34 @@ export const RestaurantDetail = ({
   restaurant: Restaurant;
 }) => {
   const navigate = useNavigate();
+  const { data: favorites = [], error } = useFavorites();
+  const addFavorite = useAddFavorite();
+  const removeFavorite = useRemoveFavorite();
+  
+  // Log error but don't break the UI
+  if (error) {
+    console.error("Error loading favorites:", error);
+  }
+  
+  const isFavorite = favorites.includes(restaurant.id);
+  const [isToggling, setIsToggling] = useState(false);
+
+  const handleToggleFavorite = async () => {
+    if (isToggling) return;
+    
+    setIsToggling(true);
+    try {
+      if (isFavorite) {
+        await removeFavorite.mutateAsync(restaurant.id);
+      } else {
+        await addFavorite.mutateAsync(restaurant.id);
+      }
+    } catch (error) {
+      console.error("Error toggling favorite:", error);
+    } finally {
+      setIsToggling(false);
+    }
+  };
 
   return (
     <div className="bg-white">
@@ -35,10 +65,15 @@ export const RestaurantDetail = ({
         </button>
 
         <button
-          className="absolute w-8 h-8 top-2 right-2 flex items-center justify-center transition-colors bg-black/50 backdrop-blur-sm rounded-full hover:bg-black/75"
-          onClick={() => navigate(-1)}
+          className={`absolute w-8 h-8 top-2 right-2 flex items-center justify-center transition-all bg-black/50 backdrop-blur-sm rounded-full hover:bg-black/75 disabled:opacity-50 ${
+            isFavorite ? "text-red-500" : "text-white"
+          }`}
+          onClick={handleToggleFavorite}
+          disabled={isToggling}
         >
-          <FiHeart className="h-4 w-4 text-white" />
+          <FiHeart
+            className={`h-4 w-4 transition-all ${isFavorite ? "fill-current" : ""}`}
+          />
         </button>
 
         <div className="absolute left-12 -translate-x-1/2 -bottom-8 w-16 h-16 rounded-full bg-white shadow-lg">
