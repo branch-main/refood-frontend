@@ -3,6 +3,7 @@ export enum OrderStatus {
   CONFIRMED = "CONFIRMED",
   DELIVERYING = "DELIVERYING",
   COMPLETED = "COMPLETED",
+  CANCELED = "CANCELED",
 }
 
 export type OrderItemOption = {
@@ -29,4 +30,5 @@ export type Order = {
   deliveryFee: number;
   totalPrice: number;
   createdAt: string;
+  deliveredAt: string | null;
 };

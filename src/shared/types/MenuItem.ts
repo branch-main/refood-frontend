@@ -20,6 +20,7 @@ export type MenuItem = {
   name: string;
   description: string;
   price: number;
+  discountPrice: number | null;
   image: string | null;
   isAvailable: boolean;
   options: MenuItemOption[];

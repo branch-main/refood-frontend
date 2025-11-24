@@ -36,10 +36,12 @@ const EmptyCart = () => {
 const CartItem = ({
   id,
   quantity,
+  additionalPrice,
   notes,
 }: {
   id: number;
   quantity: number;
+  additionalPrice: number;
   notes?: string;
 }) => {
   const { data: item } = useMenuItem(id);
@@ -87,8 +89,15 @@ const CartItem = ({
             </button>
           </div>
 
-          <span className="text-sm font-bold text-gray-800">
-            {formatPrice(item.price * quantity)}
+          <span className="text-sm font-bold text-gray-800 flex flex-col items-end">
+            {item.discountPrice && (
+              <span className="text-gray-500 text-xs font-normal line-through">
+                {formatPrice((item.price + additionalPrice) * quantity)}
+              </span>
+            )}
+            {formatPrice(
+              ((item.discountPrice ?? item.price) + additionalPrice) * quantity,
+            )}
           </span>
         </div>
       </div>
@@ -98,7 +107,7 @@ const CartItem = ({
 
 export const MenuCart = () => {
   const {
-    restaurant: restaurantId,
+    restaurantId: restaurantId,
     items,
     isOpen,
     setIsOpen,
@@ -178,6 +187,7 @@ export const MenuCart = () => {
                     key={item.id}
                     id={item.id}
                     quantity={item.quantity}
+                    additionalPrice={item.additionalPrice}
                     notes={item.notes}
                   />
                 ))}

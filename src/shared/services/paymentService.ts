@@ -29,6 +29,8 @@ export interface CreatePaymentRequest {
   customerId: number;
   amount: number;
   method: PaymentMethod;
+  successUrl: string;
+  cancelUrl: string;
 }
 
 export interface PaymentResponse {
@@ -64,6 +66,8 @@ export const paymentService = {
       customer_id: request.customerId,
       amount: request.amount,
       method: request.method,
+      success_url: request.successUrl,
+      cancel_url: request.cancelUrl,
     });
     return toPayment(response.data);
   },

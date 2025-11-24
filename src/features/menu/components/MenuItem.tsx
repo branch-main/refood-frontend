@@ -8,9 +8,6 @@ import { MenuItemModal } from "./MenuItemModal";
 import { Skeleton } from "@/shared/components/ui";
 import { MenuItem as MenuItemType } from "@/shared/types";
 
-// TODO: use actual values
-const DISCOUNTED_PRICE = 10;
-
 export const MenuItem = ({ item }: { item: MenuItemType }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [shouldMount, setShouldMount] = useState(false);
@@ -40,13 +37,13 @@ export const MenuItem = ({ item }: { item: MenuItemType }) => {
                   {item.description}
                 </p>
               </div>
-              {(DISCOUNTED_PRICE && (
+              {(item.discountPrice && (
                 <div className="flex gap-2.5 items-end leading-none">
                   <div className="font-bold text-red-500">
-                    -{calculateDiscount(item.price, DISCOUNTED_PRICE)}%
+                    -{calculateDiscount(item.price, item.discountPrice)}%
                   </div>
                   <div className="font-bold text-gray-800">
-                    {formatPrice(DISCOUNTED_PRICE)}
+                    {formatPrice(item.discountPrice)}
                   </div>
                   <div className="text-gray-500 text-sm line-through leading-none">
                     {formatPrice(item.price)}

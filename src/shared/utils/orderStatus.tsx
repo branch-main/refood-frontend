@@ -1,5 +1,5 @@
 import { OrderStatus } from "@/shared/types";
-import { FiClock, FiCheck, FiTruck, FiPackage } from "react-icons/fi";
+import { FiClock, FiCheck, FiTruck, FiPackage, FiX } from "react-icons/fi";
 
 export const getStatusIcon = (status: OrderStatus) => {
   switch (status) {
@@ -11,6 +11,8 @@ export const getStatusIcon = (status: OrderStatus) => {
       return <FiTruck className="w-4 h-4" />;
     case OrderStatus.COMPLETED:
       return <FiPackage className="w-4 h-4" />;
+    case OrderStatus.CANCELED:
+      return <FiX className="w-4 h-4" />;
     default:
       return null;
   }
@@ -26,6 +28,8 @@ export const getStatusText = (status: OrderStatus) => {
       return "En camino";
     case OrderStatus.COMPLETED:
       return "Completado";
+    case OrderStatus.CANCELED:
+      return "Cancelado";
     default:
       return status;
   }
@@ -41,5 +45,7 @@ export const getStatusColor = (status: string) => {
       return "bg-orange-50 text-orange-400";
     case OrderStatus.COMPLETED:
       return "bg-green-50 text-green-400";
+    case OrderStatus.CANCELED:
+      return "bg-red-50 text-red-400";
   }
 };

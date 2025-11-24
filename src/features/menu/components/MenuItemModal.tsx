@@ -17,54 +17,7 @@ import { ChangeEvent, useState } from "react";
 import { FaMinus, FaPlus } from "react-icons/fa6";
 import { IoIosArrowDown } from "react-icons/io";
 import { IoClose } from "react-icons/io5";
-
-// TODO: use actual values
-const DISCOUNTED_PRICE: number | null = 10;
-const OPTIONS: MenuItemOptionType[] = [
-  {
-    id: 1,
-    name: "Elige Salsas",
-    minChoices: 2,
-    maxChoices: 3,
-    isRequired: true,
-    choices: [
-      { id: 1, name: "Mayonesa", price: 1.99, isAvailable: true },
-      { id: 2, name: "Kétchup", price: 0, isAvailable: true },
-      { id: 3, name: "Mostaza", price: 0, isAvailable: false },
-      { id: 4, name: "Barbacoa", price: 0.5, isAvailable: true },
-      { id: 5, name: "Ajo", price: 0, isAvailable: true },
-      { id: 6, name: "Curry", price: 0.75, isAvailable: true },
-      { id: 7, name: "Buffalo", price: 1.0, isAvailable: true },
-      { id: 8, name: "Chipotle", price: 1.25, isAvailable: true },
-    ],
-  },
-
-  {
-    id: 2,
-    name: "Elige Bebida",
-    minChoices: 1,
-    maxChoices: 1,
-    isRequired: true,
-    choices: [
-      { id: 2, name: "Coca-Cola", price: 0, isAvailable: true },
-      { id: 3, name: "Pepsi", price: 0, isAvailable: false },
-      { id: 4, name: "Sprite", price: 0, isAvailable: true },
-    ],
-  },
-
-  {
-    id: 3,
-    name: "Elige Acompañamiento",
-    minChoices: 1,
-    maxChoices: 1,
-    isRequired: true,
-    choices: [
-      { id: 2, name: "Papas Fritas", price: 0, isAvailable: true },
-      { id: 3, name: "Aros de Cebolla", price: 0, isAvailable: false },
-      { id: 4, name: "Ensalada", price: 0, isAvailable: true },
-    ],
-  },
-];
+import { useMenuOptions } from "@/shared/hooks/useMenuOptions";
 
 const MenuItemChoice = ({
   choice,
@@ -209,7 +162,11 @@ export const MenuItemModal = ({
     Map<number, Set<number>>
   >(new Map());
 
-  const canAddToCart = OPTIONS.some((option) => {
+  const { data: options } = useMenuOptions(item.id);
+
+  if (!options) return;
+
+  const canAddToCart = options.some((option) => {
     if (!option.isRequired && option.minChoices === 0) return false;
     const selected = optionSelections.get(option.id) || new Set();
     return selected.size < Math.max(option.minChoices, 1);
@@ -217,7 +174,7 @@ export const MenuItemModal = ({
 
   const additionalPrice = Array.from(optionSelections.entries()).reduce(
     (total, [optionId, selectedIds]) => {
-      const option = OPTIONS.find((o) => o.id === optionId);
+      const option = options.find((o) => o.id === optionId);
       if (!option) return total;
 
       const choicePrice = Array.from(selectedIds).reduce((sum, choiceId) => {
@@ -230,16 +187,34 @@ export const MenuItemModal = ({
     0,
   );
 
-  // TODO: shouldn't need Number() here if types are correct
-  const price = DISCOUNTED_PRICE ?? Number(item.price);
-  const totalPrice = (Number(price) + additionalPrice) * count;
+  const price = item.discountPrice ?? item.price;
+  const totalPrice = (price + additionalPrice) * count;
 
   const handleAddToCart = () => {
+    const selectedOptions = Array.from(optionSelections.entries()).flatMap(
+      ([optionId, selectedIds]) => {
+        const option = options.find((o) => o.id === optionId);
+        if (!option) return [];
+
+        return Array.from(selectedIds).map((choiceId) => {
+          const choice = option.choices.find((c) => c.id === choiceId);
+          return {
+            name: option.name,
+            value: choice?.name || "",
+            price: choice?.price || 0,
+          };
+        });
+      },
+    );
+
     addItem(item.restaurantId, {
       id: item.id,
-      price: price + additionalPrice,
+      price: item.price,
+      discountPrice: item.discountPrice || undefined,
+      additionalPrice: additionalPrice,
       quantity: count,
       notes: notes || undefined,
+      options: selectedOptions.length > 0 ? selectedOptions : undefined,
     });
     onClose();
   };
@@ -265,14 +240,14 @@ export const MenuItemModal = ({
             <p className="text-gray-600 text-sm">{item.description}</p>
 
             <div className="flex flex-col items-start text-nowrap leading-none">
-              {(DISCOUNTED_PRICE && (
+              {(item.discountPrice && (
                 <div className="flex flex-col gap-1 items-end">
                   <div className="font-bold text-xl text-gray-800">
-                    {formatPrice(DISCOUNTED_PRICE)}
+                    {formatPrice(item.discountPrice)}
                   </div>
                   <div className="flex gap-2 items-center">
                     <div className="text-sm font-bold bg-red-100 px-2 py-0.5 rounded-lg text-red-500">
-                      -{calculateDiscount(item.price, DISCOUNTED_PRICE)}%
+                      -{calculateDiscount(item.price, item.discountPrice)}%
                     </div>
                     <div className="text-sm text-gray-500 line-through">
                       {formatPrice(item.price)}
@@ -290,7 +265,7 @@ export const MenuItemModal = ({
 
         <div className="flex flex-col flex-1 min-w-0 gap-4">
           <div className="flex-1 min-h-0 overflow-y-auto flex flex-col gap-4 pr-2">
-            {OPTIONS.map((option) => (
+            {options.map((option) => (
               <MenuItemOption
                 key={option.id}
                 option={option}

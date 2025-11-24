@@ -53,6 +53,7 @@ const toOrder = (data: any): Order => {
     })),
     deliveryAddress: data.delivery_address,
     deliveryFee: data.delivery_fee,
+    deliveredAt: data.delivered_at,
     totalPrice: data.total_price,
     createdAt: data.created_at,
   };

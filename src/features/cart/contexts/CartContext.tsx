@@ -3,13 +3,15 @@ import { createContext, useContext, useState, ReactNode } from "react";
 export interface CartItem {
   id: number;
   price: number;
+  discountPrice?: number;
+  additionalPrice: number;
   quantity: number;
   notes?: string;
-  options?: { name: string; value: string }[];
+  options?: { name: string; value: string; price: number }[];
 }
 
 interface CartContextType {
-  restaurant?: number;
+  restaurantId?: number;
   items: CartItem[];
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
@@ -69,7 +71,10 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
 
   const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
   const subtotal = items.reduce(
-    (sum, item) => sum + item.price * item.quantity,
+    (sum, item) =>
+      sum +
+      ((item.discountPrice ?? item.price) + item.additionalPrice) *
+        item.quantity,
     0,
   );
   const deliveryFee = items.length > 0 ? 2.5 : 0;
@@ -78,7 +83,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   return (
     <CartContext.Provider
       value={{
-        restaurant: restaurantId,
+        restaurantId,
         items,
         isOpen,
         setIsOpen,

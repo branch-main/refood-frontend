@@ -5,14 +5,22 @@ import {
   useRestaurant,
 } from "@/shared/hooks";
 import { OrderItem as OrderItemType } from "@/shared/types";
-import { getFallbackImage, formatPrice, getStatusIcon, getStatusText, getStatusColor, getPaymentMethodIcon, getPaymentMethodText, formatDate, formatTimeFromDate } from "@/shared/utils";
+import {
+  getFallbackImage,
+  formatPrice,
+  getStatusIcon,
+  getStatusText,
+  getStatusColor,
+  getPaymentMethodIcon,
+  getPaymentMethodText,
+  formatDate,
+  formatTimeFromDate,
+} from "@/shared/utils";
 import { useNavigate, useParams } from "react-router-dom";
 import { SlArrowLeft } from "react-icons/sl";
 
 const OrderItem = ({ item }: { item: OrderItemType }) => {
   const { data: menuItem } = useMenuItem(item.menuItemId);
-
-  console.log(item);
 
   if (!menuItem) {
     return null;
@@ -60,6 +68,8 @@ export const Order = () => {
 
   const total = productsTotal + order.deliveryFee;
 
+  console.log(order);
+
   return (
     <>
       <div className="p-6 border-b border-gray-200 flex items-center gap-5">
@@ -88,14 +98,28 @@ export const Order = () => {
 
         <div className="flex flex-col border-b border-gray-200 pb-4 px-5">
           <span className="text-gray-800 text-lg font-bold">Inicio</span>
-          <span className="text-gray-800 text-sm">{formatDate(order.createdAt)}</span>
-          <span className="text-gray-800 text-sm">{formatTimeFromDate(order.createdAt)}</span>
+          <span className="text-gray-800 text-sm">
+            {formatDate(order.createdAt)}
+          </span>
+          <span className="text-gray-800 text-sm">
+            {formatTimeFromDate(order.createdAt)}
+          </span>
         </div>
 
         <div className="flex flex-col border-b border-gray-200 pb-4 px-5">
           <span className="text-gray-800 text-lg font-bold">Entrega</span>
-          <span className="text-gray-800 text-sm">{formatDate(order.createdAt)}</span>
-          <span className="text-gray-800 text-sm">{formatTimeFromDate(order.createdAt)}</span>
+          {order.deliveredAt ? (
+            <>
+              <span className="text-gray-800 text-sm">
+                {formatDate(order.deliveredAt)}
+              </span>
+              <span className="text-gray-800 text-sm">
+                {formatTimeFromDate(order.deliveredAt)}
+              </span>
+            </>
+          ) : (
+            <span className="text-gray-500 text-sm">Pendiente</span>
+          )}
           <span className="text-gray-800 text-sm mt-4">
             {order.deliveryAddress}
           </span>
