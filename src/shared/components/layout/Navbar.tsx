@@ -27,7 +27,9 @@ export const Navbar = () => {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchValue.trim()) {
-      console.log("Searching for:", searchValue);
+      setIsMobileMenuOpen(false);
+      navigate(`/restaurants?search=${encodeURIComponent(searchValue.trim())}`);
+      setSearchValue("");
     }
   };
 

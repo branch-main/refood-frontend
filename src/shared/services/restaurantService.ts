@@ -31,14 +31,16 @@ const toRestaurant = (data: any): Restaurant => ({
   openingHours: data.opening_hours.map(toOpeningHours),
   isOpen: data.is_open,
   nextOpeningTime: data.next_opening_time,
+  bestDiscount: data.best_discount || 0,
   createdAt: data.created_at,
   updatedAt: data.updated_at,
 });
 
 export const restaurantService = {
-  getRestaurants: async (): Promise<Restaurant[]> => {
+  getRestaurants: async (search?: string): Promise<Restaurant[]> => {
+    const params = search ? { search } : {};
     return apiClient
-      .get<any>("/restaurants/")
+      .get<any>("/restaurants/", { params })
       .then((restaurants) => restaurants.map(toRestaurant));
   },
 

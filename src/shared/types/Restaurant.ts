@@ -40,6 +40,7 @@ export type Restaurant = {
   openingHours: OpeningHours[];
   isOpen: boolean;
   nextOpeningTime: string;
+  bestDiscount: number;
   createdAt: string | null;
   updatedAt: string | null;
 };

@@ -1,8 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { restaurantService } from "../services";
 
-export const useRestaurants = () =>
+export const useRestaurants = (search?: string) =>
   useQuery({
-    queryKey: ["restaurants"],
-    queryFn: () => restaurantService.getRestaurants(),
+    queryKey: ["restaurants", search],
+    queryFn: () => restaurantService.getRestaurants(search),
   });
