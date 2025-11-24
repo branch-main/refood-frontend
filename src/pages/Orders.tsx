@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useAuth, useOrdersByCustomer, useRestaurant } from "@/shared/hooks";
 import { OrderStatus, Order as OrderType } from "@/shared/types";
 import {
@@ -82,8 +83,16 @@ const Order = ({ order }: { order: OrderType }) => {
 export const Orders = () => {
   const { user } = useAuth();
   const { data: orders } = useOrdersByCustomer(user?.id);
+  const [displayCount, setDisplayCount] = useState(10);
 
   if (!orders) return;
+
+  const visibleOrders = orders.slice(0, displayCount);
+  const hasMore = displayCount < orders.length;
+
+  const handleLoadMore = () => {
+    setDisplayCount(prev => prev + 10);
+  };
 
   return (
     <div className="p-6">
@@ -93,9 +102,26 @@ export const Orders = () => {
         si hay algún inconveniente con una de tus compras.
       </p>
 
-      {orders.map((order) => (
+      {visibleOrders.map((order) => (
         <Order key={order.id} order={order} />
       ))}
+
+      {hasMore && (
+        <div className="mt-8 flex justify-center">
+          <button
+            onClick={handleLoadMore}
+            className="px-6 py-3 text-sm font-medium text-red-500 border-2 border-red-500 rounded-lg hover:bg-red-500 hover:text-white transition-all duration-200"
+          >
+            Ver más pedidos
+          </button>
+        </div>
+      )}
+
+      {!hasMore && orders.length > 10 && (
+        <div className="mt-8 text-center text-sm text-gray-500">
+          No hay más pedidos para mostrar
+        </div>
+      )}
     </div>
   );
 };
