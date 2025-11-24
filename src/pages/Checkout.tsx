@@ -167,11 +167,22 @@ const CheckoutPaymentMethods = ({
   selected,
   setSelected,
   disabled = false,
+  total,
 }: {
   selected: PaymentMethod;
   setSelected: (method: PaymentMethod) => void;
   disabled?: boolean;
+  total: number;
 }) => {
+  const isPayPalDisabled = disabled || total < 37;
+
+  const handlePayPalClick = () => {
+    if (total < 37) {
+      return; // Don't change selection
+    }
+    setSelected("PAYPAL");
+  };
+
   return (
     <div className={`bg-white rounded-lg shadow-[0_0_15px_rgba(0,0,0,0.03)] p-4 flex flex-col gap-4 ${disabled ? "opacity-50" : ""}`}>
       <span className="text-gray-800 font-bold text-lg border-b border-gray-200 pb-4">
@@ -198,21 +209,30 @@ const CheckoutPaymentMethods = ({
         </label>
 
         <label
-          className={`flex items-center gap-3 p-3 border rounded-lg transition ${disabled ? "cursor-not-allowed" : "cursor-pointer"} ${selected === "PAYPAL" ? "border-green-400 bg-green-50" : "border-gray-200"}`}
+          className={`flex items-center gap-3 p-3 border rounded-lg transition ${
+            isPayPalDisabled ? "cursor-not-allowed opacity-50" : "cursor-pointer"
+          } ${selected === "PAYPAL" ? "border-green-400 bg-green-50" : "border-gray-200"}`}
         >
           <input
             type="radio"
             name="payment"
             value="PAYPAL"
             checked={selected === "PAYPAL"}
-            onChange={(e) => setSelected(e.target.value as PaymentMethod)}
+            onChange={handlePayPalClick}
             className="w-4 h-4"
-            disabled={disabled}
+            disabled={isPayPalDisabled}
           />
-          <span className="text-gray-800 font-medium flex items-center gap-2">
-            {getPaymentMethodIcon("PAYPAL")}
-            {getPaymentMethodText("PAYPAL")}
-          </span>
+          <div className="flex-1">
+            <span className="text-gray-800 font-medium flex items-center gap-2">
+              {getPaymentMethodIcon("PAYPAL")}
+              {getPaymentMethodText("PAYPAL")}
+            </span>
+            {total < 37 && (
+              <span className="text-xs text-red-500 mt-1 block">
+                Monto mínimo: S/ 37.00
+              </span>
+            )}
+          </div>
         </label>
       </div>
     </div>
@@ -288,7 +308,7 @@ const CheckoutProceedButton = ({
 };
 
 export const Checkout = () => {
-  const { restaurantId, items, clearCart } = useCart();
+  const { restaurantId, items, clearCart, total } = useCart();
   const { location, getFormattedAddress, updateLocation } = useLocation();
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -299,6 +319,13 @@ export const Checkout = () => {
 
   const hasItems = items.length > 0;
 
+  // Auto-switch to Stripe if PayPal is selected and total is below minimum
+  useEffect(() => {
+    if (paymentMethod === "PAYPAL" && total < 37) {
+      setPaymentMethod("STRIPE");
+    }
+  }, [total, paymentMethod]);
+
   const handleCheckout = async () => {
     if (!user || !restaurantId || items.length === 0) {
       setError("Missing required information");
@@ -308,6 +335,12 @@ export const Checkout = () => {
     if (!location) {
       setError("Por favor selecciona una dirección de entrega");
       setIsLocationModalOpen(true); // Auto-open location selector
+      return;
+    }
+
+    // Validate PayPal minimum amount
+    if (paymentMethod === "PAYPAL" && total < 37) {
+      setError("El monto mínimo para PayPal es S/ 37.00");
       return;
     }
 
@@ -376,6 +409,7 @@ export const Checkout = () => {
           selected={paymentMethod}
           setSelected={setPaymentMethod}
           disabled={!hasItems}
+          total={total}
         />
       </div>
 

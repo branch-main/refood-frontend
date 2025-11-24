@@ -92,29 +92,31 @@ export const Navbar = () => {
       <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-14">
           {/* Logo */}
-          <Link
-            to="/"
-            className="flex items-center gap-2 no-underline transition-all duration-200 hover:scale-105"
-            onClick={() => setIsMobileMenuOpen(false)}
-          >
-            <img src="/logo.png" alt="ReFood" className="h-10 w-auto" />
-          </Link>
-
-          {/* Location Display - Desktop */}
-          {user && (
-            <button
-              onClick={() => setIsLocationModalOpen(true)}
-              className="hidden md:flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-red-50 transition-colors group"
+          <div className="flex items-center gap-2">
+            <Link
+              to="/"
+              className="flex items-center gap-2 no-underline transition-all duration-200 hover:scale-105"
+              onClick={() => setIsMobileMenuOpen(false)}
             >
-              <FaLocationDot className="text-red-500 text-sm" />
-              <div className="flex flex-col items-start">
-                <span className="text-xs text-gray-500">Entregar en</span>
-                <span className="text-sm font-semibold text-gray-800 group-hover:text-red-500 transition-colors max-w-[150px] truncate">
-                  {location ? getShortAddress() : "Seleccionar ubicación"}
-                </span>
-              </div>
-            </button>
-          )}
+              <img src="/logo.png" alt="ReFood" className="h-10 w-auto" />
+            </Link>
+
+            {/* Location Display - Desktop */}
+            {user && (
+              <button
+                onClick={() => setIsLocationModalOpen(true)}
+                className="hidden md:flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-red-50 transition-colors group"
+              >
+                <FaLocationDot className="text-red-500 text-sm" />
+                <div className="flex flex-col items-start">
+                  <span className="text-xs text-gray-400">Entregar en</span>
+                  <span className="text-xs font-semibold text-gray-500 group-hover:text-red-500 transition-colors max-w-[150px] truncate">
+                    {location ? getShortAddress() : "Seleccionar ubicación"}
+                  </span>
+                </div>
+              </button>
+            )}
+          </div>
 
           {/* Search Bar */}
           <form
@@ -270,7 +272,9 @@ export const Navbar = () => {
                       {location ? getShortAddress() : "Seleccionar ubicación"}
                     </span>
                   </div>
-                  <span className="text-xs text-red-500 font-medium">Cambiar</span>
+                  <span className="text-xs text-red-500 font-medium">
+                    Cambiar
+                  </span>
                 </button>
               )}
 

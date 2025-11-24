@@ -123,7 +123,7 @@ export const Modal = ({
             exit="exit"
             transition={{ duration: 0.3, ease: "easeOut" }}
             onClick={(e) => e.stopPropagation()}
-            className={modalClassName}
+            className={`${modalClassName} overflow-auto`}
           >
             {children}
           </motion.div>

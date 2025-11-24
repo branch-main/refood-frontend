@@ -23,7 +23,21 @@ export const useLocation = () => {
     } else {
       localStorage.removeItem(LOCATION_STORAGE_KEY);
     }
+    
+    // Dispatch custom event to notify other components
+    window.dispatchEvent(new CustomEvent('locationChanged', { detail: location }));
   }, [location]);
+
+  // Listen for location changes from other components
+  useEffect(() => {
+    const handleLocationChange = (event: Event) => {
+      const customEvent = event as CustomEvent<UserAddress | null>;
+      setLocation(customEvent.detail);
+    };
+
+    window.addEventListener('locationChanged', handleLocationChange);
+    return () => window.removeEventListener('locationChanged', handleLocationChange);
+  }, []);
 
   const loadDefaultAddress = async () => {
     setIsLoading(true);
@@ -40,7 +54,7 @@ export const useLocation = () => {
     }
   };
 
-  const updateLocation = (newLocation: UserAddress) => {
+  const updateLocation = (newLocation: UserAddress | null) => {
     setLocation(newLocation);
   };
 
