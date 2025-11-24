@@ -88,7 +88,7 @@ export const Navbar = () => {
   }, []);
 
   return (
-    <nav className="bg-white h-14 fixed top-0 left-0 right-0 z-99 border-b border-gray-200 shadow-[0px_0px_25px_2px_rgba(0,0,0,0.025)]">
+    <nav className={`bg-white fixed top-0 left-0 right-0 z-99 shadow-[0px_0px_25px_2px_rgba(0,0,0,0.025)] ${isMobileMenuOpen ? '' : 'border-b border-gray-200'}`}>
       <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-14">
           {/* Logo */}
@@ -252,10 +252,12 @@ export const Navbar = () => {
           </div>
         </div>
 
-        {/* Mobile Menu */}
-        {isMobileMenuOpen && (
-          <div className="md:hidden py-4 border-t border-gray-200 animate-[fadeIn_0.2s_ease-out]">
-            <div className="flex flex-col space-y-2">
+      </div>
+      
+      {/* Mobile Menu */}
+      {isMobileMenuOpen && (
+        <div className="md:hidden py-4 bg-white border-t border-gray-200 animate-[fadeIn_0.2s_ease-out]">
+          <div className="flex flex-col space-y-2 px-4 sm:px-6 lg:px-8">
               {/* Mobile Location Selector */}
               {user && (
                 <button
@@ -422,10 +424,9 @@ export const Navbar = () => {
                   </Button>
                 </div>
               )}
-            </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* Location Selector Modal */}
       <LocationSelector

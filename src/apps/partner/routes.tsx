@@ -8,6 +8,7 @@ import {
   PartnerSettings,
   CreateMenuItem,
 } from "./pages";
+import { RestaurantSettings } from "./pages/RestaurantSettings";
 import { AuthProvider } from "@/shared/contexts";
 import { authService } from "@/shared/services";
 
@@ -32,6 +33,7 @@ export const routes: RouteObject = {
   children: [
     { index: true, element: <PartnerDashboard /> },
     { path: "restaurants", element: <PartnerRestaurants /> },
+    { path: "restaurants/:id/settings", element: <RestaurantSettings /> },
     { path: "orders", element: <PartnerOrders /> },
     { path: "analytics", element: <PartnerAnalytics /> },
     { path: "settings", element: <PartnerSettings /> },
