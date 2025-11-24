@@ -107,18 +107,34 @@ const CheckoutItemList = () => {
             </span>
           </div>
         )}
-        <span className="text-gray-500 text-sm">1 producto</span>
-      </div>
-
-      {items && items.map((item) => <CheckoutItem key={item.cartItemId} item={item} />)}
-
-      <div className="flex justify-between items-center pt-4 border-t border-gray-200">
-        <span className="text-gray-800">Entrega estimada</span>
-        <span className="text-gray-800 font-bold">
-          {restaurant?.minPreparationTime} - {restaurant?.maxPreparationTime}{" "}
-          min
+        <span className="text-gray-500 text-sm">
+          {items.length === 1 ? "1 producto" : `${items.length} productos`}
         </span>
       </div>
+
+      {items.length === 0 ? (
+        <div className="py-8 text-center">
+          <div className="text-gray-400 mb-2">
+            <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+          </div>
+          <p className="text-gray-600 font-medium mb-1">Tu pedido ha sido procesado</p>
+          <p className="text-gray-500 text-sm">El carrito se ha vaciado correctamente</p>
+        </div>
+      ) : (
+        <>
+          {items.map((item) => <CheckoutItem key={item.cartItemId} item={item} />)}
+
+          <div className="flex justify-between items-center pt-4 border-t border-gray-200">
+            <span className="text-gray-800">Entrega estimada</span>
+            <span className="text-gray-800 font-bold">
+              {restaurant?.minPreparationTime} - {restaurant?.maxPreparationTime}{" "}
+              min
+            </span>
+          </div>
+        </>
+      )}
     </div>
   );
 };
@@ -126,19 +142,21 @@ const CheckoutItemList = () => {
 const CheckoutPaymentMethods = ({
   selected,
   setSelected,
+  disabled = false,
 }: {
   selected: PaymentMethod;
   setSelected: (method: PaymentMethod) => void;
+  disabled?: boolean;
 }) => {
   return (
-    <div className="bg-white rounded-lg shadow-[0_0_15px_rgba(0,0,0,0.03)] p-4 flex flex-col gap-4">
+    <div className={`bg-white rounded-lg shadow-[0_0_15px_rgba(0,0,0,0.03)] p-4 flex flex-col gap-4 ${disabled ? "opacity-50" : ""}`}>
       <span className="text-gray-800 font-bold text-lg border-b border-gray-200 pb-4">
         Método de pago
       </span>
 
       <div className="flex flex-col gap-2">
         <label
-          className={`flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition ${selected === "STRIPE" ? "border-green-400 bg-green-50" : "border-gray-200"}`}
+          className={`flex items-center gap-3 p-3 border rounded-lg transition ${disabled ? "cursor-not-allowed" : "cursor-pointer"} ${selected === "STRIPE" ? "border-green-400 bg-green-50" : "border-gray-200"}`}
         >
           <input
             type="radio"
@@ -147,6 +165,7 @@ const CheckoutPaymentMethods = ({
             checked={selected === "STRIPE"}
             onChange={(e) => setSelected(e.target.value as PaymentMethod)}
             className="w-4 h-4 text-green-400"
+            disabled={disabled}
           />
           <span className="text-gray-800 font-medium flex items-center gap-2">
             {getPaymentMethodIcon("STRIPE")}
@@ -155,7 +174,7 @@ const CheckoutPaymentMethods = ({
         </label>
 
         <label
-          className={`flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition ${selected === "PAYPAL" ? "border-green-400 bg-green-50" : "border-gray-200"}`}
+          className={`flex items-center gap-3 p-3 border rounded-lg transition ${disabled ? "cursor-not-allowed" : "cursor-pointer"} ${selected === "PAYPAL" ? "border-green-400 bg-green-50" : "border-gray-200"}`}
         >
           <input
             type="radio"
@@ -164,6 +183,7 @@ const CheckoutPaymentMethods = ({
             checked={selected === "PAYPAL"}
             onChange={(e) => setSelected(e.target.value as PaymentMethod)}
             className="w-4 h-4"
+            disabled={disabled}
           />
           <span className="text-gray-800 font-medium flex items-center gap-2">
             {getPaymentMethodIcon("PAYPAL")}
@@ -217,14 +237,16 @@ const CheckoutError = ({ message }: { message: string | null }) => {
 const CheckoutProceedButton = ({
   onCheckout,
   isProcessing,
+  disabled = false,
 }: {
   onCheckout: () => void;
   isProcessing: boolean;
+  disabled?: boolean;
 }) => {
   return (
     <button
       onClick={onCheckout}
-      disabled={isProcessing}
+      disabled={isProcessing || disabled}
       className="bg-green-400 text-white text-sm font-bold px-6 py-3 rounded-lg hover:bg-green-500 transition w-full disabled:bg-gray-300 disabled:cursor-not-allowed"
     >
       {isProcessing ? (
@@ -232,6 +254,8 @@ const CheckoutProceedButton = ({
           <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
           Procesando...
         </span>
+      ) : disabled ? (
+        "Carrito vacío"
       ) : (
         "Hacer pedido"
       )}
@@ -240,18 +264,14 @@ const CheckoutProceedButton = ({
 };
 
 export const Checkout = () => {
-  const { restaurantId, items } = useCart();
+  const { restaurantId, items, clearCart } = useCart();
   const navigate = useNavigate();
   const { user } = useAuth();
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("STRIPE");
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (items.length === 0) {
-      navigate("/restaurants");
-    }
-  }, [items, navigate]);
+  const hasItems = items.length > 0;
 
   const handleCheckout = async () => {
     if (!user || !restaurantId || items.length === 0) {
@@ -274,6 +294,9 @@ export const Checkout = () => {
           options: item.options || [],
         })),
       });
+
+      // Clear the cart after successfully creating the order
+      clearCart();
 
       const payment = await paymentService.createPayment({
         orderId: order.id,
@@ -321,6 +344,7 @@ export const Checkout = () => {
         <CheckoutPaymentMethods
           selected={paymentMethod}
           setSelected={setPaymentMethod}
+          disabled={!hasItems}
         />
       </div>
 
@@ -330,6 +354,7 @@ export const Checkout = () => {
         <CheckoutProceedButton
           onCheckout={handleCheckout}
           isProcessing={isProcessing}
+          disabled={!hasItems}
         />
       </div>
     </>
