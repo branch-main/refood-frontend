@@ -1,4 +1,11 @@
-import { createContext, useContext, useState, ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  ReactNode,
+  useEffect,
+} from "react";
+import { menuService } from "@/shared/services";
 
 export interface CartItem {
   id: number;
@@ -14,6 +21,7 @@ interface CartContextType {
   restaurantId?: number;
   items: CartItem[];
   isOpen: boolean;
+  isLoading: boolean;
   setIsOpen: (isOpen: boolean) => void;
   addItem: (restaurantId: number, item: CartItem) => void;
   removeItem: (id: number) => void;
@@ -26,32 +34,79 @@ interface CartContextType {
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
+const CART_STORAGE_KEY = "cart_items";
+const RESTAURANT_STORAGE_KEY = "cart_restaurant_id";
+
 export const CartProvider = ({ children }: { children: ReactNode }) => {
-  const [items, setItems] = useState<CartItem[]>([]);
+  const [items, setItems] = useState<CartItem[]>(() => {
+    const saved = localStorage.getItem(CART_STORAGE_KEY);
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  const [restaurantId, setRestaurantId] = useState<number | undefined>(() => {
+    const saved = localStorage.getItem(RESTAURANT_STORAGE_KEY);
+    return saved ? Number(saved) : undefined;
+  });
+
   const [isOpen, setIsOpen] = useState(false);
-  const [restaurantId, setRestaurantId] = useState<number | undefined>(
-    undefined,
-  );
+  const [isLoading, setIsLoading] = useState(true);
 
-  const addItem = (restaurant: number, newItem: CartItem) => {
-    if (restaurantId && restaurantId !== restaurant) {
-      alert(
-        "No puedes agregar productos de diferentes restaurantes al carrito.",
-      );
-      return;
+  useEffect(() => {
+    const validateItems = async () => {
+      if (!restaurantId || items.length === 0) {
+        setIsLoading(false);
+        return;
+      }
+
+      const validated: CartItem[] = [];
+
+      for (const item of items) {
+        try {
+          const menuItem = await menuService.getMenuItem(item.id);
+
+          if (menuItem.restaurantId === restaurantId) {
+            validated.push(item);
+          }
+        } catch {}
+      }
+
+      if (validated.length === 0) {
+        clearCart();
+      } else {
+        setItems(validated);
+      }
+
+      setIsLoading(false);
+    };
+
+    validateItems();
+  }, []);
+
+  useEffect(() => {
+    if (items.length > 0 && restaurantId) {
+      localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(items));
+      localStorage.setItem(RESTAURANT_STORAGE_KEY, restaurantId.toString());
+    } else {
+      localStorage.removeItem(CART_STORAGE_KEY);
+      localStorage.removeItem(RESTAURANT_STORAGE_KEY);
     }
+  }, [items, restaurantId]);
 
-    setRestaurantId(restaurant);
-    setItems((prev) => {
-      return [...prev, { ...newItem, quantity: newItem.quantity || 1 }];
-    });
+  const addItem = (restId: number, item: CartItem) => {
+    if (restaurantId && restaurantId !== restId) return false;
+
+    setRestaurantId(restId);
+    setItems((prev) => [...prev, { ...item, quantity: item.quantity ?? 1 }]);
+
+    return true;
   };
 
   const removeItem = (id: number) => {
-    setItems((prev) => prev.filter((item) => item.id !== id));
-    if (items.length === 0) {
-      setRestaurantId(undefined);
-    }
+    setItems((prev) => {
+      const updated = prev.filter((i) => i.id !== id);
+      if (updated.length === 0) setRestaurantId(undefined);
+      return updated;
+    });
   };
 
   const updateQuantity = (id: number, quantity: number) => {
@@ -69,15 +124,15 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     setItems([]);
   };
 
-  const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
+  const itemCount = items.reduce((s, i) => s + i.quantity, 0);
+
   const subtotal = items.reduce(
-    (sum, item) =>
-      sum +
-      ((item.discountPrice ?? item.price) + item.additionalPrice) *
-        item.quantity,
+    (s, i) =>
+      s + ((i.discountPrice ?? i.price) + i.additionalPrice) * i.quantity,
     0,
   );
-  const deliveryFee = items.length > 0 ? 2.5 : 0;
+
+  const deliveryFee = items.length ? 2 : 0;
   const total = subtotal + deliveryFee;
 
   return (
@@ -86,6 +141,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         restaurantId,
         items,
         isOpen,
+        isLoading,
         setIsOpen,
         addItem,
         removeItem,

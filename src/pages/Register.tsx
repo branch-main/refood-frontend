@@ -116,7 +116,7 @@ export const Register = () => {
           name="phone"
           value={formData.phone}
           onChange={handleChange}
-          placeholder="+1234567890"
+          placeholder="999999999"
           required
           autoComplete="tel"
         />

@@ -115,7 +115,7 @@ export const MenuCart = () => {
     total,
   } = useCart();
 
-  const deliveryFee = items.length > 0 ? 2.5 : 0;
+  const deliveryFee = items.length > 0 ? 2 : 0;
 
   const { data: restaurant } = useRestaurant(restaurantId);
 
@@ -217,10 +217,7 @@ export const MenuCart = () => {
                 <button
                   className="cursor-pointer mt-2 w-full bg-green-500 text-white text-sm font-semibold py-3
               rounded-lg hover:bg-green-600 transition-all duration-200"
-                  onClick={() => {
-                    setIsOpen(false);
-                    navigate("/checkout");
-                  }}
+                  onClick={() => navigate("/checkout")}
                 >
                   Proceder al pago
                 </button>
