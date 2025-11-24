@@ -1,6 +1,5 @@
 import { useFavorites, useRestaurant } from "@/shared/hooks";
 import { Link } from "react-router-dom";
-import { FiHeart } from "react-icons/fi";
 import { Loading } from "@/shared/components/ui";
 import { RestaurantCard } from "@/features/restaurants/components";
 
@@ -35,18 +34,17 @@ export const Favorites = () => {
       </p>
 
       {favorites?.length === 0 ? (
-        <div className="mt-8 text-center py-12">
-          <FiHeart className="mx-auto text-gray-300 mb-4" size={64} />
-          <h3 className="text-xl font-semibold text-gray-800 mb-2">
+        <div className="mt-8 text-center py-12 w-1/2 mx-auto">
+          <h3 className="text-lg font-semibold mb-1">
             No tienes favoritos aún
           </h3>
-          <p className="text-gray-500 mb-6">
+          <p className="text-sm text-gray-500 mb-6">
             Explora restaurantes y guarda tus favoritos con un clic en el
             corazón
           </p>
           <Link
             to="/restaurants"
-            className="inline-block bg-red-500 text-white px-6 py-3 rounded-lg hover:bg-red-600 transition-colors font-semibold"
+            className="text-sm inline-block bg-red-500 text-white px-4 py-2.5 rounded-lg hover:bg-red-600 transition-colors font-semibold"
           >
             Explorar restaurantes
           </Link>
