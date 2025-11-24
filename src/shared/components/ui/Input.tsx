@@ -12,19 +12,19 @@ export const Input = ({
   ...props
 }: InputProps) => {
   return (
-    <div className={`flex flex-col gap-2 ${fullWidth ? "w-full" : ""}`}>
+    <div className={`flex flex-col gap-1.5 ${fullWidth ? "w-full" : ""}`}>
       {label && (
-        <label className="text-[0.9375rem] font-semibold text-gray-700 tracking-wide">
+        <label className="text-sm font-medium text-gray-700">
           {label}
         </label>
       )}
       <input
         type={type}
-        className={`w-full px-4 py-3.5 border-2 rounded-xl text-base transition-all duration-200 bg-white text-gray-900 placeholder:text-gray-400 focus:outline-none focus:bg-[#fefefe] disabled:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60 ${error ? "border-red-500 focus:border-red-600 focus:shadow-[0_0_0_3px_rgba(239,68,68,0.1)]" : "border-gray-200 focus:border-[#B21F1F] focus:shadow-[0_0_0_3px_rgba(178,31,31,0.1)]"}`}
+        className={`w-full px-4 py-2.5 border rounded-lg text-sm transition-all duration-200 bg-white text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 disabled:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60 ${error ? "border-red-300 focus:border-red-500 focus:ring-red-100" : "border-gray-300 focus:border-red-500 focus:ring-red-100"}`}
         {...props}
       />
       {error && (
-        <span className="text-red-600 text-sm mt-1 font-medium">{error}</span>
+        <span className="text-red-600 text-xs mt-0.5">{error}</span>
       )}
     </div>
   );
