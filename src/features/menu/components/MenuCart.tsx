@@ -3,11 +3,11 @@ import { formatPrice, formatRating, getFallbackImage } from "@/shared/utils";
 import { useCart } from "@/features/cart/contexts";
 import { LiaCartPlusSolid } from "react-icons/lia";
 import { IoMdCloseCircle } from "react-icons/io";
-import { FaLocationDot } from "react-icons/fa6";
 import { Link, useNavigate } from "react-router-dom";
 import { BsFillStarFill } from "react-icons/bs";
 import { Modal } from "@/shared/components/ui/Modal";
 import { useMenuItem, useRestaurant } from "@/shared/hooks";
+import { LocationDisplay } from "@/shared/components/common";
 
 const EmptyCart = () => {
   const { setIsOpen } = useCart();
@@ -126,9 +126,7 @@ export const MenuCart = () => {
   } = useCart();
 
   const deliveryFee = items.length > 0 ? 2 : 0;
-
   const { data: restaurant } = useRestaurant(restaurantId);
-
   const navigate = useNavigate();
 
   return (
@@ -148,13 +146,7 @@ export const MenuCart = () => {
               onClick={() => setIsOpen(false)}
             />
           </div>
-          <span
-            className="text-red-500 hover:text-red-600 transition-colors cursor-pointer text-xs font-bold inline-flex items-center gap-3"
-            onClick={() => alert("ubcacion")}
-          >
-            <FaLocationDot className="w-4 h-4" />
-            Av. Victor Larco Herrera 777
-          </span>
+          <LocationDisplay variant="navbar" />
         </div>
 
         {restaurant && (

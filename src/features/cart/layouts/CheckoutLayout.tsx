@@ -1,5 +1,5 @@
-import { FaLocationDot } from "react-icons/fa6";
 import { Link, Outlet, ScrollRestoration } from "react-router-dom";
+import { LocationDisplay } from "@/shared/components/common";
 
 export const CheckoutLayout = () => {
   return (
@@ -12,13 +12,7 @@ export const CheckoutLayout = () => {
           <img src="/logo.png" alt="ReFood" className="h-10 w-auto" />
         </Link>
 
-        <span
-          className="text-red-500 hover:text-red-600 transition-colors cursor-pointer text-xs font-bold inline-flex items-center gap-3"
-          onClick={() => alert("ubcacion")}
-        >
-          <FaLocationDot className="w-4 h-4" />
-          Av. Victor Larco Herrera 777
-        </span>
+        <LocationDisplay variant="navbar" />
       </nav>
 
       <main className="mt-15 flex max-w-4xl 2xl:max-w-5xl mx-auto gap-4 p-4">

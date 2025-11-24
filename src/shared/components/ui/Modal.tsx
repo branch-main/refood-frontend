@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 
 type Animation = "scale" | "slide-right" | "slide-left";
@@ -92,8 +93,8 @@ export const Modal = ({
 
   const containerClassName =
     animation === "slide-right" || animation === "slide-left"
-      ? "fixed inset-0 z-999"
-      : "fixed inset-0 z-999 flex items-center justify-center";
+      ? "fixed inset-0 z-[9999]"
+      : "fixed inset-0 z-[9999] flex items-center justify-center";
 
   const modalClassName =
     animation === "slide-right"
@@ -102,7 +103,7 @@ export const Modal = ({
         ? "bg-white h-screen fixed left-0"
         : "bg-white rounded-lg max-w-screen max-h-screen";
 
-  return (
+  const modalContent = (
     <AnimatePresence>
       {isOpen && (
         <motion.div
@@ -130,4 +131,6 @@ export const Modal = ({
       )}
     </AnimatePresence>
   );
+
+  return createPortal(modalContent, document.body);
 };

@@ -1,5 +1,5 @@
 import { CartItem, useCart } from "@/features/cart/contexts";
-import { useAuth, useMenuItem, useRestaurant } from "@/shared/hooks";
+import { useAuth, useMenuItem, useRestaurant, useLocation } from "@/shared/hooks";
 import {
   calculateDiscount,
   formatPrice,
@@ -14,16 +14,40 @@ import {
 } from "@/shared/services/paymentService";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { LocationSelector } from "@/shared/components/common";
+import { FaLocationDot } from "react-icons/fa6";
 
-const CheckoutAddress = () => {
+const CheckoutAddress = ({ 
+  onOpenLocationModal 
+}: { 
+  onOpenLocationModal: () => void 
+}) => {
+  const { location, getFormattedAddress } = useLocation();
+
   return (
     <div className="bg-white rounded-lg shadow-[0_0_15px_rgba(0,0,0,0.03)] p-4 flex flex-col gap-4">
       <span className="text-gray-800 font-bold text-lg border-b border-gray-200 pb-4">
         Dirección de entrega
       </span>
-      <span className="text-gray-800 font-bold">
-        Residencia Militar - EP, Jiron Simon Bolivar 119, Trujillo 13001, Peru
-      </span>
+      
+      <div 
+        onClick={onOpenLocationModal}
+        className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg cursor-pointer hover:border-red-300 hover:bg-red-50 transition"
+      >
+        <FaLocationDot className="text-red-500 text-xl flex-shrink-0" />
+        <div className="flex-1">
+          <span className="text-gray-800 font-bold block">
+            {location ? getFormattedAddress() : "Seleccionar ubicación"}
+          </span>
+          {location && (
+            <span className="text-xs text-gray-500">
+              {location.city}, {location.state} - {location.zipCode}
+            </span>
+          )}
+        </div>
+        <span className="text-sm text-red-500 font-medium">Cambiar</span>
+      </div>
+
       <div className="flex flex-col gap-1">
         <span className="text-xs text-gray-800">
           Instrucciones de entrega (opcional)
@@ -265,17 +289,25 @@ const CheckoutProceedButton = ({
 
 export const Checkout = () => {
   const { restaurantId, items, clearCart } = useCart();
+  const { location, getFormattedAddress, updateLocation } = useLocation();
   const navigate = useNavigate();
   const { user } = useAuth();
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("STRIPE");
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
 
   const hasItems = items.length > 0;
 
   const handleCheckout = async () => {
     if (!user || !restaurantId || items.length === 0) {
       setError("Missing required information");
+      return;
+    }
+
+    if (!location) {
+      setError("Por favor selecciona una dirección de entrega");
+      setIsLocationModalOpen(true); // Auto-open location selector
       return;
     }
 
@@ -286,8 +318,7 @@ export const Checkout = () => {
       const order = await orderService.createOrder({
         customerId: user.id,
         restaurantId: restaurantId,
-        deliveryAddress:
-          "Residencia Militar - EP, Jiron Simon Bolivar 119, Trujillo 13001, Peru",
+        deliveryAddress: getFormattedAddress(),
         items: items.map((item) => ({
           menuItemId: item.id,
           quantity: item.quantity,
@@ -339,7 +370,7 @@ export const Checkout = () => {
   return (
     <>
       <div className="flex-1 space-y-4">
-        <CheckoutAddress />
+        <CheckoutAddress onOpenLocationModal={() => setIsLocationModalOpen(true)} />
         <CheckoutItemList />
         <CheckoutPaymentMethods
           selected={paymentMethod}
@@ -357,6 +388,16 @@ export const Checkout = () => {
           disabled={!hasItems}
         />
       </div>
+
+      <LocationSelector
+        isOpen={isLocationModalOpen}
+        onClose={() => setIsLocationModalOpen(false)}
+        onSelect={(address) => {
+          updateLocation(address);
+          setError(null); // Clear error when address is selected
+        }}
+        currentAddress={location}
+      />
     </>
   );
 };

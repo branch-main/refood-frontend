@@ -1,20 +1,24 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
-import { useAuth } from "@/shared/hooks";
+import { useAuth, useLocation } from "@/shared/hooks";
 import { useRestaurantContext } from "@/features/restaurants/contexts";
 import { useCart } from "@/features/cart/contexts";
 import { FiMenu, FiX, FiShoppingCart } from "react-icons/fi";
 import { ImSearch } from "react-icons/im";
+import { FaLocationDot } from "react-icons/fa6";
 import { Button } from "../ui";
+import { LocationSelector } from "../common";
 
 export const Navbar = () => {
   const { user, logout } = useAuth();
   const restaurantContext = useRestaurantContext();
   const currentRestaurant = restaurantContext?.currentRestaurant || null;
   const { itemCount, setIsOpen: setCartOpen } = useCart();
+  const { location, getShortAddress, updateLocation } = useLocation();
   const navigate = useNavigate();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -95,6 +99,22 @@ export const Navbar = () => {
           >
             <img src="/logo.png" alt="ReFood" className="h-10 w-auto" />
           </Link>
+
+          {/* Location Display - Desktop */}
+          {user && (
+            <button
+              onClick={() => setIsLocationModalOpen(true)}
+              className="hidden md:flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-red-50 transition-colors group"
+            >
+              <FaLocationDot className="text-red-500 text-sm" />
+              <div className="flex flex-col items-start">
+                <span className="text-xs text-gray-500">Entregar en</span>
+                <span className="text-sm font-semibold text-gray-800 group-hover:text-red-500 transition-colors max-w-[150px] truncate">
+                  {location ? getShortAddress() : "Seleccionar ubicación"}
+                </span>
+              </div>
+            </button>
+          )}
 
           {/* Search Bar */}
           <form
@@ -234,6 +254,26 @@ export const Navbar = () => {
         {isMobileMenuOpen && (
           <div className="md:hidden py-4 border-t border-gray-200 animate-[fadeIn_0.2s_ease-out]">
             <div className="flex flex-col space-y-2">
+              {/* Mobile Location Selector */}
+              {user && (
+                <button
+                  onClick={() => {
+                    setIsLocationModalOpen(true);
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="mx-4 mb-2 flex items-center gap-3 p-3 bg-red-50 rounded-lg border border-red-100 hover:bg-red-100 transition-colors"
+                >
+                  <FaLocationDot className="text-red-500 text-lg flex-shrink-0" />
+                  <div className="flex flex-col items-start flex-1">
+                    <span className="text-xs text-gray-600">Entregar en</span>
+                    <span className="text-sm font-semibold text-gray-800 truncate max-w-full">
+                      {location ? getShortAddress() : "Seleccionar ubicación"}
+                    </span>
+                  </div>
+                  <span className="text-xs text-red-500 font-medium">Cambiar</span>
+                </button>
+              )}
+
               {/* Mobile Search Bar */}
               <form onSubmit={handleSearch} className="px-4 pb-2">
                 <div className="flex items-center rounded-xl shadow-sm bg-white text-gray-800 px-4 gap-3">
@@ -382,6 +422,14 @@ export const Navbar = () => {
           </div>
         )}
       </div>
+
+      {/* Location Selector Modal */}
+      <LocationSelector
+        isOpen={isLocationModalOpen}
+        onClose={() => setIsLocationModalOpen(false)}
+        onSelect={(address) => updateLocation(address)}
+        currentAddress={location}
+      />
     </nav>
   );
 };
