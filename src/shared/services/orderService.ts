@@ -77,15 +77,15 @@ export const orderService = {
     return toOrder(response.data);
   },
 
+  getOrder: async (id: string): Promise<Order> => {
+    const response = await ordersApiClient.get<any>(`/orders/${id}`);
+    return toOrder(response.data);
+  },
+
   getOrders: async (customerId: number): Promise<Order[]> => {
     const response = await ordersApiClient.get<any[]>(
       `/orders?customer_id=${customerId}`,
     );
     return response.data.map(toOrder);
-  },
-
-  getOrder: async (id: string): Promise<Order> => {
-    const response = await ordersApiClient.get<any>(`/orders/${id}`);
-    return toOrder(response.data);
   },
 };

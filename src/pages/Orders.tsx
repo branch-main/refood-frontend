@@ -1,5 +1,5 @@
 import { useAuth, useOrdersByCustomer, useRestaurant } from "@/shared/hooks";
-import { Order as OrderType } from "@/shared/types";
+import { OrderStatus, Order as OrderType } from "@/shared/types";
 import {
   formatPrice,
   getFallbackImage,
@@ -56,18 +56,24 @@ const Order = ({ order }: { order: OrderType }) => {
       </div>
 
       <div className="mt-4 flex justify-center gap-4">
-        <Link
-          to={`/profile/orders/${order.id}`}
-          className="text-sm text-white bg-red-500 px-5 py-2 rounded-lg hover:bg-red-600 transition"
-        >
-          Ver detalles
-        </Link>
-        <Link
-          to={`/profile/orders/${order.id}`}
-          className="text-sm text-red-500 border border-red-500 px-5 py-2 rounded-lg hover:bg-red-600 hover:text-white transition"
-        >
-          Imprimir comprobante
-        </Link>
+        {order.status !== OrderStatus.CANCELLED && (
+          <Link
+            to={`/profile/orders/${order.id}`}
+            className="text-sm text-white bg-red-500 px-5 py-2 rounded-lg hover:bg-red-600 transition"
+          >
+            Ver detalles
+          </Link>
+        )}
+
+        {order.status !== OrderStatus.PENDING &&
+          order.status !== OrderStatus.CANCELLED && (
+            <Link
+              to={`/profile/orders/${order.id}`}
+              className="text-sm text-red-500 border border-red-500 px-5 py-2 rounded-lg hover:bg-red-600 hover:text-white transition"
+            >
+              Imprimir comprobante
+            </Link>
+          )}
       </div>
     </div>
   );

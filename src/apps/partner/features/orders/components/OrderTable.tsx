@@ -6,13 +6,17 @@ import { Link } from "react-router-dom";
 const statusToText = (status: OrderStatus) => {
   switch (status) {
     case OrderStatus.PENDING:
-      return "Pendiente";
+      return "Pago Pendiente";
     case OrderStatus.CONFIRMED:
       return "Confirmado";
-    case OrderStatus.DELIVERYING:
+    case OrderStatus.PREPARING:
+      return "Preparando";
+    case OrderStatus.DELIVERING:
       return "En camino";
     case OrderStatus.COMPLETED:
       return "Completado";
+    case OrderStatus.CANCELLED:
+      return "Cancelado";
     default:
       return "Desconocido";
   }
@@ -24,10 +28,14 @@ const statusToColor = (status: OrderStatus) => {
       return "text-yellow-600 bg-yellow-100";
     case OrderStatus.CONFIRMED:
       return "text-blue-600 bg-blue-100";
-    case OrderStatus.DELIVERYING:
+    case OrderStatus.PREPARING:
+      return "text-purple-600 bg-purple-100";
+    case OrderStatus.DELIVERING:
       return "text-orange-600 bg-orange-100";
     case OrderStatus.COMPLETED:
       return "text-green-600 bg-green-100";
+    case OrderStatus.CANCELLED:
+      return "text-red-600 bg-red-100";
     default:
       return "text-gray-600 bg-gray-100";
   }

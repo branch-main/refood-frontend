@@ -19,7 +19,7 @@ paymentsApiClient.interceptors.request.use(
   },
   (error) => {
     return Promise.reject(error);
-  }
+  },
 );
 
 export type PaymentMethod = "STRIPE" | "PAYPAL" | "YAPE";
@@ -41,7 +41,6 @@ export interface PaymentResponse {
   method: PaymentMethod;
   status: string;
   transactionId: string;
-  createdAt: string;
 }
 
 const toPayment = (data: any): PaymentResponse => {
@@ -53,13 +52,12 @@ const toPayment = (data: any): PaymentResponse => {
     method: data.method,
     status: data.status,
     transactionId: data.transaction_id,
-    createdAt: data.created_at,
   };
 };
 
 export const paymentService = {
   createPayment: async (
-    request: CreatePaymentRequest
+    request: CreatePaymentRequest,
   ): Promise<PaymentResponse> => {
     const response = await paymentsApiClient.post<any>("/payments", {
       order_id: request.orderId,
@@ -85,7 +83,7 @@ export const paymentService = {
   },
 
   getPaymentByTransaction: async (
-    transactionId: string
+    transactionId: string,
   ): Promise<PaymentResponse> => {
     const response = await paymentsApiClient.get<any>("/payments", {
       params: { transaction_id: transactionId },
@@ -94,7 +92,7 @@ export const paymentService = {
   },
 
   getPaymentsByCustomer: async (
-    customerId: number
+    customerId: number,
   ): Promise<PaymentResponse[]> => {
     const response = await paymentsApiClient.get<any[]>("/payments/customer", {
       params: { customer_id: customerId },
@@ -104,18 +102,18 @@ export const paymentService = {
 
   completePayment: async (paymentId: string): Promise<PaymentResponse> => {
     const response = await paymentsApiClient.post<any>(
-      `/payments/${paymentId}/complete`
+      `/payments/${paymentId}/complete`,
     );
     return toPayment(response.data);
   },
 
   failPayment: async (
     paymentId: string,
-    reason?: string
+    reason?: string,
   ): Promise<PaymentResponse> => {
     const response = await paymentsApiClient.post<any>(
       `/payments/${paymentId}/fail`,
-      reason
+      reason,
     );
     return toPayment(response.data);
   },

@@ -1,5 +1,6 @@
 import { OrderStatus } from "@/shared/types";
 import { FiClock, FiCheck, FiTruck, FiPackage, FiX } from "react-icons/fi";
+import { GiCookingPot } from "react-icons/gi";
 
 export const getStatusIcon = (status: OrderStatus) => {
   switch (status) {
@@ -7,11 +8,13 @@ export const getStatusIcon = (status: OrderStatus) => {
       return <FiClock className="w-4 h-4" />;
     case OrderStatus.CONFIRMED:
       return <FiCheck className="w-4 h-4" />;
-    case OrderStatus.DELIVERYING:
+    case OrderStatus.PREPARING:
+      return <GiCookingPot className="w-4 h-4" />;
+    case OrderStatus.DELIVERING:
       return <FiTruck className="w-4 h-4" />;
     case OrderStatus.COMPLETED:
       return <FiPackage className="w-4 h-4" />;
-    case OrderStatus.CANCELED:
+    case OrderStatus.CANCELLED:
       return <FiX className="w-4 h-4" />;
     default:
       return null;
@@ -21,14 +24,16 @@ export const getStatusIcon = (status: OrderStatus) => {
 export const getStatusText = (status: OrderStatus) => {
   switch (status) {
     case OrderStatus.PENDING:
-      return "Pendiente";
+      return "Pago Pendiente";
     case OrderStatus.CONFIRMED:
       return "Confirmado";
-    case OrderStatus.DELIVERYING:
+    case OrderStatus.PREPARING:
+      return "Preparando";
+    case OrderStatus.DELIVERING:
       return "En camino";
     case OrderStatus.COMPLETED:
       return "Completado";
-    case OrderStatus.CANCELED:
+    case OrderStatus.CANCELLED:
       return "Cancelado";
     default:
       return status;
@@ -38,14 +43,18 @@ export const getStatusText = (status: OrderStatus) => {
 export const getStatusColor = (status: string) => {
   switch (status) {
     case OrderStatus.PENDING:
-      return "bg-yellow-50 text-yellow-400";
+      return "bg-yellow-50 text-yellow-600";
     case OrderStatus.CONFIRMED:
-      return "bg-blue-50 text-blue-400";
-    case OrderStatus.DELIVERYING:
-      return "bg-orange-50 text-orange-400";
+      return "bg-blue-50 text-blue-600";
+    case OrderStatus.PREPARING:
+      return "bg-purple-50 text-purple-600";
+    case OrderStatus.DELIVERING:
+      return "bg-orange-50 text-orange-600";
     case OrderStatus.COMPLETED:
-      return "bg-green-50 text-green-400";
-    case OrderStatus.CANCELED:
-      return "bg-red-50 text-red-400";
+      return "bg-green-50 text-green-600";
+    case OrderStatus.CANCELLED:
+      return "bg-red-50 text-red-600";
+    default:
+      return "bg-gray-50 text-gray-600";
   }
 };
