@@ -26,17 +26,33 @@ const OrderItem = ({ item }: { item: OrderItemType }) => {
     return null;
   }
 
+  // Calculate total price including options
+  const optionsTotal = item.options.reduce((sum, option) => sum + option.price, 0);
+  const itemTotalPrice = (item.price + optionsTotal) * item.quantity;
+
   return (
     <div className="flex gap-4">
       <img
         alt={menuItem.name}
         src={getFallbackImage(menuItem.name, menuItem.image)}
-        className="h-16 w-16 object-cover"
+        className="h-16 w-16 object-cover rounded-lg"
       />
 
       <div className="flex-1">
         <h4 className="text-sm font-semibold text-gray-800">{menuItem.name}</h4>
         <p className="text-sm text-gray-500">{menuItem.description}</p>
+        
+        {/* Show selected options */}
+        {item.options.length > 0 && (
+          <div className="mt-1 space-y-0.5">
+            {item.options.map((option, index) => (
+              <p key={index} className="text-xs text-gray-600">
+                • {option.name}: {option.value} 
+                {option.price > 0 && ` (+${formatPrice(option.price)})`}
+              </p>
+            ))}
+          </div>
+        )}
       </div>
 
       <div className="text-center">
@@ -44,7 +60,7 @@ const OrderItem = ({ item }: { item: OrderItemType }) => {
           {item.quantity === 1 ? "1 Unidad" : `${item.quantity} Unidades`}
         </p>
         <p className="text-sm font-bold text-gray-800">
-          {formatPrice(item.price * item.quantity)}
+          {formatPrice(itemTotalPrice)}
         </p>
       </div>
     </div>
@@ -61,10 +77,11 @@ export const Order = () => {
 
   if (!order || !restaurant || !payment) return null;
 
-  const productsTotal = order.items.reduce(
-    (total, item) => total + item.price * item.quantity,
-    0,
-  );
+  // Calculate products total including options
+  const productsTotal = order.items.reduce((total, item) => {
+    const optionsTotal = item.options.reduce((sum, option) => sum + option.price, 0);
+    return total + (item.price + optionsTotal) * item.quantity;
+  }, 0);
 
   const total = productsTotal + order.deliveryFee;
 
