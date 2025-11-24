@@ -8,6 +8,7 @@ import {
 import { menuService } from "@/shared/services";
 
 export interface CartItem {
+  cartItemId: string;
   id: number;
   price: number;
   discountPrice?: number;
@@ -23,9 +24,9 @@ interface CartContextType {
   isOpen: boolean;
   isLoading: boolean;
   setIsOpen: (isOpen: boolean) => void;
-  addItem: (restaurantId: number, item: CartItem) => void;
-  removeItem: (id: number) => void;
-  updateQuantity: (id: number, quantity: number) => void;
+  addItem: (restaurantId: number, item: Omit<CartItem, "cartItemId">) => void;
+  removeItem: (cartItemId: string) => void;
+  updateQuantity: (cartItemId: string, quantity: number) => void;
   clearCart: () => void;
   itemCount: number;
   subtotal: number;
@@ -37,10 +38,26 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 const CART_STORAGE_KEY = "cart_items";
 const RESTAURANT_STORAGE_KEY = "cart_restaurant_id";
 
+const generateCartItemId = (): string => {
+  return `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+};
+
 export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [items, setItems] = useState<CartItem[]>(() => {
     const saved = localStorage.getItem(CART_STORAGE_KEY);
-    return saved ? JSON.parse(saved) : [];
+    if (!saved) return [];
+    
+    const parsedItems = JSON.parse(saved);
+    // Migrate old items without cartItemId or regenerate for all
+    return parsedItems.map((item: any) => {
+      if (!item.cartItemId) {
+        return {
+          ...item,
+          cartItemId: generateCartItemId(),
+        };
+      }
+      return item;
+    });
   });
 
   const [restaurantId, setRestaurantId] = useState<number | undefined>(() => {
@@ -92,31 +109,39 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [items, restaurantId]);
 
-  const addItem = (restId: number, item: CartItem) => {
+  const addItem = (restId: number, item: Omit<CartItem, "cartItemId">) => {
     if (restaurantId && restaurantId !== restId) return false;
 
     setRestaurantId(restId);
-    setItems((prev) => [...prev, { ...item, quantity: item.quantity ?? 1 }]);
+    const cartItemId = generateCartItemId();
+    setItems((prev) => [...prev, { ...item, cartItemId, quantity: item.quantity ?? 1 }]);
 
     return true;
   };
 
-  const removeItem = (id: number) => {
+  const removeItem = (cartItemId: string) => {
     setItems((prev) => {
-      const updated = prev.filter((i) => i.id !== id);
+      const updated = prev.filter((i) => i.cartItemId !== cartItemId);
       if (updated.length === 0) setRestaurantId(undefined);
       return updated;
     });
   };
 
-  const updateQuantity = (id: number, quantity: number) => {
-    setItems((prev) =>
-      prev
+  const updateQuantity = (cartItemId: string, quantity: number) => {
+    setItems((prev) => {
+      const updated = prev
         .map((item) =>
-          item.id === id ? { ...item, quantity: Math.max(0, quantity) } : item,
+          item.cartItemId === cartItemId ? { ...item, quantity: Math.max(0, quantity) } : item,
         )
-        .filter((item) => item.quantity > 0),
-    );
+        .filter((item) => item.quantity > 0);
+      
+      // Clear restaurant if cart is empty
+      if (updated.length === 0) {
+        setRestaurantId(undefined);
+      }
+      
+      return updated;
+    });
   };
 
   const clearCart = () => {

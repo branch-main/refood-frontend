@@ -34,11 +34,13 @@ const EmptyCart = () => {
 };
 
 const CartItem = ({
+  cartItemId,
   id,
   quantity,
   additionalPrice,
   notes,
 }: {
+  cartItemId: string;
   id: number;
   quantity: number;
   additionalPrice: number;
@@ -46,6 +48,14 @@ const CartItem = ({
 }) => {
   const { data: item } = useMenuItem(id);
   const { updateQuantity } = useCart();
+
+  const handleMinus = () => {
+    updateQuantity(cartItemId, quantity - 1);
+  };
+
+  const handlePlus = () => {
+    updateQuantity(cartItemId, quantity + 1);
+  };
 
   if (!item) {
     return null;
@@ -73,7 +83,7 @@ const CartItem = ({
         <div className="flex items-end justify-between w-full">
           <div className="flex items-center gap-2 bg-gray-100 rounded-lg py-px">
             <button
-              onClick={() => updateQuantity(item.id, quantity - 1)}
+              onClick={handleMinus}
               className="p-1.5 cursor-pointer rounded transition-colors"
             >
               <FiMinus className="w-3 h-3 text-gray-600" />
@@ -82,7 +92,7 @@ const CartItem = ({
               {quantity}
             </span>
             <button
-              onClick={() => updateQuantity(id, quantity + 1)}
+              onClick={handlePlus}
               className="p-1.5 cursor-pointer rounded transition-colors"
             >
               <FiPlus className="w-3 h-3 text-gray-600" />
@@ -184,7 +194,8 @@ export const MenuCart = () => {
               <div className="overflow-y-auto space-y-4 pr-4">
                 {items.map((item) => (
                   <CartItem
-                    key={item.id}
+                    key={item.cartItemId}
+                    cartItemId={item.cartItemId}
                     id={item.id}
                     quantity={item.quantity}
                     additionalPrice={item.additionalPrice}

@@ -110,7 +110,7 @@ const CheckoutItemList = () => {
         <span className="text-gray-500 text-sm">1 producto</span>
       </div>
 
-      {items && items.map((item) => <CheckoutItem key={item.id} item={item} />)}
+      {items && items.map((item) => <CheckoutItem key={item.cartItemId} item={item} />)}
 
       <div className="flex justify-between items-center pt-4 border-t border-gray-200">
         <span className="text-gray-800">Entrega estimada</span>
