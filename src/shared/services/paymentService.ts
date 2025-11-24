@@ -101,4 +101,22 @@ export const paymentService = {
     });
     return response.data.map(toPayment);
   },
+
+  completePayment: async (paymentId: string): Promise<PaymentResponse> => {
+    const response = await paymentsApiClient.post<any>(
+      `/payments/${paymentId}/complete`
+    );
+    return toPayment(response.data);
+  },
+
+  failPayment: async (
+    paymentId: string,
+    reason?: string
+  ): Promise<PaymentResponse> => {
+    const response = await paymentsApiClient.post<any>(
+      `/payments/${paymentId}/fail`,
+      reason
+    );
+    return toPayment(response.data);
+  },
 };

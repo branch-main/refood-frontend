@@ -280,8 +280,14 @@ export const Checkout = () => {
         customerId: user.id,
         amount: order.totalPrice,
         method: paymentMethod,
-        successUrl: `${window.location.origin}/profile/orders/${order.id}`,
-        cancelUrl: `${window.location.origin}/payment-cancel?order_id=${order.id}`,
+        successUrl:
+          paymentMethod === "PAYPAL"
+            ? `${window.location.origin}/paypal-callback`
+            : `${window.location.origin}/profile/orders/${order.id}`,
+        cancelUrl:
+          paymentMethod === "PAYPAL"
+            ? `${window.location.origin}/paypal-callback`
+            : `${window.location.origin}/checkout`,
       });
 
       if (paymentMethod === "STRIPE") {
@@ -296,7 +302,10 @@ export const Checkout = () => {
           throw new Error(stripeError.message);
         }
       } else if (paymentMethod === "PAYPAL") {
-        alert("Redirecting to PayPal...");
+        // PayPal integration - redirect to approval URL
+        const paypalOrderId = payment.transactionId;
+        const paypalApprovalUrl = `https://www.sandbox.paypal.com/checkoutnow?token=${paypalOrderId}`;
+        window.location.href = paypalApprovalUrl;
       }
     } catch (e) {
       setError("Error processing payment");

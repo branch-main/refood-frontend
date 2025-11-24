@@ -12,6 +12,8 @@ import {
   Order,
   Notifications,
   Favorites,
+  PayPalCallback,
+  PaymentFailed,
 } from "@/pages";
 import { Layout } from "@/shared/components/layout";
 import { authService } from "@/shared/services";
@@ -66,6 +68,16 @@ export const routes: RouteObject = {
       element: <CheckoutLayout />,
       loader: requireAuth,
       children: [{ index: true, element: <Checkout /> }],
+    },
+
+    {
+      path: "paypal-callback",
+      element: <PayPalCallback />,
+    },
+
+    {
+      path: "payment-failed",
+      element: <PaymentFailed />,
     },
 
     {

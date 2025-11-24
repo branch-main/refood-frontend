@@ -6,6 +6,8 @@ export * from "./Menu";
 export * from "./Notifications";
 export * from "./Order";
 export * from "./Orders";
+export * from "./PaymentFailed";
+export * from "./PayPalCallback";
 export * from "./Profile";
 export * from "./Register";
 export * from "./Restaurant";
