@@ -153,7 +153,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
 
   const subtotal = items.reduce(
     (s, i) =>
-      s + ((i.discountPrice ?? i.price) + i.additionalPrice) * i.quantity,
+      s + ((i.discountPrice && i.discountPrice > 0 ? i.discountPrice : i.price) + i.additionalPrice) * i.quantity,
     0,
   );
 

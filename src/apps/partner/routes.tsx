@@ -9,6 +9,7 @@ import {
   PartnerMenu,
 } from "./pages";
 import { RestaurantSettings } from "./pages/RestaurantSettings";
+import { MenuItemOptions } from "./pages/MenuItemOptions";
 import { AuthProvider } from "@/shared/contexts";
 import { authService } from "@/shared/services";
 
@@ -35,6 +36,7 @@ export const routes: RouteObject = {
     { path: "restaurants", element: <PartnerRestaurants /> },
     { path: "restaurants/:id/settings", element: <RestaurantSettings /> },
     { path: "menu", element: <PartnerMenu /> },
+    { path: "menu/:id/options", element: <MenuItemOptions /> },
     { path: "orders", element: <PartnerOrders /> },
     { path: "analytics", element: <PartnerAnalytics /> },
     { path: "settings", element: <PartnerSettings /> },

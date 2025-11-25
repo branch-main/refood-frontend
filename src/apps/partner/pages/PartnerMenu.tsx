@@ -1,13 +1,15 @@
 import { useState, useEffect } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/shared/components/ui";
 import { menuService, restaurantService } from "@/shared/services";
 import { MenuItem } from "@/shared/types";
 import { MenuItemFormModal } from "../features/menu/components/MenuItemFormModal";
-import { FiEdit2, FiTrash2, FiPlus } from "react-icons/fi";
+import { FiEdit2, FiTrash2, FiPlus, FiSettings } from "react-icons/fi";
 import { formatPrice } from "@/shared/utils";
 
 export const PartnerMenu = () => {
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<MenuItem | null>(null);
@@ -190,6 +192,15 @@ export const PartnerMenu = () => {
                     />
                     <div className="absolute top-3 right-3 flex gap-2">
                       <button
+                        onClick={() =>
+                          navigate(`/partner/menu/${item.id}/options`)
+                        }
+                        className="p-2 bg-white rounded-lg shadow-md hover:bg-gray-50 transition-colors"
+                        title="Opciones de personalización"
+                      >
+                        <FiSettings className="w-4 h-4 text-gray-700" />
+                      </button>
+                      <button
                         onClick={() => handleEdit(item)}
                         className="p-2 bg-white rounded-lg shadow-md hover:bg-gray-50 transition-colors"
                         title="Editar"
@@ -252,6 +263,15 @@ export const PartnerMenu = () => {
                         {item.isAvailable ? "Disponible" : "No disponible"}
                       </span>
                     </div>
+
+                    {/* Options Link */}
+                    <button
+                      onClick={() => navigate(`/partner/menu/${item.id}/options`)}
+                      className="w-full flex items-center justify-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium text-gray-700"
+                    >
+                      <FiSettings className="w-4 h-4" />
+                      Gestionar Opciones
+                    </button>
                   </div>
                 </div>
               ))}

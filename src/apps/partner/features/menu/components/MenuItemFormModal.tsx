@@ -83,7 +83,9 @@ export const MenuItemFormModal = ({
       [name]:
         type === "number"
           ? value === ""
-            ? 0
+            ? name === "discountedPrice"
+              ? undefined  // For discountedPrice, use undefined when empty
+              : 0
             : parseFloat(value)
           : type === "checkbox"
             ? (e.target as HTMLInputElement).checked

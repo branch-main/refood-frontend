@@ -1,5 +1,5 @@
 import { apiClient } from "../api";
-import { MenuItem, MenuItemOption } from "../types";
+import { MenuItem, MenuItemOption, MenuItemChoice } from "../types";
 
 const toMenuItem = (data: any): MenuItem => ({
   id: data.id,
@@ -7,10 +7,28 @@ const toMenuItem = (data: any): MenuItem => ({
   name: data.name,
   description: data.description,
   price: Number(data.price),
-  discountPrice: data.discounted_price && Number(data.discounted_price),
+  discountPrice: data.discounted_price && Number(data.discounted_price) > 0
+    ? Number(data.discounted_price)
+    : null,
   image: data.image,
   isAvailable: data.is_available,
   options: [],
+});
+
+const toMenuItemOption = (data: any): MenuItemOption => ({
+  id: data.id,
+  name: data.name,
+  minChoices: data.min_choices,
+  maxChoices: data.max_choices,
+  isRequired: data.is_required,
+  choices: data.choices ? data.choices.map(toMenuItemChoice) : [],
+});
+
+const toMenuItemChoice = (data: any): MenuItemChoice => ({
+  id: data.id,
+  name: data.name,
+  price: Number(data.price),
+  isAvailable: data.is_available,
 });
 
 export interface CreateMenuItemData {
@@ -32,27 +50,41 @@ export interface UpdateMenuItemData {
   image?: File;
 }
 
+export interface CreateOptionData {
+  name: string;
+  minChoices: number;
+  maxChoices: number;
+  isRequired: boolean;
+}
+
+export interface UpdateOptionData {
+  name?: string;
+  minChoices?: number;
+  maxChoices?: number;
+  isRequired?: boolean;
+}
+
+export interface CreateChoiceData {
+  name: string;
+  price: number;
+  isAvailable: boolean;
+}
+
+export interface UpdateChoiceData {
+  name?: string;
+  price?: number;
+  isAvailable?: boolean;
+}
+
 export const menuService = {
   getMenuItem: async (id: number): Promise<MenuItem> => {
     return apiClient.get<any>(`/menu/${id}`).then(toMenuItem);
   },
 
-  getMenuOptions: async (id: number): Promise<MenuItemOption[]> => {
-    return apiClient.get<any[]>(`/menu/${id}/options`).then((options) => {
-      return options.map((option) => ({
-        id: option.id,
-        name: option.name,
-        minChoices: option.min_choices,
-        maxChoices: option.max_choices,
-        isRequired: option.is_required,
-        choices: option.choices.map((choice: any) => ({
-          id: choice.id,
-          name: choice.name,
-          price: Number(choice.price),
-          isAvailable: choice.is_available,
-        })),
-      }));
-    });
+  getMenuOptions: async (menuItemId: number): Promise<MenuItemOption[]> => {
+    return apiClient
+      .get<any[]>(`/menu/${menuItemId}/options/`)
+      .then((options) => options.map(toMenuItemOption));
   },
 
   getMenu: async (): Promise<MenuItem[]> => {
@@ -73,7 +105,8 @@ export const menuService = {
     formData.append("name", data.name);
     formData.append("description", data.description);
     formData.append("price", data.price.toString());
-    if (data.discountedPrice !== undefined) {
+    // Only send discounted_price if it's a valid number greater than 0
+    if (data.discountedPrice !== undefined && data.discountedPrice !== null && data.discountedPrice > 0) {
       formData.append("discounted_price", data.discountedPrice.toString());
     }
     formData.append("is_available", data.isAvailable.toString());
@@ -99,7 +132,8 @@ export const menuService = {
       formData.append("description", data.description);
     if (data.price !== undefined)
       formData.append("price", data.price.toString());
-    if (data.discountedPrice !== undefined)
+    // Only send discounted_price if it's a valid number greater than 0
+    if (data.discountedPrice !== undefined && data.discountedPrice !== null && data.discountedPrice > 0)
       formData.append("discounted_price", data.discountedPrice.toString());
     if (data.isAvailable !== undefined)
       formData.append("is_available", data.isAvailable.toString());
@@ -114,5 +148,73 @@ export const menuService = {
 
   deleteMenuItem: async (id: number): Promise<void> => {
     return apiClient.delete(`/menu/${id}/`);
+  },
+
+  // Options CRUD
+  createOption: async (
+    menuItemId: number,
+    data: CreateOptionData
+  ): Promise<void> => {
+    return apiClient.post(`/menu/${menuItemId}/create_option/`, {
+      name: data.name,
+      min_choices: data.minChoices,
+      max_choices: data.maxChoices,
+      is_required: data.isRequired,
+    });
+  },
+
+  updateOption: async (
+    optionId: number,
+    data: UpdateOptionData
+  ): Promise<MenuItemOption> => {
+    const payload: any = {};
+    if (data.name !== undefined) payload.name = data.name;
+    if (data.minChoices !== undefined) payload.min_choices = data.minChoices;
+    if (data.maxChoices !== undefined) payload.max_choices = data.maxChoices;
+    if (data.isRequired !== undefined) payload.is_required = data.isRequired;
+
+    return apiClient
+      .patch<any>(`/menu/options/${optionId}/`, payload)
+      .then(toMenuItemOption);
+  },
+
+  deleteOption: async (optionId: number): Promise<void> => {
+    return apiClient.delete(`/menu/options/${optionId}/`);
+  },
+
+  // Choices CRUD
+  getOptionChoices: async (optionId: number): Promise<MenuItemChoice[]> => {
+    return apiClient
+      .get<any[]>(`/menu/options/${optionId}/choices/`)
+      .then((choices) => choices.map(toMenuItemChoice));
+  },
+
+  createChoice: async (
+    optionId: number,
+    data: CreateChoiceData
+  ): Promise<void> => {
+    return apiClient.post(`/menu/options/${optionId}/create_choice/`, {
+      name: data.name,
+      price: data.price.toString(),
+      is_available: data.isAvailable,
+    });
+  },
+
+  updateChoice: async (
+    choiceId: number,
+    data: UpdateChoiceData
+  ): Promise<MenuItemChoice> => {
+    const payload: any = {};
+    if (data.name !== undefined) payload.name = data.name;
+    if (data.price !== undefined) payload.price = data.price.toString();
+    if (data.isAvailable !== undefined) payload.is_available = data.isAvailable;
+
+    return apiClient
+      .patch<any>(`/menu/choices/${choiceId}/`, payload)
+      .then(toMenuItemChoice);
+  },
+
+  deleteChoice: async (choiceId: number): Promise<void> => {
+    return apiClient.delete(`/menu/choices/${choiceId}/`);
   },
 };
