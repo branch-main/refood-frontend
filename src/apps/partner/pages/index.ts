@@ -1,4 +1,5 @@
 export * from "./PartnerAnalytics";
+export * from "./PartnerCategories";
 export * from "./PartnerDashboard";
 export * from "./PartnerMenu";
 export * from "./PartnerOrders";

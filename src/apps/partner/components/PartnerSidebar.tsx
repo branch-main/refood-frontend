@@ -1,5 +1,5 @@
 import { useLocation, Link, useNavigate } from "react-router-dom";
-import { FiShoppingBag, FiBarChart2, FiLogOut, FiMenu } from "react-icons/fi";
+import { FiShoppingBag, FiBarChart2, FiLogOut, FiMenu, FiGrid } from "react-icons/fi";
 import { MdRestaurantMenu, MdDashboard } from "react-icons/md";
 import { useAuthContext } from "@/shared/contexts";
 import { AiOutlineShop } from "react-icons/ai";
@@ -14,6 +14,7 @@ const generalMenuItems = [
 ];
 
 const restaurantMenuItems = [
+  { path: "/partner/categories", label: "Categorías", icon: FiGrid },
   { path: "/partner/menu", label: "Menú", icon: MdRestaurantMenu },
   { path: "/partner/orders", label: "Pedidos", icon: FiShoppingBag },
 ];

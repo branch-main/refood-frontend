@@ -7,6 +7,7 @@ import {
   PartnerAnalytics,
   PartnerSettings,
   PartnerMenu,
+  PartnerCategories,
 } from "./pages";
 import { RestaurantSettings } from "./pages/RestaurantSettings";
 import { MenuItemOptions } from "./pages/MenuItemOptions";
@@ -35,6 +36,7 @@ export const routes: RouteObject = {
     { index: true, element: <PartnerDashboard /> },
     { path: "restaurants", element: <PartnerRestaurants /> },
     { path: "restaurants/:id/settings", element: <RestaurantSettings /> },
+    { path: "categories", element: <PartnerCategories /> },
     { path: "menu", element: <PartnerMenu /> },
     { path: "menu/:id/options", element: <MenuItemOptions /> },
     { path: "orders", element: <PartnerOrders /> },

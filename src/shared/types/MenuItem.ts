@@ -17,6 +17,7 @@ export type MenuItemOption = {
 export type MenuItem = {
   id: number;
   restaurantId: number;
+  categoryId: number | null;
   name: string;
   description: string;
   price: number;
@@ -24,4 +25,11 @@ export type MenuItem = {
   image: string | null;
   isAvailable: boolean;
   options: MenuItemOption[];
+};
+
+export type Category = {
+  id: number;
+  restaurantId: number;
+  name: string;
+  displayOrder: number;
 };

@@ -1,9 +1,10 @@
 import { apiClient } from "../api";
-import { MenuItem, MenuItemOption, MenuItemChoice } from "../types";
+import { MenuItem, MenuItemOption, MenuItemChoice, Category } from "../types";
 
 const toMenuItem = (data: any): MenuItem => ({
   id: data.id,
   restaurantId: data.restaurant_id,
+  categoryId: data.category_id,
   name: data.name,
   description: data.description,
   price: Number(data.price),
@@ -13,6 +14,13 @@ const toMenuItem = (data: any): MenuItem => ({
   image: data.image,
   isAvailable: data.is_available,
   options: [],
+});
+
+const toCategory = (data: any): Category => ({
+  id: data.id,
+  restaurantId: data.restaurant_id,
+  name: data.name,
+  displayOrder: data.display_order,
 });
 
 const toMenuItemOption = (data: any): MenuItemOption => ({
@@ -33,6 +41,7 @@ const toMenuItemChoice = (data: any): MenuItemChoice => ({
 
 export interface CreateMenuItemData {
   restaurantId: number;
+  categoryId?: number | null;
   name: string;
   description: string;
   price: number;
@@ -44,10 +53,21 @@ export interface CreateMenuItemData {
 export interface UpdateMenuItemData {
   name?: string;
   description?: string;
+  categoryId?: number | null;
   price?: number;
   discountedPrice?: number;
   isAvailable?: boolean;
   image?: File;
+}
+
+export interface CreateCategoryData {
+  restaurantId: number;
+  name: string;
+}
+
+export interface UpdateCategoryData {
+  name?: string;
+  displayOrder?: number;
 }
 
 export interface CreateOptionData {
@@ -109,6 +129,9 @@ export const menuService = {
     if (data.discountedPrice !== undefined && data.discountedPrice !== null && data.discountedPrice > 0) {
       formData.append("discounted_price", data.discountedPrice.toString());
     }
+    if (data.categoryId) {
+      formData.append("category_id", data.categoryId.toString());
+    }
     formData.append("is_available", data.isAvailable.toString());
     if (data.image) {
       formData.append("image", data.image);
@@ -130,6 +153,13 @@ export const menuService = {
     if (data.name !== undefined) formData.append("name", data.name);
     if (data.description !== undefined)
       formData.append("description", data.description);
+    if (data.categoryId !== undefined) {
+      if (data.categoryId === null) {
+        formData.append("category_id", "");
+      } else {
+        formData.append("category_id", data.categoryId.toString());
+      }
+    }
     if (data.price !== undefined)
       formData.append("price", data.price.toString());
     // Only send discounted_price if it's a valid number greater than 0
@@ -216,5 +246,48 @@ export const menuService = {
 
   deleteChoice: async (choiceId: number): Promise<void> => {
     return apiClient.delete(`/menu/choices/${choiceId}/`);
+  },
+
+  // Categories CRUD
+  getCategories: async (restaurantId: number): Promise<Category[]> => {
+    return apiClient
+      .get<any[]>(`/menu/categories/?restaurant_id=${restaurantId}`)
+      .then((categories) => categories.map(toCategory));
+  },
+
+  getCategory: async (categoryId: number): Promise<Category> => {
+    return apiClient.get<any>(`/menu/categories/${categoryId}/`).then(toCategory);
+  },
+
+  createCategory: async (data: CreateCategoryData): Promise<Category> => {
+    return apiClient
+      .post<any>("/menu/categories/", {
+        restaurant_id: data.restaurantId,
+        name: data.name,
+      })
+      .then(toCategory);
+  },
+
+  updateCategory: async (
+    categoryId: number,
+    data: UpdateCategoryData
+  ): Promise<Category> => {
+    const payload: any = {};
+    if (data.name !== undefined) payload.name = data.name;
+    if (data.displayOrder !== undefined) payload.display_order = data.displayOrder;
+
+    return apiClient
+      .patch<any>(`/menu/categories/${categoryId}/`, payload)
+      .then(toCategory);
+  },
+
+  deleteCategory: async (categoryId: number): Promise<void> => {
+    return apiClient.delete(`/menu/categories/${categoryId}/`);
+  },
+
+  reorderCategories: async (categoryIds: number[]): Promise<Category[]> => {
+    return apiClient
+      .post<any[]>("/menu/categories/reorder/", { category_ids: categoryIds })
+      .then((categories) => categories.map(toCategory));
   },
 };

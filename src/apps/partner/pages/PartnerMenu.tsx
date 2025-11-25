@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Select } from "@/shared/components/ui";
 import { menuService } from "@/shared/services";
-import { MenuItem } from "@/shared/types";
+import { MenuItem, Category } from "@/shared/types";
 import { MenuItemFormModal } from "../features/menu/components/MenuItemFormModal";
 import { ConfirmModal } from "../components/ConfirmModal";
 import { FiEdit2, FiTrash2, FiPlus, FiSettings } from "react-icons/fi";
@@ -37,6 +37,17 @@ export const PartnerMenu = () => {
   const [filterStatus, setFilterStatus] = useState<
     "all" | "active" | "inactive"
   >("all");
+  const [filterCategory, setFilterCategory] = useState<number | "all">("all");
+
+  // Get categories for selected restaurant
+  const { data: categories = [] } = useQuery({
+    queryKey: ["categories", selectedRestaurantId],
+    queryFn: () =>
+      selectedRestaurantId
+        ? menuService.getCategories(selectedRestaurantId)
+        : Promise.resolve([]),
+    enabled: !!selectedRestaurantId,
+  });
 
   // Get menu items for selected restaurant
   const { data: menuItems, isLoading } = useQuery({
@@ -115,11 +126,37 @@ export const PartnerMenu = () => {
   const filteredItems =
     menuItems
       ?.filter((item) => {
-        if (filterStatus === "active") return item.isAvailable;
-        if (filterStatus === "inactive") return !item.isAvailable;
+        if (filterStatus === "active" && !item.isAvailable) return false;
+        if (filterStatus === "inactive" && item.isAvailable) return false;
+        if (filterCategory !== "all" && item.categoryId !== filterCategory) return false;
         return true;
       })
       .sort((a, b) => a.name.localeCompare(b.name)) || [];
+
+  // Group items by category for display
+  const getCategoryName = (categoryId: number | null) => {
+    if (!categoryId) return "Sin categoría";
+    const category = categories.find(c => c.id === categoryId);
+    return category?.name || "Sin categoría";
+  };
+
+  // Get grouped items by category (maintaining category order)
+  const groupedItems = categories.reduce((acc, category) => {
+    const items = filteredItems.filter(item => item.categoryId === category.id);
+    if (items.length > 0) {
+      acc.push({ category, items });
+    }
+    return acc;
+  }, [] as { category: Category; items: MenuItem[] }[]);
+
+  // Add items without category
+  const uncategorizedItems = filteredItems.filter(item => !item.categoryId);
+  if (uncategorizedItems.length > 0) {
+    groupedItems.push({ 
+      category: { id: 0, restaurantId: selectedRestaurantId || 0, name: "Sin categoría", displayOrder: 999 }, 
+      items: uncategorizedItems 
+    });
+  }
 
   if (!selectedRestaurant) {
     return (
@@ -157,18 +194,31 @@ export const PartnerMenu = () => {
         <div className="px-6 py-4 border-b border-gray-100">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-medium text-gray-800">Productos</h2>
-            <Select
-              options={[
-                { value: "all", label: "Todos" },
-                { value: "active", label: "Activos" },
-                { value: "inactive", label: "Inactivos" },
-              ]}
-              value={filterStatus}
-              onChange={(value) =>
-                setFilterStatus(value as "all" | "active" | "inactive")
-              }
-              className="min-w-[140px]"
-            />
+            <div className="flex items-center gap-3">
+              {categories.length > 0 && (
+                <Select
+                  options={[
+                    { value: "all", label: "Todas las categorías" },
+                    ...categories.map((c) => ({ value: c.id, label: c.name })),
+                  ]}
+                  value={filterCategory}
+                  onChange={(value) => setFilterCategory(value as number | "all")}
+                  className="min-w-[180px]"
+                />
+              )}
+              <Select
+                options={[
+                  { value: "all", label: "Todos" },
+                  { value: "active", label: "Activos" },
+                  { value: "inactive", label: "Inactivos" },
+                ]}
+                value={filterStatus}
+                onChange={(value) =>
+                  setFilterStatus(value as "all" | "active" | "inactive")
+                }
+                className="min-w-[140px]"
+              />
+            </div>
           </div>
         </div>
 
@@ -179,98 +229,110 @@ export const PartnerMenu = () => {
                 <MenuItemSkeleton key={i} />
               ))}
             </div>
-          ) : filteredItems.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {filteredItems.map((item, index) => (
-                <motion.div
-                  key={item.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3, delay: index * 0.03 }}
-                  className="group rounded-xl overflow-hidden border border-gray-200 hover:shadow-lg transition-shadow bg-white"
-                >
-                  <div className="relative">
-                    <img
-                      src={
-                        item.image ||
-                        `https://ui-avatars.com/api/?name=${encodeURIComponent(item.name)}&background=B21F1F&color=fff&size=400`
-                      }
-                      alt={item.name}
-                      className={`w-full aspect-square object-cover ${!item.isAvailable ? "opacity-50" : ""}`}
-                    />
-                    {/* Dark overlay on hover */}
-                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-200" />
-                    <div className="absolute top-2 right-2 flex gap-1.5 opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-200 z-10">
-                      <button
-                        onClick={() =>
-                          navigate(`/partner/menu/${item.id}/options`)
-                        }
-                        className="p-1.5 bg-white rounded-lg shadow hover:bg-gray-50 transition-colors"
-                        title="Opciones"
+          ) : groupedItems.length > 0 ? (
+            <div className="space-y-8">
+              {groupedItems.map(({ category, items: categoryItems }) => (
+                <div key={category.id}>
+                  <h3 className="text-sm font-semibold text-gray-600 uppercase tracking-wider mb-4">
+                    {category.name}
+                    <span className="ml-2 text-xs font-normal text-gray-400">
+                      ({categoryItems.length})
+                    </span>
+                  </h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                    {categoryItems.map((item, index) => (
+                      <motion.div
+                        key={item.id}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.3, delay: index * 0.03 }}
+                        className="group rounded-xl overflow-hidden border border-gray-200 hover:shadow-lg transition-shadow bg-white"
                       >
-                        <FiSettings className="w-3.5 h-3.5 text-gray-700" />
-                      </button>
-                      <button
-                        onClick={() => handleEdit(item)}
-                        className="p-1.5 bg-white rounded-lg shadow hover:bg-gray-50 transition-colors"
-                        title="Editar"
-                      >
-                        <FiEdit2 className="w-3.5 h-3.5 text-gray-700" />
-                      </button>
-                      <button
-                        onClick={() => handleDelete(item)}
-                        className="p-1.5 bg-white rounded-lg shadow hover:bg-red-50 transition-colors"
-                        title="Eliminar"
-                        disabled={deleteMutation.isPending}
-                      >
-                        <FiTrash2 className="w-3.5 h-3.5 text-red-600" />
-                      </button>
-                    </div>
-                    {item.discountPrice && (
-                      <div className="absolute top-2 left-2 bg-red-500 text-white px-2 py-0.5 rounded-md text-xs font-bold shadow z-10">
-                        -
-                        {Math.round(
-                          ((item.price - item.discountPrice) / item.price) *
-                            100,
-                        )}
-                        %
-                      </div>
-                    )}
-                    {!item.isAvailable && (
-                      <div className="absolute bottom-2 left-2 bg-gray-900 text-white px-2 py-1 rounded-md text-xs font-medium z-10">
-                        No disponible
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="p-3">
-                    <h3 className="font-medium text-gray-800 text-sm line-clamp-1">
-                      {item.name}
-                    </h3>
-                    <p className="text-xs text-gray-500 line-clamp-1 mt-0.5">
-                      {item.description || "Sin descripción"}
-                    </p>
-                    <div className="flex items-center justify-between mt-2">
-                      {item.discountPrice ? (
-                        <div className="flex items-baseline gap-1.5">
-                          <span className="text-sm font-bold text-red-600">
-                            {formatPrice(item.discountPrice)}
-                          </span>
-                          <span className="text-xs text-gray-400 line-through">
-                            {formatPrice(item.price)}
-                          </span>
+                        <div className="relative">
+                          <img
+                            src={
+                              item.image ||
+                              `https://ui-avatars.com/api/?name=${encodeURIComponent(item.name)}&background=B21F1F&color=fff&size=400`
+                            }
+                            alt={item.name}
+                            className={`w-full aspect-square object-cover ${!item.isAvailable ? "opacity-50" : ""}`}
+                          />
+                          {/* Dark overlay on hover */}
+                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-200" />
+                          <div className="absolute top-2 right-2 flex gap-1.5 opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-200 z-10">
+                            <button
+                              onClick={() =>
+                                navigate(`/partner/menu/${item.id}/options`)
+                              }
+                              className="p-1.5 bg-white rounded-lg shadow hover:bg-gray-50 transition-colors"
+                              title="Opciones"
+                            >
+                              <FiSettings className="w-3.5 h-3.5 text-gray-700" />
+                            </button>
+                            <button
+                              onClick={() => handleEdit(item)}
+                              className="p-1.5 bg-white rounded-lg shadow hover:bg-gray-50 transition-colors"
+                              title="Editar"
+                            >
+                              <FiEdit2 className="w-3.5 h-3.5 text-gray-700" />
+                            </button>
+                            <button
+                              onClick={() => handleDelete(item)}
+                              className="p-1.5 bg-white rounded-lg shadow hover:bg-red-50 transition-colors"
+                              title="Eliminar"
+                              disabled={deleteMutation.isPending}
+                            >
+                              <FiTrash2 className="w-3.5 h-3.5 text-red-600" />
+                            </button>
+                          </div>
+                          {item.discountPrice && (
+                            <div className="absolute top-2 left-2 bg-red-500 text-white px-2 py-0.5 rounded-md text-xs font-bold shadow z-10">
+                              -
+                              {Math.round(
+                                ((item.price - item.discountPrice) / item.price) *
+                                  100,
+                              )}
+                              %
+                            </div>
+                          )}
+                          {!item.isAvailable && (
+                            <div className="absolute bottom-2 left-2 bg-gray-900 text-white px-2 py-1 rounded-md text-xs font-medium z-10">
+                              No disponible
+                            </div>
+                          )}
                         </div>
-                      ) : (
-                        <span className="text-sm font-bold text-gray-800">
-                          {formatPrice(item.price)}
-                        </span>
-                      )}
-                      <span
-                        className={`w-2 h-2 rounded-full ${item.isAvailable ? "bg-green-400" : "bg-gray-300"}`}
-                      />
-                    </div>
+
+                        <div className="p-3">
+                          <h3 className="font-medium text-gray-800 text-sm line-clamp-1">
+                            {item.name}
+                          </h3>
+                          <p className="text-xs text-gray-500 line-clamp-1 mt-0.5">
+                            {item.description || "Sin descripción"}
+                          </p>
+                          <div className="flex items-center justify-between mt-2">
+                            {item.discountPrice ? (
+                              <div className="flex items-baseline gap-1.5">
+                                <span className="text-sm font-bold text-red-600">
+                                  {formatPrice(item.discountPrice)}
+                                </span>
+                                <span className="text-xs text-gray-400 line-through">
+                                  {formatPrice(item.price)}
+                                </span>
+                              </div>
+                            ) : (
+                              <span className="text-sm font-bold text-gray-800">
+                                {formatPrice(item.price)}
+                              </span>
+                            )}
+                            <span
+                              className={`w-2 h-2 rounded-full ${item.isAvailable ? "bg-green-400" : "bg-gray-300"}`}
+                            />
+                          </div>
+                        </div>
+                      </motion.div>
+                    ))}
                   </div>
-                </motion.div>
+                </div>
               ))}
             </div>
           ) : (

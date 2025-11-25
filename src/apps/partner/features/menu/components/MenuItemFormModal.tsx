@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
-import { Modal } from "@/shared/components/ui";
+import { useQuery } from "@tanstack/react-query";
+import { Modal, Select } from "@/shared/components/ui";
 import { MenuItem } from "@/shared/types";
+import { menuService } from "@/shared/services";
 import { FiUpload, FiTrash2 } from "react-icons/fi";
 
 interface MenuItemFormModalProps {
@@ -23,6 +25,7 @@ export const MenuItemFormModal = ({
   const [formData, setFormData] = useState({
     name: "",
     description: "",
+    categoryId: null as number | null,
     price: 0,
     discountedPrice: undefined as number | undefined,
     isAvailable: true,
@@ -30,11 +33,19 @@ export const MenuItemFormModal = ({
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
 
+  // Fetch categories for the restaurant
+  const { data: categories = [] } = useQuery({
+    queryKey: ["categories", restaurantId],
+    queryFn: () => menuService.getCategories(restaurantId),
+    enabled: !!restaurantId && isOpen,
+  });
+
   useEffect(() => {
     if (menuItem) {
       setFormData({
         name: menuItem.name,
         description: menuItem.description,
+        categoryId: menuItem.categoryId,
         price: menuItem.price,
         discountedPrice: menuItem.discountPrice || undefined,
         isAvailable: menuItem.isAvailable,
@@ -44,6 +55,7 @@ export const MenuItemFormModal = ({
       setFormData({
         name: "",
         description: "",
+        categoryId: categories.length > 0 ? categories[0].id : null,
         price: 0,
         discountedPrice: undefined,
         isAvailable: true,
@@ -52,6 +64,13 @@ export const MenuItemFormModal = ({
     }
     setImageFile(null);
   }, [menuItem, isOpen]);
+
+  // Update default category when categories load
+  useEffect(() => {
+    if (!menuItem && categories.length > 0 && !formData.categoryId) {
+      setFormData(prev => ({ ...prev, categoryId: categories[0].id }));
+    }
+  }, [categories, menuItem]);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -191,6 +210,21 @@ export const MenuItemFormModal = ({
               rows={2}
             />
           </div>
+
+          {/* Category */}
+          {categories.length > 0 && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                Categoría
+              </label>
+              <Select
+                options={categories.map((c) => ({ value: c.id, label: c.name }))}
+                value={formData.categoryId}
+                onChange={(value) => setFormData(prev => ({ ...prev, categoryId: value as number }))}
+                placeholder="Selecciona una categoría"
+              />
+            </div>
+          )}
 
           {/* Price & Discounted Price */}
           <div className="grid grid-cols-2 gap-3">
