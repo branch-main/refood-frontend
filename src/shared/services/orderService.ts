@@ -49,6 +49,8 @@ const toOrder = (data: any): Order => {
   return {
     id: data.id,
     customerId: data.customer_id,
+    customerFirstName: data.customer_first_name,
+    customerLastName: data.customer_last_name,
     restaurantId: data.restaurant_id,
     deliveryDriverId: data.delivery_driver_id,
     status: data.status,
@@ -89,11 +91,70 @@ export interface RestaurantStats {
   totalOrders: number;
 }
 
+export interface DailyDataPoint {
+  date: string;
+  value: number;
+}
+
+export interface TopProduct {
+  menuItemId: number;
+  name: string;
+  image: string | null;
+  quantitySold: number;
+  revenue: number;
+}
+
+export interface Analytics {
+  totalRevenue: number;
+  totalOrders: number;
+  totalItemsSold: number;
+  averageOrderValue: number;
+  revenueChange: number;
+  ordersChange: number;
+  dailyRevenue: DailyDataPoint[];
+  dailyOrders: DailyDataPoint[];
+  topProducts: TopProduct[];
+  uniqueCustomers: number;
+  newCustomers: number;
+  returningCustomers: number;
+  ordersByStatus: Record<string, number>;
+}
+
 const toRestaurantStats = (data: any): RestaurantStats => {
   return {
     restaurantId: data.restaurant_id,
     totalSales: parseFloat(data.total_sales),
     totalOrders: data.total_orders,
+  };
+};
+
+const toAnalytics = (data: any): Analytics => {
+  return {
+    totalRevenue: parseFloat(data.total_revenue),
+    totalOrders: data.total_orders,
+    totalItemsSold: data.total_items_sold,
+    averageOrderValue: parseFloat(data.average_order_value),
+    revenueChange: data.revenue_change,
+    ordersChange: data.orders_change,
+    dailyRevenue: data.daily_revenue.map((d: any) => ({
+      date: d.date,
+      value: parseFloat(d.value),
+    })),
+    dailyOrders: data.daily_orders.map((d: any) => ({
+      date: d.date,
+      value: parseFloat(d.value),
+    })),
+    topProducts: data.top_products.map((p: any) => ({
+      menuItemId: p.menu_item_id,
+      name: p.name,
+      image: p.image,
+      quantitySold: p.quantity_sold,
+      revenue: parseFloat(p.revenue),
+    })),
+    uniqueCustomers: data.unique_customers,
+    newCustomers: data.new_customers,
+    returningCustomers: data.returning_customers,
+    ordersByStatus: data.orders_by_status,
   };
 };
 
@@ -166,5 +227,12 @@ export const orderService = {
       `/orders/restaurant-stats?restaurant_ids=${restaurantIds.join(",")}`
     );
     return response.data.map(toRestaurantStats);
+  },
+
+  getAnalytics: async (restaurantIds: number[], period: string = "7d"): Promise<Analytics> => {
+    const response = await ordersApiClient.get<any>(
+      `/orders/analytics?restaurant_ids=${restaurantIds.join(",")}&period=${period}`
+    );
+    return toAnalytics(response.data);
   },
 };

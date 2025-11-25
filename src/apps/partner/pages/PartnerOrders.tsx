@@ -82,6 +82,12 @@ const OrderCard = ({
             {getRelativeTime(order.createdAt)}
           </div>
         </div>
+        {/* Customer Name */}
+        {(order.customerFirstName || order.customerLastName) && (
+          <p className="text-sm font-medium text-gray-800 mb-1">
+            {order.customerFirstName} {order.customerLastName}
+          </p>
+        )}
         <div className="flex items-center gap-2 text-sm text-gray-600">
           <FiMapPin className="w-4 h-4 text-gray-400" />
           <span className="line-clamp-1">{order.deliveryAddress}</span>

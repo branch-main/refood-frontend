@@ -24,6 +24,8 @@ export type OrderItem = {
 export type Order = {
   id: string;
   customerId: number;
+  customerFirstName: string | null;
+  customerLastName: string | null;
   restaurantId: number;
   deliveryDriverId: number | null;
   status: OrderStatus;

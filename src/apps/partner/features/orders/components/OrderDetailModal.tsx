@@ -107,6 +107,20 @@ export const OrderDetailModal = ({
         {/* Scrollable Content */}
         <div className="flex-1 overflow-y-auto min-h-0">
           <div className="p-6">
+            {/* Customer Info */}
+            {(order.customerFirstName || order.customerLastName) && (
+              <div className="mb-6">
+                <h3 className="text-sm font-semibold text-gray-700 mb-2">
+                  Cliente
+                </h3>
+                <div className="p-3 bg-gray-50 rounded-lg">
+                  <span className="text-sm font-medium text-gray-900">
+                    {order.customerFirstName} {order.customerLastName}
+                  </span>
+                </div>
+              </div>
+            )}
+
             {/* Delivery Address */}
             <div className="mb-6">
               <h3 className="text-sm font-semibold text-gray-700 mb-2">
