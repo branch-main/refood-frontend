@@ -1,4 +1,5 @@
 export * from "./useAuth";
+export * from "./useCategories";
 export * from "./useDebounced";
 export * from "./useFavorites";
 export * from "./useMenu";

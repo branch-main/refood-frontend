@@ -7,21 +7,22 @@ import {
   RestaurantDetail,
   RestaurantSchedule,
 } from "@/features/restaurants/components";
-import { useRestaurant } from "@/shared/hooks";
-
-const CATEGORIES = ["Comida criolla", "Ceviche", "Bebidas", "Hamburguesas"];
+import { useRestaurant, useCategories } from "@/shared/hooks";
 
 export const Restaurant = () => {
   const { id } = useParams();
   const { isLoading, data: restaurant } = useRestaurant(Number(id));
+  const { isLoading: isCategoriesLoading, data: categories } = useCategories(Number(id));
 
-  if (isLoading) {
+  if (isLoading || isCategoriesLoading) {
     return <Restaurant.Skeleton />;
   }
 
   if (!restaurant) {
     return <div>Restaurante no encontrado</div>;
   }
+
+  const sortedCategories = categories?.slice().sort((a, b) => a.displayOrder - b.displayOrder) || [];
 
   return (
     <div className="flex-col">
@@ -33,9 +34,9 @@ export const Restaurant = () => {
         </div>
 
         <div className="flex flex-col flex-1 gap-8 mx-8 mt-4">
-          {CATEGORIES.map((category) => (
+          {sortedCategories.map((category) => (
             <RestaurantMenu
-              key={category}
+              key={category.id}
               restaurantId={restaurant.id}
               category={category}
             />

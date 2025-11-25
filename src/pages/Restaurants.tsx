@@ -135,7 +135,7 @@ export const Restaurants = () => {
 
         <h1 className="text-2xl font-bold text-gray-800 mt-4">
           {trendingLoading && <Skeleton className="w-64 h-8 rounded-lg" />}
-          {trending && <span>¡Los {trending.length} más elegidos!</span>}
+          {trending && <span>¡Los más elegidos!</span>}
         </h1>
 
         <div className="flex gap-8 overflow-x-auto py-4">
@@ -143,12 +143,14 @@ export const Restaurants = () => {
             ? Array.from({ length: 5 }).map((_, i) => (
                 <RestaurantCompact.Skeleton key={i} />
               ))
-            : trending?.map((restaurant) => (
-                <RestaurantCompact
-                  key={restaurant.id}
-                  restaurant={restaurant}
-                />
-              ))}
+            : sortRestaurants(trending, "relevance")
+                ?.slice(0, 10)
+                .map((restaurant) => (
+                  <RestaurantCompact
+                    key={restaurant.id}
+                    restaurant={restaurant}
+                  />
+                ))}
         </div>
 
         <h1 className="text-2xl font-bold text-gray-800">

@@ -1,13 +1,31 @@
 import { useFavorites, useRestaurant } from "@/shared/hooks";
 import { Link } from "react-router-dom";
-import { Loading } from "@/shared/components/ui";
+import { Skeleton } from "@/shared/components/ui";
 import { RestaurantCard } from "@/features/restaurants/components";
 
 const _Restaurant = ({ id }: { id: number }) => {
-  const { data: restaurant } = useRestaurant(id);
+  const { data: restaurant, isLoading } = useRestaurant(id);
+  
+  if (isLoading) {
+    return <RestaurantCard.Skeleton />;
+  }
+  
   if (!restaurant) return null;
   return <RestaurantCard restaurant={restaurant} />;
 };
+
+const FavoritesSkeleton = () => (
+  <div className="p-6">
+    <Skeleton className="h-10 w-48 mb-2" />
+    <Skeleton className="h-4 w-96 mb-4" />
+    <div className="border-b border-gray-200 mb-5" />
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {[1, 2, 3].map((i) => (
+        <RestaurantCard.Skeleton key={i} />
+      ))}
+    </div>
+  </div>
+);
 
 export const Favorites = () => {
   const { data: favorites, isLoading, error } = useFavorites();
@@ -18,11 +36,7 @@ export const Favorites = () => {
   }
 
   if (isLoading) {
-    return (
-      <div className="p-6">
-        <Loading />
-      </div>
-    );
+    return <FavoritesSkeleton />;
   }
 
   return (
@@ -52,7 +66,7 @@ export const Favorites = () => {
       ) : (
         <div className="mt-5 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {favorites?.map((restaurantId) => (
-            <_Restaurant id={restaurantId} />
+            <_Restaurant key={restaurantId} id={restaurantId} />
           ))}
         </div>
       )}

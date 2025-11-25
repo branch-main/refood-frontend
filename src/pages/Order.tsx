@@ -18,6 +18,7 @@ import {
 } from "@/shared/utils";
 import { useNavigate, useParams } from "react-router-dom";
 import { SlArrowLeft } from "react-icons/sl";
+import { Skeleton } from "@/shared/components/ui";
 
 const getStatusHint = (status: OrderStatus): string => {
   switch (status) {
@@ -41,10 +42,22 @@ const getStatusHint = (status: OrderStatus): string => {
 };
 
 const OrderItem = ({ item }: { item: OrderItemType }) => {
-  const { data: menuItem } = useMenuItem(item.menuItemId);
+  const { data: menuItem, isLoading } = useMenuItem(item.menuItemId);
 
-  if (!menuItem) {
-    return null;
+  if (isLoading || !menuItem) {
+    return (
+      <div className="flex gap-4">
+        <Skeleton className="h-16 w-16 rounded-lg" />
+        <div className="flex-1 space-y-2">
+          <Skeleton className="h-4 w-32" />
+          <Skeleton className="h-3 w-48" />
+        </div>
+        <div className="text-center space-y-1">
+          <Skeleton className="h-3 w-16" />
+          <Skeleton className="h-4 w-12" />
+        </div>
+      </div>
+    );
   }
 
   // Calculate total price including options
@@ -88,15 +101,78 @@ const OrderItem = ({ item }: { item: OrderItemType }) => {
   );
 };
 
+const OrderSkeleton = () => (
+  <>
+    <div className="p-6 border-b border-gray-200 flex items-center gap-5">
+      <Skeleton className="w-5 h-5" />
+      <Skeleton className="h-5 w-20" />
+    </div>
+    <div className="px-24 py-12 flex flex-col gap-4">
+      <div className="flex items-center justify-between border-b border-gray-200 pb-4 px-5">
+        <div className="flex flex-col gap-2">
+          <Skeleton className="h-6 w-48" />
+          <Skeleton className="h-4 w-64" />
+        </div>
+        <div className="flex flex-col items-end gap-2">
+          <Skeleton className="h-6 w-24 rounded-full" />
+          <Skeleton className="h-3 w-40" />
+        </div>
+      </div>
+      <div className="flex flex-col border-b border-gray-200 pb-4 px-5 gap-2">
+        <Skeleton className="h-5 w-16" />
+        <Skeleton className="h-4 w-32" />
+        <Skeleton className="h-4 w-24" />
+      </div>
+      <div className="flex flex-col border-b border-gray-200 pb-4 px-5 gap-2">
+        <Skeleton className="h-5 w-16" />
+        <Skeleton className="h-4 w-32" />
+      </div>
+      <div className="flex flex-col border-b border-gray-200 pb-4 px-5 gap-2">
+        <Skeleton className="h-5 w-20" />
+        <div className="space-y-4 my-4">
+          {[1, 2].map((i) => (
+            <div key={i} className="flex gap-4">
+              <Skeleton className="h-16 w-16 rounded-lg" />
+              <div className="flex-1 space-y-2">
+                <Skeleton className="h-4 w-32" />
+                <Skeleton className="h-3 w-48" />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div className="flex flex-col px-5 gap-2">
+        <Skeleton className="h-5 w-16" />
+        <div className="flex justify-between">
+          <Skeleton className="h-4 w-24" />
+          <Skeleton className="h-4 w-16" />
+        </div>
+        <div className="flex justify-between">
+          <Skeleton className="h-4 w-20" />
+          <Skeleton className="h-4 w-12" />
+        </div>
+        <div className="flex justify-between">
+          <Skeleton className="h-4 w-12" />
+          <Skeleton className="h-4 w-16" />
+        </div>
+      </div>
+    </div>
+  </>
+);
+
 export const Order = () => {
   const { orderId } = useParams<{ orderId: string }>();
   const navigate = useNavigate();
 
-  const { data: order } = useOrder(orderId);
-  const { data: payment } = usePaymentByOrder(order?.id);
-  const { data: restaurant } = useRestaurant(order?.restaurantId);
+  const { data: order, isLoading: orderLoading } = useOrder(orderId);
+  const { data: payment, isLoading: paymentLoading } = usePaymentByOrder(order?.id);
+  const { data: restaurant, isLoading: restaurantLoading } = useRestaurant(order?.restaurantId);
 
-  if (!order || !restaurant || !payment) return null;
+  const isLoading = orderLoading || paymentLoading || restaurantLoading;
+
+  if (isLoading || !order || !restaurant || !payment) {
+    return <OrderSkeleton />;
+  }
 
   // Calculate products total including options
   const productsTotal = order.items.reduce((total, item) => {

@@ -4,7 +4,7 @@ import {
   MenuItemOption as MenuItemOptionType,
 } from "@/shared/types";
 import { useCart } from "@/features/cart/contexts";
-import { Textarea } from "@/shared/components/ui";
+import { Skeleton, Textarea } from "@/shared/components/ui";
 import { Checkbox } from "@/shared/components/ui/Checkbox";
 import { Modal } from "@/shared/components/ui/Modal";
 import { Radio } from "@/shared/components/ui/Radio";
@@ -13,7 +13,7 @@ import {
   calculateDiscount,
   getFallbackImage,
 } from "@/shared/utils";
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useState, useEffect } from "react";
 import { FaMinus, FaPlus } from "react-icons/fa6";
 import { IoIosArrowDown } from "react-icons/io";
 import { IoClose } from "react-icons/io5";
@@ -162,19 +162,24 @@ export const MenuItemModal = ({
     Map<number, Set<number>>
   >(new Map());
 
-  const { data: options } = useMenuOptions(item.id);
+  const { data: options, isLoading } = useMenuOptions(item.id);
 
-  if (!options) return;
+  // Reset state when item changes
+  useEffect(() => {
+    setCount(1);
+    setNotes("");
+    setOptionSelections(new Map());
+  }, [item.id]);
 
-  const canAddToCart = options.some((option) => {
+  const canAddToCart = options?.some((option) => {
     if (!option.isRequired && option.minChoices === 0) return false;
     const selected = optionSelections.get(option.id) || new Set();
     return selected.size < Math.max(option.minChoices, 1);
-  });
+  }) ?? false;
 
   const additionalPrice = Array.from(optionSelections.entries()).reduce(
     (total, [optionId, selectedIds]) => {
-      const option = options.find((o) => o.id === optionId);
+      const option = options?.find((o) => o.id === optionId);
       if (!option) return total;
 
       const choicePrice = Array.from(selectedIds).reduce((sum, choiceId) => {
@@ -191,6 +196,8 @@ export const MenuItemModal = ({
   const totalPrice = (price + additionalPrice) * count;
 
   const handleAddToCart = () => {
+    if (!options) return;
+    
     const selectedOptions = Array.from(optionSelections.entries()).flatMap(
       ([optionId, selectedIds]) => {
         const option = options.find((o) => o.id === optionId);
@@ -265,18 +272,40 @@ export const MenuItemModal = ({
 
         <div className="flex flex-col flex-1 min-w-0 gap-4">
           <div className="flex-1 min-h-0 overflow-y-auto flex flex-col gap-4 pr-2">
-            {options.map((option) => (
-              <MenuItemOption
-                key={option.id}
-                option={option}
-                selected={optionSelections.get(option.id) || new Set()}
-                onSelectionChange={(selected) => {
-                  const newSelections = new Map(optionSelections);
-                  newSelections.set(option.id, selected);
-                  setOptionSelections(newSelections);
-                }}
-              />
-            ))}
+            {isLoading ? (
+              <>
+                <div className="flex flex-col w-full border border-gray-200 px-2.5 py-2 rounded-lg gap-3">
+                  <Skeleton className="h-5 w-32" />
+                  <Skeleton className="h-4 w-48" />
+                  <div className="flex flex-col gap-2">
+                    <Skeleton className="h-8 w-full" />
+                    <Skeleton className="h-8 w-full" />
+                    <Skeleton className="h-8 w-full" />
+                  </div>
+                </div>
+                <div className="flex flex-col w-full border border-gray-200 px-2.5 py-2 rounded-lg gap-3">
+                  <Skeleton className="h-5 w-32" />
+                  <Skeleton className="h-4 w-48" />
+                  <div className="flex flex-col gap-2">
+                    <Skeleton className="h-8 w-full" />
+                    <Skeleton className="h-8 w-full" />
+                  </div>
+                </div>
+              </>
+            ) : (
+              options?.map((option) => (
+                <MenuItemOption
+                  key={option.id}
+                  option={option}
+                  selected={optionSelections.get(option.id) || new Set()}
+                  onSelectionChange={(selected) => {
+                    const newSelections = new Map(optionSelections);
+                    newSelections.set(option.id, selected);
+                    setOptionSelections(newSelections);
+                  }}
+                />
+              ))
+            )}
 
             <div className="flex flex-col w-full">
               <span className="text-gray-800 font-bold">
@@ -314,7 +343,7 @@ export const MenuItemModal = ({
             </div>
 
             <button
-              disabled={canAddToCart}
+              disabled={canAddToCart || isLoading}
               className="disabled:bg-gray-200 disabled:text-gray-400 cursor-pointer disabled:cursor-default flex-1 text-sm rounded-lg py-2.5 transition-colors bg-red-500 hover:bg-red-700 text-white font-semibold"
               onClick={handleAddToCart}
             >

@@ -10,6 +10,7 @@ import {
   formatDate,
 } from "@/shared/utils";
 import { Link } from "react-router-dom";
+import { Skeleton } from "@/shared/components/ui";
 
 const getStatusHint = (status: OrderStatus): string => {
   switch (status) {
@@ -33,12 +34,20 @@ const getStatusHint = (status: OrderStatus): string => {
 };
 
 const Order = ({ order }: { order: OrderType }) => {
-  const { data: restaurant } = useRestaurant(order.restaurantId);
+  const { data: restaurant, isLoading } = useRestaurant(order.restaurantId);
   const quantity = order.items.reduce((acc, item) => acc + item.quantity, 0);
 
   return (
     <div className="mt-5 rounded-lg p-5 border border-gray-200">
-      {restaurant && (
+      {isLoading ? (
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Skeleton className="h-11 w-11 rounded-full" />
+            <Skeleton className="h-5 w-32" />
+          </div>
+          <Skeleton className="h-6 w-24 rounded-full" />
+        </div>
+      ) : restaurant && (
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <img
@@ -106,12 +115,51 @@ const Order = ({ order }: { order: OrderType }) => {
   );
 };
 
+const OrderSkeleton = () => (
+  <div className="mt-5 rounded-lg p-5 border border-gray-200">
+    <div className="flex items-center justify-between">
+      <div className="flex items-center gap-3">
+        <Skeleton className="h-11 w-11 rounded-full" />
+        <Skeleton className="h-5 w-32" />
+      </div>
+      <Skeleton className="h-6 w-24 rounded-full" />
+    </div>
+    <div className="mt-4 grid grid-rows-2 grid-cols-2 gap-2">
+      <Skeleton className="h-4 w-24" />
+      <Skeleton className="h-4 w-20" />
+      <Skeleton className="h-4 w-28" />
+      <Skeleton className="h-4 w-16" />
+    </div>
+    <div className="mt-4 flex items-center justify-between">
+      <Skeleton className="h-5 w-20" />
+      <Skeleton className="h-9 w-36 rounded-lg" />
+    </div>
+  </div>
+);
+
+const OrdersPageSkeleton = () => (
+  <div className="p-6">
+    <Skeleton className="h-10 w-64 mb-2" />
+    <Skeleton className="h-4 w-96 mb-4" />
+    <div className="border-b border-gray-200 mb-2" />
+    {[1, 2, 3].map((i) => (
+      <OrderSkeleton key={i} />
+    ))}
+  </div>
+);
+
 export const Orders = () => {
   const { user } = useAuth();
-  const { data: orders } = useOrdersByCustomer(user?.id);
+  const { data: orders, isLoading } = useOrdersByCustomer(user?.id);
   const [displayCount, setDisplayCount] = useState(10);
 
-  if (!orders) return;
+  if (isLoading) {
+    return <OrdersPageSkeleton />;
+  }
+
+  if (!orders) {
+    return <OrdersPageSkeleton />;
+  }
 
   const visibleOrders = orders.slice(0, displayCount);
   const hasMore = displayCount < orders.length;
@@ -128,25 +176,36 @@ export const Orders = () => {
         si hay algún inconveniente con una de tus compras.
       </p>
 
-      {visibleOrders.map((order) => (
-        <Order key={order.id} order={order} />
-      ))}
-
-      {hasMore && (
-        <div className="mt-8 flex justify-center">
-          <button
-            onClick={handleLoadMore}
-            className="px-6 py-3 text-sm font-medium text-red-500 border-2 border-red-500 rounded-lg hover:bg-red-500 hover:text-white transition-all duration-200"
-          >
-            Ver más pedidos
-          </button>
+      {visibleOrders.length === 0 ? (
+        <div className="mt-8 text-center py-12">
+          <h3 className="text-lg font-semibold mb-1">No tienes pedidos aún</h3>
+          <p className="text-sm text-gray-500">
+            Cuando realices tu primer pedido, aparecerá aquí
+          </p>
         </div>
-      )}
+      ) : (
+        <>
+          {visibleOrders.map((order) => (
+            <Order key={order.id} order={order} />
+          ))}
 
-      {!hasMore && orders.length > 10 && (
-        <div className="mt-8 text-center text-sm text-gray-500">
-          No hay más pedidos para mostrar
-        </div>
+          {hasMore && (
+            <div className="mt-8 flex justify-center">
+              <button
+                onClick={handleLoadMore}
+                className="px-6 py-3 text-sm font-medium text-red-500 border-2 border-red-500 rounded-lg hover:bg-red-500 hover:text-white transition-all duration-200"
+              >
+                Ver más pedidos
+              </button>
+            </div>
+          )}
+
+          {!hasMore && orders.length > 10 && (
+            <div className="mt-8 text-center text-sm text-gray-500">
+              No hay más pedidos para mostrar
+            </div>
+          )}
+        </>
       )}
     </div>
   );
