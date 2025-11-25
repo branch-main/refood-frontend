@@ -247,6 +247,8 @@ export const PartnerOrders = () => {
   const [activeTab, setActiveTab] = useState<TabStatus>("NEW");
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [cancelOrderId, setCancelOrderId] = useState<string | null>(null);
+  const [visibleCount, setVisibleCount] = useState(12);
+  const ITEMS_PER_PAGE = 12;
 
   // Get orders for selected restaurant
   const { data: orders, isLoading: ordersLoading } = useQuery({
@@ -321,8 +323,18 @@ export const PartnerOrders = () => {
   };
 
   // Filter orders by tab
-  const filteredOrders =
+  const allFilteredOrders =
     orders?.filter((order) => statusToTab[order.status] === activeTab) || [];
+  
+  // Apply pagination
+  const filteredOrders = allFilteredOrders.slice(0, visibleCount);
+  const hasMore = allFilteredOrders.length > visibleCount;
+
+  // Reset visible count when tab changes
+  const handleTabChange = (tab: TabStatus) => {
+    setVisibleCount(ITEMS_PER_PAGE);
+    setActiveTab(tab);
+  };
 
   // Count orders per tab
   const orderCounts: Record<TabStatus, number> = {
@@ -381,7 +393,7 @@ export const PartnerOrders = () => {
           {tabs.map((tab) => (
             <button
               key={tab.key}
-              onClick={() => setActiveTab(tab.key)}
+              onClick={() => handleTabChange(tab.key)}
               className={`flex-1 px-6 py-4 text-sm font-medium transition-all relative ${
                 activeTab === tab.key
                   ? "text-red-600"
@@ -419,25 +431,39 @@ export const PartnerOrders = () => {
             ))}
           </div>
         ) : filteredOrders.length > 0 ? (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            {filteredOrders.map((order, index) => (
-              <motion.div
-                key={order.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: index * 0.05 }}
-              >
-                <OrderCard
-                  order={order}
-                  onViewDetails={handleViewDetails}
-                  onStartPreparation={handleStartPreparation}
-                  onMarkReady={handleMarkReady}
-                  onCancel={handleCancel}
-                  isLoading={isLoading}
-                />
-              </motion.div>
-            ))}
-          </div>
+          <>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              {filteredOrders.map((order, index) => (
+                <motion.div
+                  key={order.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: index * 0.05 }}
+                >
+                  <OrderCard
+                    order={order}
+                    onViewDetails={handleViewDetails}
+                    onStartPreparation={handleStartPreparation}
+                    onMarkReady={handleMarkReady}
+                    onCancel={handleCancel}
+                    isLoading={isLoading}
+                  />
+                </motion.div>
+              ))}
+            </div>
+
+            {/* Load More Button */}
+            {hasMore && (
+              <div className="flex justify-center pt-6">
+                <button
+                  onClick={() => setVisibleCount(prev => prev + ITEMS_PER_PAGE)}
+                  className="px-6 py-2.5 text-sm font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors"
+                >
+                  Mostrar más ({allFilteredOrders.length - visibleCount} restantes)
+                </button>
+              </div>
+            )}
+          </>
         ) : (
           <motion.div
             initial={{ opacity: 0, y: 20 }}

@@ -29,7 +29,7 @@ export const MenuItemFormModal = ({
     categoryId: null as number | null,
     price: 0,
     discountedPrice: undefined as number | undefined,
-    isAvailable: true,
+    isAvailable: false,
   });
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -60,7 +60,7 @@ export const MenuItemFormModal = ({
         categoryId: categories.length > 0 ? categories[0].id : null,
         price: 0,
         discountedPrice: undefined,
-        isAvailable: true,
+        isAvailable: false,
       });
       setImagePreview(null);
     }

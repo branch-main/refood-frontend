@@ -130,6 +130,10 @@ export const restaurantService = {
     return apiClient.delete(`/restaurants/${id}/`);
   },
 
+  toggleActive: async (id: number): Promise<Restaurant> => {
+    return apiClient.patch<any>(`/restaurants/${id}/toggle-active/`).then(toRestaurant);
+  },
+
   updateOpeningHours: async (
     restaurantId: number,
     day: number,

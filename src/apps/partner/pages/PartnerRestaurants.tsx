@@ -5,7 +5,7 @@ import { RestaurantFormModal } from "../features/restaurants/components/Restaura
 import { ConfirmModal } from "../components/ConfirmModal";
 import { restaurantService, orderService } from "@/shared/services";
 import { Restaurant } from "@/shared/types";
-import { FiEdit2, FiTrash2, FiPlus, FiSettings } from "react-icons/fi";
+import { FiEdit2, FiTrash2, FiPlus, FiSettings, FiPower } from "react-icons/fi";
 import { formatPrice, formatRating } from "@/shared/utils";
 import { BsFillStarFill } from "react-icons/bs";
 import { motion, AnimatePresence } from "framer-motion";
@@ -117,6 +117,13 @@ export const PartnerRestaurants = () => {
     },
   });
 
+  const toggleActiveMutation = useMutation({
+    mutationFn: restaurantService.toggleActive,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["my-restaurants"] });
+    },
+  });
+
   const handleCreate = () => {
     setEditingRestaurant(null);
     setIsFormOpen(true);
@@ -125,6 +132,10 @@ export const PartnerRestaurants = () => {
   const handleEdit = (restaurant: Restaurant) => {
     setEditingRestaurant(restaurant);
     setIsFormOpen(true);
+  };
+
+  const handleToggleActive = (restaurant: Restaurant) => {
+    toggleActiveMutation.mutate(restaurant.id);
   };
 
   const handleDelete = async (restaurant: Restaurant) => {
@@ -210,7 +221,9 @@ export const PartnerRestaurants = () => {
               return (
                 <motion.div
                   key={restaurant.id}
-                  className="rounded-2xl overflow-hidden bg-white border border-gray-100 shadow-sm hover:shadow-xl hover:shadow-gray-200/50 transition-shadow duration-300 group"
+                  className={`rounded-2xl overflow-hidden bg-white border shadow-sm hover:shadow-xl hover:shadow-gray-200/50 transition-shadow duration-300 group ${
+                    restaurant.isActive ? 'border-gray-100' : 'border-gray-200'
+                  }`}
                   onMouseEnter={() => setHoveredId(restaurant.id)}
                   onMouseLeave={() => setHoveredId(null)}
                   variants={itemVariants}
@@ -227,7 +240,7 @@ export const PartnerRestaurants = () => {
                           ? `${restaurant.banner}?t=${restaurant.updatedAt ? new Date(restaurant.updatedAt).getTime() : Date.now()}`
                           : `https://ui-avatars.com/api/?name=${encodeURIComponent(restaurant.name)}&background=B21F1F&color=fff&size=400`
                       }
-                      className="w-full aspect-[16/9] object-cover"
+                      className={`w-full aspect-[16/9] object-cover ${!restaurant.isActive ? 'grayscale opacity-70' : ''}`}
                     />
                     {/* Gradient overlay */}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
@@ -237,24 +250,20 @@ export const PartnerRestaurants = () => {
                         hoveredId === restaurant.id ? 'opacity-100' : 'opacity-0'
                       }`}
                     />
+                    {/* Inactive overlay */}
+                    {!restaurant.isActive && (
+                      <div className="absolute inset-0 bg-gray-900/30" />
+                    )}
                     {/* Logo */}
                     {restaurant.logo && (
                       <div className="absolute bottom-3 left-3">
                         <img
                           src={`${restaurant.logo}?t=${restaurant.updatedAt ? new Date(restaurant.updatedAt).getTime() : Date.now()}`}
                           alt={`${restaurant.name} logo`}
-                          className="w-12 h-12 rounded-full object-cover border-2 border-gray-200 shadow-lg bg-white"
+                          className={`w-12 h-12 rounded-full object-cover border-2 border-gray-200 shadow-lg bg-white ${!restaurant.isActive ? 'grayscale' : ''}`}
                         />
                       </div>
                     )}
-                    {/* Status badge */}
-                    <div className={`absolute top-3 left-3 px-2.5 py-1 rounded-full text-xs font-medium ${
-                      restaurant.isActive 
-                        ? 'bg-green-500 text-white' 
-                        : 'bg-gray-500 text-white'
-                    }`}>
-                      {restaurant.isActive ? 'Activo' : 'Inactivo'}
-                    </div>
                     {/* Action buttons */}
                     <motion.div 
                       className="absolute top-3 right-3 flex gap-1.5"
@@ -265,6 +274,18 @@ export const PartnerRestaurants = () => {
                       }}
                       transition={{ duration: 0.2 }}
                     >
+                      <button
+                        onClick={() => handleToggleActive(restaurant)}
+                        className={`p-2 backdrop-blur-sm rounded-lg shadow-lg transition-colors ${
+                          restaurant.isActive 
+                            ? 'bg-white/95 hover:bg-orange-50' 
+                            : 'bg-green-500 hover:bg-green-600'
+                        }`}
+                        title={restaurant.isActive ? 'Desactivar' : 'Activar'}
+                        disabled={toggleActiveMutation.isPending}
+                      >
+                        <FiPower className={`w-4 h-4 ${restaurant.isActive ? 'text-orange-500' : 'text-white'}`} />
+                      </button>
                       <button
                         onClick={() =>
                           navigate(`/partner/restaurants/${restaurant.id}/settings`)
@@ -295,9 +316,16 @@ export const PartnerRestaurants = () => {
                   <div className="p-4">
                     <div className="flex items-start justify-between gap-2 mb-3">
                       <div className="min-w-0 flex-1">
-                        <h3 className="font-semibold text-gray-800 truncate text-lg">
-                          {restaurant.name}
-                        </h3>
+                        <div className="flex items-center gap-2">
+                          <h3 className={`font-semibold truncate text-lg ${restaurant.isActive ? 'text-gray-800' : 'text-gray-400'}`}>
+                            {restaurant.name}
+                          </h3>
+                          {!restaurant.isActive && (
+                            <span className="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full shrink-0">
+                              Inactivo
+                            </span>
+                          )}
+                        </div>
                         <p className="text-sm text-gray-500 line-clamp-1 mt-0.5">
                           {restaurant.description || 'Sin descripción'}
                         </p>

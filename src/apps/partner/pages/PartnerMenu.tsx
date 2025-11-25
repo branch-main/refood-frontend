@@ -38,6 +38,9 @@ export const PartnerMenu = () => {
     "all" | "active" | "inactive"
   >("all");
   const [filterCategory, setFilterCategory] = useState<number | "all">("all");
+  const [sortBy, setSortBy] = useState<"name" | "price" | "price-desc">("name");
+  const [visibleCount, setVisibleCount] = useState(12);
+  const ITEMS_PER_PAGE = 12;
 
   // Get categories for selected restaurant
   const { data: categories = [] } = useQuery({
@@ -123,7 +126,7 @@ export const PartnerMenu = () => {
   };
 
   // Filter and sort menu items
-  const filteredItems =
+  const allFilteredItems =
     menuItems
       ?.filter((item) => {
         if (filterStatus === "active" && !item.isAvailable) return false;
@@ -131,7 +134,30 @@ export const PartnerMenu = () => {
         if (filterCategory !== "all" && item.categoryId !== filterCategory) return false;
         return true;
       })
-      .sort((a, b) => a.name.localeCompare(b.name)) || [];
+      .sort((a, b) => {
+        switch (sortBy) {
+          case "name":
+            return a.name.localeCompare(b.name);
+          case "price":
+            return (a.discountPrice || a.price) - (b.discountPrice || b.price);
+          case "price-desc":
+            return (b.discountPrice || b.price) - (a.discountPrice || a.price);
+          default:
+            return 0;
+        }
+      }) || [];
+
+  // Apply pagination
+  const filteredItems = allFilteredItems.slice(0, visibleCount);
+  const hasMore = allFilteredItems.length > visibleCount;
+
+  // Reset visible count when filters change
+  const handleFilterChange = (type: 'status' | 'category' | 'sort', value: any) => {
+    setVisibleCount(ITEMS_PER_PAGE);
+    if (type === 'status') setFilterStatus(value);
+    if (type === 'category') setFilterCategory(value);
+    if (type === 'sort') setSortBy(value);
+  };
 
   // Group items by category for display
   const getCategoryName = (categoryId: number | null) => {
@@ -202,7 +228,7 @@ export const PartnerMenu = () => {
                     ...categories.map((c) => ({ value: c.id, label: c.name })),
                   ]}
                   value={filterCategory}
-                  onChange={(value) => setFilterCategory(value as number | "all")}
+                  onChange={(value) => handleFilterChange('category', value)}
                   className="min-w-[180px]"
                 />
               )}
@@ -213,9 +239,17 @@ export const PartnerMenu = () => {
                   { value: "inactive", label: "Inactivos" },
                 ]}
                 value={filterStatus}
-                onChange={(value) =>
-                  setFilterStatus(value as "all" | "active" | "inactive")
-                }
+                onChange={(value) => handleFilterChange('status', value)}
+                className="min-w-[140px]"
+              />
+              <Select
+                options={[
+                  { value: "name", label: "Nombre A-Z" },
+                  { value: "price", label: "Precio menor" },
+                  { value: "price-desc", label: "Precio mayor" },
+                ]}
+                value={sortBy}
+                onChange={(value) => handleFilterChange('sort', value)}
                 className="min-w-[140px]"
               />
             </div>
@@ -324,9 +358,6 @@ export const PartnerMenu = () => {
                                 {formatPrice(item.price)}
                               </span>
                             )}
-                            <span
-                              className={`w-2 h-2 rounded-full ${item.isAvailable ? "bg-green-400" : "bg-gray-300"}`}
-                            />
                           </div>
                         </div>
                       </motion.div>
@@ -334,6 +365,18 @@ export const PartnerMenu = () => {
                   </div>
                 </div>
               ))}
+
+              {/* Load More Button */}
+              {hasMore && (
+                <div className="flex justify-center pt-6">
+                  <button
+                    onClick={() => setVisibleCount(prev => prev + ITEMS_PER_PAGE)}
+                    className="px-6 py-2.5 text-sm font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors"
+                  >
+                    Mostrar más ({allFilteredItems.length - visibleCount} restantes)
+                  </button>
+                </div>
+              )}
             </div>
           ) : (
             <motion.div
