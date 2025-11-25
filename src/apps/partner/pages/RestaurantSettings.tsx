@@ -142,8 +142,9 @@ export const RestaurantSettings = () => {
               <div className="relative">
                 <img
                   src={
-                    restaurant.logo ||
-                    `https://ui-avatars.com/api/?name=${encodeURIComponent(restaurant.name)}&background=B21F1F&color=fff&size=200`
+                    restaurant.logo
+                      ? `${restaurant.logo}?t=${Date.now()}`
+                      : `https://ui-avatars.com/api/?name=${encodeURIComponent(restaurant.name)}&background=B21F1F&color=fff&size=200`
                   }
                   alt="Logo"
                   className="w-full aspect-square object-cover rounded-xl border border-gray-200"
@@ -173,8 +174,9 @@ export const RestaurantSettings = () => {
               <div className="relative">
                 <img
                   src={
-                    restaurant.banner ||
-                    `https://ui-avatars.com/api/?name=${encodeURIComponent(restaurant.name)}&background=B21F1F&color=fff&size=400`
+                    restaurant.banner
+                      ? `${restaurant.banner}?t=${Date.now()}`
+                      : `https://ui-avatars.com/api/?name=${encodeURIComponent(restaurant.name)}&background=B21F1F&color=fff&size=400`
                   }
                   alt="Banner"
                   className="w-full aspect-video object-cover rounded-xl border border-gray-200"

@@ -119,8 +119,9 @@ export const PartnerRestaurants = () => {
                   <img
                     alt={restaurant.name}
                     src={
-                      restaurant.banner ||
-                      `https://ui-avatars.com/api/?name=${encodeURIComponent(restaurant.name)}&background=B21F1F&color=fff&size=400`
+                      restaurant.banner
+                        ? `${restaurant.banner}?t=${restaurant.updatedAt ? new Date(restaurant.updatedAt).getTime() : Date.now()}`
+                        : `https://ui-avatars.com/api/?name=${encodeURIComponent(restaurant.name)}&background=B21F1F&color=fff&size=400`
                     }
                     className="w-full aspect-video object-cover"
                   />
