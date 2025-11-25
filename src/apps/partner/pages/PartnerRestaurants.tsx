@@ -8,7 +8,7 @@ import { Restaurant } from "@/shared/types";
 import { FiEdit2, FiTrash2, FiPlus, FiSettings } from "react-icons/fi";
 import { formatPrice, formatRating } from "@/shared/utils";
 import { BsFillStarFill } from "react-icons/bs";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 
 const containerVariants = {
   hidden: { opacity: 1 },
@@ -30,6 +30,7 @@ const itemVariants = {
       ease: "easeOut",
     },
   },
+  exit: { opacity: 0, y: -20 },
 };
 
 const RestaurantCardSkeleton = () => (
@@ -199,6 +200,7 @@ export const PartnerRestaurants = () => {
             initial="hidden"
             animate="visible"
           >
+          <AnimatePresence mode="popLayout">
             {[...restaurants].sort((a, b) => a.name.localeCompare(b.name)).map((restaurant) => {
               const stats = statsMap.get(restaurant.id);
               const rating = restaurant.stats?.rating ?? 0;
@@ -212,7 +214,10 @@ export const PartnerRestaurants = () => {
                   onMouseEnter={() => setHoveredId(restaurant.id)}
                   onMouseLeave={() => setHoveredId(null)}
                   variants={itemVariants}
-                  layout={false}
+                  initial="hidden"
+                  animate="visible"
+                  exit="exit"
+                  layout
                 >
                   <div className="relative">
                     <img
@@ -225,10 +230,10 @@ export const PartnerRestaurants = () => {
                       className="w-full aspect-[16/9] object-cover"
                     />
                     {/* Gradient overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
                     {/* Hover overlay */}
                     <div 
-                      className={`absolute inset-0 bg-black/20 transition-opacity duration-200 ${
+                      className={`absolute inset-0 bg-black/25 transition-opacity duration-200 ${
                         hoveredId === restaurant.id ? 'opacity-100' : 'opacity-0'
                       }`}
                     />
@@ -323,6 +328,7 @@ export const PartnerRestaurants = () => {
                 </motion.div>
               );
             })}
+          </AnimatePresence>
           </motion.div>
         ) : (
           <motion.div 

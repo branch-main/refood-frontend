@@ -3,7 +3,8 @@ import { useQuery } from "@tanstack/react-query";
 import { Modal, Select } from "@/shared/components/ui";
 import { MenuItem } from "@/shared/types";
 import { menuService } from "@/shared/services";
-import { FiUpload, FiTrash2 } from "react-icons/fi";
+import { parseApiErrors, FormErrors } from "@/shared/utils";
+import { FiUpload, FiTrash2, FiAlertCircle } from "react-icons/fi";
 
 interface MenuItemFormModalProps {
   isOpen: boolean;
@@ -32,6 +33,7 @@ export const MenuItemFormModal = ({
   });
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [errors, setErrors] = useState<FormErrors>({});
 
   // Fetch categories for the restaurant
   const { data: categories = [] } = useQuery({
@@ -63,6 +65,7 @@ export const MenuItemFormModal = ({
       setImagePreview(null);
     }
     setImageFile(null);
+    setErrors({});
   }, [menuItem, isOpen]);
 
   // Update default category when categories load
@@ -91,11 +94,16 @@ export const MenuItemFormModal = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await onSubmit({
-      ...formData,
-      restaurantId,
-      image: imageFile || undefined,
-    });
+    setErrors({});
+    try {
+      await onSubmit({
+        ...formData,
+        restaurantId,
+        image: imageFile || undefined,
+      });
+    } catch (error) {
+      setErrors(parseApiErrors(error));
+    }
   };
 
   const handleChange = (
@@ -127,6 +135,14 @@ export const MenuItemFormModal = ({
         </div>
 
         <form onSubmit={handleSubmit} className="p-5 space-y-4 overflow-y-auto flex-1">
+          {/* General Error */}
+          {(errors.detail || errors.non_field_errors) && (
+            <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-xl text-sm text-red-600">
+              <FiAlertCircle className="w-4 h-4 flex-shrink-0" />
+              <span>{errors.detail || errors.non_field_errors}</span>
+            </div>
+          )}
+
           {/* Image Upload */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -178,6 +194,9 @@ export const MenuItemFormModal = ({
                 />
               </label>
             )}
+            {errors.image && (
+              <p className="mt-1 text-xs text-red-500">{errors.image}</p>
+            )}
           </div>
 
           {/* Name */}
@@ -191,9 +210,14 @@ export const MenuItemFormModal = ({
               value={formData.name}
               onChange={handleChange}
               placeholder="Ej: Pizza Margherita"
-              className="w-full px-3 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent text-sm"
+              className={`w-full px-3 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent text-sm ${
+                errors.name ? "border-red-300 bg-red-50/50" : "border-gray-200"
+              }`}
               required
             />
+            {errors.name && (
+              <p className="mt-1 text-xs text-red-500">{errors.name}</p>
+            )}
           </div>
 
           {/* Description */}
@@ -206,9 +230,14 @@ export const MenuItemFormModal = ({
               value={formData.description}
               onChange={handleChange}
               placeholder="Describe el producto..."
-              className="w-full px-3 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent resize-none text-sm"
+              className={`w-full px-3 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent resize-none text-sm ${
+                errors.description ? "border-red-300 bg-red-50/50" : "border-gray-200"
+              }`}
               rows={2}
             />
+            {errors.description && (
+              <p className="mt-1 text-xs text-red-500">{errors.description}</p>
+            )}
           </div>
 
           {/* Category */}
@@ -223,6 +252,9 @@ export const MenuItemFormModal = ({
                 onChange={(value) => setFormData(prev => ({ ...prev, categoryId: value as number }))}
                 placeholder="Selecciona una categoría"
               />
+              {errors.category_id && (
+                <p className="mt-1 text-xs text-red-500">{errors.category_id}</p>
+              )}
             </div>
           )}
 
@@ -240,9 +272,14 @@ export const MenuItemFormModal = ({
                 placeholder="0.00"
                 step="0.01"
                 min="0"
-                className="w-full px-3 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent text-sm"
+                className={`w-full px-3 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent text-sm ${
+                  errors.price ? "border-red-300 bg-red-50/50" : "border-gray-200"
+                }`}
                 required
               />
+              {errors.price && (
+                <p className="mt-1 text-xs text-red-500">{errors.price}</p>
+              )}
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">
@@ -256,8 +293,13 @@ export const MenuItemFormModal = ({
                 placeholder="Opcional"
                 step="0.01"
                 min="0"
-                className="w-full px-3 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent text-sm"
+                className={`w-full px-3 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent text-sm ${
+                  errors.discounted_price ? "border-red-300 bg-red-50/50" : "border-gray-200"
+                }`}
               />
+              {errors.discounted_price && (
+                <p className="mt-1 text-xs text-red-500">{errors.discounted_price}</p>
+              )}
             </div>
           </div>
 

@@ -9,6 +9,7 @@ export const Input = ({
   error,
   type = "text",
   fullWidth = true,
+  className = "",
   ...props
 }: InputProps) => {
   return (
@@ -20,7 +21,7 @@ export const Input = ({
       )}
       <input
         type={type}
-        className={`w-full px-4 py-2.5 border rounded-lg text-sm transition-all duration-200 bg-white text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 disabled:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60 ${error ? "border-red-300 focus:border-red-500 focus:ring-red-100" : "border-gray-300 focus:border-red-500 focus:ring-red-100"}`}
+        className={`w-full px-4 py-2.5 border rounded-xl text-sm transition-all duration-200 bg-white text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60 ${error ? "border-red-300 bg-red-50/50" : "border-gray-300"} ${className}`}
         {...props}
       />
       {error && (

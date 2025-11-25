@@ -3,8 +3,9 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { motion, Reorder, useDragControls, AnimatePresence } from "framer-motion";
 import { menuService } from "@/shared/services";
 import { Category } from "@/shared/types";
+import { parseApiErrors, FormErrors } from "@/shared/utils";
 import { ConfirmModal } from "../components/ConfirmModal";
-import { FiEdit2, FiTrash2, FiPlus, FiCheck, FiX } from "react-icons/fi";
+import { FiEdit2, FiTrash2, FiPlus, FiCheck, FiX, FiAlertCircle } from "react-icons/fi";
 import { MdDragIndicator } from "react-icons/md";
 import { HiChevronRight } from "react-icons/hi2";
 import { useRestaurantContext } from "../contexts";
@@ -130,19 +131,26 @@ const CategoryItem = ({ category, itemCount, onEdit, onDelete }: CategoryItemPro
 
 interface CategoryFormProps {
   category?: Category | null;
-  onSubmit: (name: string) => void;
+  onSubmit: (name: string) => Promise<void>;
   onCancel: () => void;
   isLoading?: boolean;
 }
 
 const CategoryForm = ({ category, onSubmit, onCancel, isLoading }: CategoryFormProps) => {
   const [name, setName] = useState(category?.name || "");
+  const [error, setError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (name.trim()) {
-      onSubmit(name.trim());
+      setError(null);
+      try {
+        await onSubmit(name.trim());
+      } catch (err) {
+        const errors = parseApiErrors(err);
+        setError(errors.name || errors.detail || errors.non_field_errors || "Error al guardar");
+      }
     }
   };
 
@@ -155,36 +163,49 @@ const CategoryForm = ({ category, onSubmit, onCancel, isLoading }: CategoryFormP
 
   return (
     <form onSubmit={handleSubmit} onKeyDown={handleKeyDown}>
-      <div className="flex items-center gap-4 p-4 bg-red-50 rounded-xl border-2 border-red-200">
-        <input
-          ref={inputRef}
-          type="text"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="Nombre de la categoría"
-          className="flex-1 px-4 py-2.5 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent shadow-sm"
-          autoFocus
-          disabled={isLoading}
-        />
-        <div className="flex items-center gap-2">
-          <button
-            type="submit"
-            disabled={!name.trim() || isLoading}
-            className="inline-flex items-center gap-2 px-4 py-2.5 bg-red-500 text-white rounded-lg text-sm font-medium hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          >
-            <FiCheck className="w-4 h-4" />
-            {category ? "Guardar" : "Crear"}
-          </button>
-          <button
-            type="button"
-            onClick={onCancel}
+      <div className="flex flex-col gap-2 p-4 bg-red-50 rounded-xl border-2 border-red-200">
+        <div className="flex items-center gap-4">
+          <input
+            ref={inputRef}
+            type="text"
+            value={name}
+            onChange={(e) => {
+              setName(e.target.value);
+              if (error) setError(null);
+            }}
+            placeholder="Nombre de la categoría"
+            className={`flex-1 px-4 py-2.5 bg-white border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent shadow-sm ${
+              error ? "border-red-300" : "border-gray-200"
+            }`}
+            autoFocus
             disabled={isLoading}
-            className="inline-flex items-center gap-2 px-4 py-2.5 bg-white text-gray-600 border border-gray-200 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors"
-          >
-            <FiX className="w-4 h-4" />
-            Cancelar
-          </button>
+          />
+          <div className="flex items-center gap-2">
+            <button
+              type="submit"
+              disabled={!name.trim() || isLoading}
+              className="inline-flex items-center gap-2 px-4 py-2.5 bg-red-500 text-white rounded-lg text-sm font-medium hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              <FiCheck className="w-4 h-4" />
+              {category ? "Guardar" : "Crear"}
+            </button>
+            <button
+              type="button"
+              onClick={onCancel}
+              disabled={isLoading}
+              className="inline-flex items-center gap-2 px-4 py-2.5 bg-white text-gray-600 border border-gray-200 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors"
+            >
+              <FiX className="w-4 h-4" />
+              Cancelar
+            </button>
+          </div>
         </div>
+        {error && (
+          <div className="flex items-center gap-2 text-sm text-red-600">
+            <FiAlertCircle className="w-4 h-4 flex-shrink-0" />
+            <span>{error}</span>
+          </div>
+        )}
       </div>
     </form>
   );
@@ -268,13 +289,13 @@ export const PartnerCategories = () => {
     reorderMutation.mutate(categoryIds);
   };
 
-  const handleCreate = (name: string) => {
-    createMutation.mutate(name);
+  const handleCreate = async (name: string) => {
+    await createMutation.mutateAsync(name);
   };
 
-  const handleUpdate = (name: string) => {
+  const handleUpdate = async (name: string) => {
     if (editingCategory) {
-      updateMutation.mutate({ id: editingCategory.id, name });
+      await updateMutation.mutateAsync({ id: editingCategory.id, name });
     }
   };
 
@@ -319,17 +340,14 @@ export const PartnerCategories = () => {
             Categorías
           </h1>
         </div>
-        <motion.button
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.1 }}
+        <button
           onClick={() => setIsCreating(true)}
           disabled={isCreating}
           className="inline-flex items-center gap-2 px-5 py-2.5 bg-red-500 text-white rounded-xl font-medium text-sm shadow-sm shadow-red-500/25 hover:bg-red-600 hover:shadow-md hover:shadow-red-500/30 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <FiPlus className="w-4 h-4" />
           Agregar Categoría
-        </motion.button>
+        </button>
       </motion.div>
 
       {/* Categories List */}

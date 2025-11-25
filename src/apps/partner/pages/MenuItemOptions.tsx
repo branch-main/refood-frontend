@@ -6,7 +6,8 @@ import { Modal } from "@/shared/components/ui/Modal";
 import { ConfirmModal } from "../components/ConfirmModal";
 import { menuService } from "@/shared/services";
 import { MenuItemOption, MenuItemChoice } from "@/shared/types";
-import { FiEdit2, FiTrash2, FiPlus, FiChevronDown, FiChevronUp, FiArrowLeft } from "react-icons/fi";
+import { parseApiErrors, FormErrors } from "@/shared/utils";
+import { FiEdit2, FiTrash2, FiPlus, FiChevronDown, FiChevronUp, FiArrowLeft, FiAlertCircle } from "react-icons/fi";
 import { HiChevronRight } from "react-icons/hi2";
 import { formatPrice } from "@/shared/utils";
 import { useRestaurantContext } from "../contexts";
@@ -57,6 +58,9 @@ export const MenuItemOptions = () => {
     price: 0,
     isAvailable: true,
   });
+
+  const [optionErrors, setOptionErrors] = useState<FormErrors>({});
+  const [choiceErrors, setChoiceErrors] = useState<FormErrors>({});
 
   // Get menu item details
   const { data: menuItem } = useQuery({
@@ -148,6 +152,7 @@ export const MenuItemOptions = () => {
   const handleCreateOption = () => {
     setEditingOption(null);
     resetOptionForm();
+    setOptionErrors({});
     setIsOptionFormOpen(true);
   };
 
@@ -159,6 +164,7 @@ export const MenuItemOptions = () => {
       maxChoices: option.maxChoices,
       isRequired: option.isRequired,
     });
+    setOptionErrors({});
     setIsOptionFormOpen(true);
   };
 
@@ -175,13 +181,18 @@ export const MenuItemOptions = () => {
 
   const handleSubmitOption = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (editingOption) {
-      await updateOptionMutation.mutateAsync({
-        optionId: editingOption.id,
-        data: optionForm,
-      });
-    } else {
-      await createOptionMutation.mutateAsync(optionForm);
+    setOptionErrors({});
+    try {
+      if (editingOption) {
+        await updateOptionMutation.mutateAsync({
+          optionId: editingOption.id,
+          data: optionForm,
+        });
+      } else {
+        await createOptionMutation.mutateAsync(optionForm);
+      }
+    } catch (error) {
+      setOptionErrors(parseApiErrors(error));
     }
   };
 
@@ -189,6 +200,7 @@ export const MenuItemOptions = () => {
     setSelectedOptionId(optionId);
     setEditingChoice(null);
     resetChoiceForm();
+    setChoiceErrors({});
     setIsChoiceFormOpen(true);
   };
 
@@ -200,6 +212,7 @@ export const MenuItemOptions = () => {
       price: choice.price,
       isAvailable: choice.isAvailable,
     });
+    setChoiceErrors({});
     setIsChoiceFormOpen(true);
   };
 
@@ -216,16 +229,21 @@ export const MenuItemOptions = () => {
 
   const handleSubmitChoice = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (editingChoice) {
-      await updateChoiceMutation.mutateAsync({
-        choiceId: editingChoice.id,
-        data: choiceForm,
-      });
-    } else if (selectedOptionId) {
-      await createChoiceMutation.mutateAsync({
-        optionId: selectedOptionId,
-        data: choiceForm,
-      });
+    setChoiceErrors({});
+    try {
+      if (editingChoice) {
+        await updateChoiceMutation.mutateAsync({
+          choiceId: editingChoice.id,
+          data: choiceForm,
+        });
+      } else if (selectedOptionId) {
+        await createChoiceMutation.mutateAsync({
+          optionId: selectedOptionId,
+          data: choiceForm,
+        });
+      }
+    } catch (error) {
+      setChoiceErrors(parseApiErrors(error));
     }
   };
 
@@ -359,50 +377,59 @@ export const MenuItemOptions = () => {
                     transition={{ duration: 0.2 }}
                     className="px-6 pb-5"
                   >
-                    <div className="space-y-3">
+                    <div className="space-y-2">
                       {option.choices.length > 0 ? (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                        <div className="space-y-2">
                           {option.choices.map((choice, choiceIndex) => (
                             <motion.div
                               key={choice.id}
-                              initial={{ opacity: 0, scale: 0.95 }}
-                              animate={{ opacity: 1, scale: 1 }}
+                              initial={{ opacity: 0, x: -10 }}
+                              animate={{ opacity: 1, x: 0 }}
                               transition={{ duration: 0.2, delay: choiceIndex * 0.03 }}
-                              className={`relative group p-4 rounded-xl border-2 transition-all ${
+                              className={`group flex items-center gap-4 p-3 rounded-xl transition-colors ${
                                 choice.isAvailable
-                                  ? "bg-white border-gray-100 hover:border-gray-200"
-                                  : "bg-gray-50 border-gray-100 opacity-60"
+                                  ? "bg-gray-50 hover:bg-gray-100"
+                                  : "bg-gray-50/50"
                               }`}
                             >
-                              <div className="flex items-start justify-between">
-                                <div className="flex-1 min-w-0">
-                                  <h4 className="font-medium text-gray-800 truncate">{choice.name}</h4>
-                                  <p className="text-sm text-gray-500 mt-1">
-                                    {choice.price > 0 ? `+${formatPrice(choice.price)}` : "Sin costo adicional"}
-                                  </p>
-                                </div>
-                                <div className={`w-2.5 h-2.5 rounded-full flex-shrink-0 mt-1.5 ${
-                                  choice.isAvailable ? "bg-green-400" : "bg-gray-300"
-                                }`} />
+                              <div className="flex-1 min-w-0">
+                                <h4 className={`font-medium text-sm truncate ${
+                                  choice.isAvailable ? "text-gray-800" : "text-gray-400 line-through"
+                                }`}>{choice.name}</h4>
                               </div>
-                              
-                              {/* Hover actions */}
-                              <div className="absolute top-2 right-8 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                <button
-                                  onClick={() => handleEditChoice(choice, option.id)}
-                                  className="p-1.5 bg-white hover:bg-gray-100 rounded-lg transition-colors shadow-sm"
-                                  title="Editar"
-                                >
-                                  <FiEdit2 className="w-3.5 h-3.5 text-gray-500" />
-                                </button>
-                                <button
-                                  onClick={() => handleDeleteChoice(choice)}
-                                  className="p-1.5 bg-white hover:bg-red-50 rounded-lg transition-colors shadow-sm"
-                                  title="Eliminar"
-                                  disabled={deleteChoiceMutation.isPending}
-                                >
-                                  <FiTrash2 className="w-3.5 h-3.5 text-red-500" />
-                                </button>
+
+                              <div className="flex items-center gap-3">
+                                <span className={`text-sm font-medium ${
+                                  choice.isAvailable 
+                                    ? choice.price > 0 ? "text-gray-700" : "text-gray-400"
+                                    : "text-gray-300"
+                                }`}>
+                                  {choice.price > 0 ? `+${formatPrice(choice.price)}` : "Gratis"}
+                                </span>
+
+                                {!choice.isAvailable && (
+                                  <span className="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">
+                                    No disponible
+                                  </span>
+                                )}
+                                
+                                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                  <button
+                                    onClick={() => handleEditChoice(choice, option.id)}
+                                    className="p-1.5 hover:bg-white rounded-lg transition-colors"
+                                    title="Editar"
+                                  >
+                                    <FiEdit2 className="w-3.5 h-3.5 text-gray-500" />
+                                  </button>
+                                  <button
+                                    onClick={() => handleDeleteChoice(choice)}
+                                    className="p-1.5 hover:bg-white rounded-lg transition-colors"
+                                    title="Eliminar"
+                                    disabled={deleteChoiceMutation.isPending}
+                                  >
+                                    <FiTrash2 className="w-3.5 h-3.5 text-red-500" />
+                                  </button>
+                                </div>
                               </div>
                             </motion.div>
                           ))}
@@ -415,7 +442,7 @@ export const MenuItemOptions = () => {
                       
                       <button
                         onClick={() => handleCreateChoice(option.id)}
-                        className="w-full flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-gray-200 rounded-xl text-sm font-medium text-gray-500 hover:border-red-300 hover:text-red-500 hover:bg-red-50/50 transition-all"
+                        className="w-full flex items-center justify-center gap-2 px-4 py-2.5 border-2 border-dashed border-gray-200 rounded-xl text-sm font-medium text-gray-500 hover:border-red-300 hover:text-red-500 hover:bg-red-50/50 transition-all"
                       >
                         <FiPlus className="w-4 h-4" />
                         Agregar opción
@@ -463,6 +490,14 @@ export const MenuItemOptions = () => {
             </h2>
           </div>
           <form onSubmit={handleSubmitOption} className="p-6 space-y-4">
+            {/* General Error */}
+            {(optionErrors.detail || optionErrors.non_field_errors) && (
+              <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-xl text-sm text-red-600">
+                <FiAlertCircle className="w-4 h-4 flex-shrink-0" />
+                <span>{optionErrors.detail || optionErrors.non_field_errors}</span>
+              </div>
+            )}
+
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Nombre
@@ -473,10 +508,15 @@ export const MenuItemOptions = () => {
                 onChange={(e) =>
                   setOptionForm({ ...optionForm, name: e.target.value })
                 }
-                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent text-sm"
+                className={`w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent text-sm ${
+                  optionErrors.name ? "border-red-300 bg-red-50/50" : "border-gray-200"
+                }`}
                 placeholder="Ej: Tamaño, Ingredientes extras"
                 required
               />
+              {optionErrors.name && (
+                <p className="mt-1 text-xs text-red-500">{optionErrors.name}</p>
+              )}
             </div>
 
             <div className="grid grid-cols-2 gap-4">
@@ -493,10 +533,15 @@ export const MenuItemOptions = () => {
                       minChoices: parseInt(e.target.value) || 0,
                     })
                   }
-                  className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent text-sm"
+                  className={`w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent text-sm ${
+                    optionErrors.min_choices ? "border-red-300 bg-red-50/50" : "border-gray-200"
+                  }`}
                   min="0"
                   required
                 />
+                {optionErrors.min_choices && (
+                  <p className="mt-1 text-xs text-red-500">{optionErrors.min_choices}</p>
+                )}
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -511,10 +556,15 @@ export const MenuItemOptions = () => {
                       maxChoices: parseInt(e.target.value) || 1,
                     })
                   }
-                  className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent text-sm"
+                  className={`w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent text-sm ${
+                    optionErrors.max_choices ? "border-red-300 bg-red-50/50" : "border-gray-200"
+                  }`}
                   min="1"
                   required
                 />
+                {optionErrors.max_choices && (
+                  <p className="mt-1 text-xs text-red-500">{optionErrors.max_choices}</p>
+                )}
               </div>
             </div>
 
@@ -571,6 +621,14 @@ export const MenuItemOptions = () => {
             </h2>
           </div>
           <form onSubmit={handleSubmitChoice} className="p-6 space-y-4">
+            {/* General Error */}
+            {(choiceErrors.detail || choiceErrors.non_field_errors) && (
+              <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-xl text-sm text-red-600">
+                <FiAlertCircle className="w-4 h-4 flex-shrink-0" />
+                <span>{choiceErrors.detail || choiceErrors.non_field_errors}</span>
+              </div>
+            )}
+
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Nombre
@@ -581,10 +639,15 @@ export const MenuItemOptions = () => {
                 onChange={(e) =>
                   setChoiceForm({ ...choiceForm, name: e.target.value })
                 }
-                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent text-sm"
+                className={`w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent text-sm ${
+                  choiceErrors.name ? "border-red-300 bg-red-50/50" : "border-gray-200"
+                }`}
                 placeholder="Ej: Grande, Queso extra"
                 required
               />
+              {choiceErrors.name && (
+                <p className="mt-1 text-xs text-red-500">{choiceErrors.name}</p>
+              )}
             </div>
 
             <div>
@@ -600,11 +663,16 @@ export const MenuItemOptions = () => {
                     price: parseFloat(e.target.value) || 0,
                   })
                 }
-                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent text-sm"
+                className={`w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent text-sm ${
+                  choiceErrors.price ? "border-red-300 bg-red-50/50" : "border-gray-200"
+                }`}
                 step="0.01"
                 min="0"
                 required
               />
+              {choiceErrors.price && (
+                <p className="mt-1 text-xs text-red-500">{choiceErrors.price}</p>
+              )}
             </div>
 
             <div className="flex items-center gap-3 py-2">
