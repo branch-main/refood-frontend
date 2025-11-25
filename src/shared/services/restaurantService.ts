@@ -21,19 +21,25 @@ const toRestaurant = (data: any): Restaurant => ({
   logo: data.logo,
   banner: data.banner,
   isActive: data.is_active,
-  stats: {
-    totalSales: data.stats.total_sales,
-    totalOrders: data.stats.total_orders,
-    totalItemsSold: data.stats.total_items_sold,
-    rating: data.stats.rating,
-    totalReviews: data.stats.total_reviews,
+  stats: data.stats ? {
+    totalSales: data.stats.total_sales || 0,
+    totalOrders: data.stats.total_orders || 0,
+    totalItemsSold: data.stats.total_items_sold || 0,
+    rating: data.stats.rating || 0,
+    totalReviews: data.stats.total_reviews || 0,
+  } : {
+    totalSales: 0,
+    totalOrders: 0,
+    totalItemsSold: 0,
+    rating: 0,
+    totalReviews: 0,
   },
-  openingHours: data.opening_hours.map(toOpeningHours),
-  isOpen: data.is_open,
-  nextOpeningTime: data.next_opening_time,
+  openingHours: data.opening_hours ? data.opening_hours.map(toOpeningHours) : [],
+  isOpen: data.is_open ?? false,
+  nextOpeningTime: data.next_opening_time || '',
   bestDiscount: data.best_discount || 0,
-  createdAt: data.created_at,
-  updatedAt: data.updated_at,
+  createdAt: data.created_at || null,
+  updatedAt: data.updated_at || null,
 });
 
 export interface CreateRestaurantData {

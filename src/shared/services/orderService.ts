@@ -34,6 +34,17 @@ export interface CreateOrderRequest {
   }[];
 }
 
+export interface DashboardStats {
+  todayEarnings: number;
+  yesterdayEarnings: number;
+  todayOrders: number;
+  yesterdayOrders: number;
+  todayItems: number;
+  yesterdayItems: number;
+  weeklyEarnings: number[];
+  recentOrders: Order[];
+}
+
 const toOrder = (data: any): Order => {
   return {
     id: data.id,
@@ -56,6 +67,33 @@ const toOrder = (data: any): Order => {
     deliveredAt: data.delivered_at,
     totalPrice: data.total_price,
     createdAt: data.created_at,
+  };
+};
+
+const toDashboardStats = (data: any): DashboardStats => {
+  return {
+    todayEarnings: parseFloat(data.today_earnings),
+    yesterdayEarnings: parseFloat(data.yesterday_earnings),
+    todayOrders: data.today_orders,
+    yesterdayOrders: data.yesterday_orders,
+    todayItems: data.today_items,
+    yesterdayItems: data.yesterday_items,
+    weeklyEarnings: data.weekly_earnings.map((e: string) => parseFloat(e)),
+    recentOrders: data.recent_orders.map(toOrder),
+  };
+};
+
+export interface RestaurantStats {
+  restaurantId: number;
+  totalSales: number;
+  totalOrders: number;
+}
+
+const toRestaurantStats = (data: any): RestaurantStats => {
+  return {
+    restaurantId: data.restaurant_id,
+    totalSales: parseFloat(data.total_sales),
+    totalOrders: data.total_orders,
   };
 };
 
@@ -114,5 +152,19 @@ export const orderService = {
   cancelOrder: async (orderId: string, reason: string): Promise<Order> => {
     const response = await ordersApiClient.post<any>(`/orders/${orderId}/cancel`, { reason });
     return toOrder(response.data);
+  },
+
+  getDashboardStats: async (restaurantIds: number[]): Promise<DashboardStats> => {
+    const response = await ordersApiClient.get<any>(
+      `/orders/dashboard-stats?restaurant_ids=${restaurantIds.join(",")}`
+    );
+    return toDashboardStats(response.data);
+  },
+
+  getRestaurantStats: async (restaurantIds: number[]): Promise<RestaurantStats[]> => {
+    const response = await ordersApiClient.get<any[]>(
+      `/orders/restaurant-stats?restaurant_ids=${restaurantIds.join(",")}`
+    );
+    return response.data.map(toRestaurantStats);
   },
 };

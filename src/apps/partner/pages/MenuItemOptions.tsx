@@ -1,13 +1,35 @@
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useParams, useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 import { Modal } from "@/shared/components/ui/Modal";
+import { ConfirmModal } from "../components/ConfirmModal";
 import { menuService } from "@/shared/services";
 import { MenuItemOption, MenuItemChoice } from "@/shared/types";
 import { FiEdit2, FiTrash2, FiPlus, FiChevronDown, FiChevronUp, FiArrowLeft } from "react-icons/fi";
 import { HiChevronRight } from "react-icons/hi2";
 import { formatPrice } from "@/shared/utils";
 import { useRestaurantContext } from "../contexts";
+
+// Skeleton for option rows
+const OptionSkeleton = () => (
+  <div className="px-6 py-4 animate-pulse">
+    <div className="flex items-center gap-4">
+      <div className="w-8 h-8 bg-gray-200 rounded-lg" />
+      <div className="flex-1">
+        <div className="flex items-center gap-3 mb-2">
+          <div className="h-5 w-32 bg-gray-200 rounded" />
+          <div className="h-5 w-20 bg-gray-200 rounded-full" />
+        </div>
+        <div className="h-4 w-48 bg-gray-200 rounded" />
+      </div>
+      <div className="flex gap-2">
+        <div className="w-8 h-8 bg-gray-200 rounded-lg" />
+        <div className="w-8 h-8 bg-gray-200 rounded-lg" />
+      </div>
+    </div>
+  </div>
+);
 
 export const MenuItemOptions = () => {
   const { id } = useParams();
@@ -20,6 +42,8 @@ export const MenuItemOptions = () => {
   const [editingOption, setEditingOption] = useState<MenuItemOption | null>(null);
   const [editingChoice, setEditingChoice] = useState<MenuItemChoice | null>(null);
   const [selectedOptionId, setSelectedOptionId] = useState<number | null>(null);
+  const [deleteOption, setDeleteOption] = useState<MenuItemOption | null>(null);
+  const [deleteChoice, setDeleteChoice] = useState<MenuItemChoice | null>(null);
 
   const [optionForm, setOptionForm] = useState({
     name: "",
@@ -139,8 +163,13 @@ export const MenuItemOptions = () => {
   };
 
   const handleDeleteOption = async (option: MenuItemOption) => {
-    if (window.confirm(`¿Eliminar opción "${option.name}"?`)) {
-      await deleteOptionMutation.mutateAsync(option.id);
+    setDeleteOption(option);
+  };
+
+  const confirmDeleteOption = async () => {
+    if (deleteOption) {
+      await deleteOptionMutation.mutateAsync(deleteOption.id);
+      setDeleteOption(null);
     }
   };
 
@@ -175,8 +204,13 @@ export const MenuItemOptions = () => {
   };
 
   const handleDeleteChoice = async (choice: MenuItemChoice) => {
-    if (window.confirm(`¿Eliminar opción "${choice.name}"?`)) {
-      await deleteChoiceMutation.mutateAsync(choice.id);
+    setDeleteChoice(choice);
+  };
+
+  const confirmDeleteChoice = async () => {
+    if (deleteChoice) {
+      await deleteChoiceMutation.mutateAsync(deleteChoice.id);
+      setDeleteChoice(null);
     }
   };
 
@@ -207,9 +241,28 @@ export const MenuItemOptions = () => {
 
   if (isLoading) {
     return (
-      <div className="bg-white rounded-2xl p-8 shadow-[0px_0px_25px_2px_rgba(0,0,0,0.025)]">
-        <p className="text-gray-500">Cargando...</p>
-      </div>
+      <>
+        <div className="flex justify-between items-center mb-7">
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => navigate("/partner/menu")}
+              className="p-2 -ml-2 hover:bg-gray-100 rounded-lg transition-colors"
+            >
+              <FiArrowLeft className="w-5 h-5 text-gray-500" />
+            </button>
+            <div className="h-7 w-32 bg-gray-200 rounded animate-pulse" />
+            <HiChevronRight className="w-5 h-5 text-gray-400" />
+            <div className="h-7 w-24 bg-gray-200 rounded animate-pulse" />
+          </div>
+        </div>
+        <div className="bg-white rounded-2xl shadow-[0px_0px_25px_2px_rgba(0,0,0,0.025)]">
+          <div className="divide-y divide-gray-100">
+            {[...Array(3)].map((_, i) => (
+              <OptionSkeleton key={i} />
+            ))}
+          </div>
+        </div>
+      </>
     );
   }
 
@@ -239,8 +292,13 @@ export const MenuItemOptions = () => {
       <div className="bg-white rounded-2xl shadow-[0px_0px_25px_2px_rgba(0,0,0,0.025)]">
         {options && options.length > 0 ? (
           <div className="divide-y divide-gray-100">
-            {options.map((option) => (
-              <div key={option.id}>
+            {options.map((option, index) => (
+              <motion.div
+                key={option.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: index * 0.05 }}
+              >
                 {/* Option Header */}
                 <div className="px-6 py-4 flex items-center justify-between">
                   <div className="flex items-center gap-4 flex-1">
@@ -294,13 +352,22 @@ export const MenuItemOptions = () => {
 
                 {/* Choices */}
                 {expandedOptions.has(option.id) && (
-                  <div className="px-6 pb-5">
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    exit={{ opacity: 0, height: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="px-6 pb-5"
+                  >
                     <div className="space-y-3">
                       {option.choices.length > 0 ? (
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                          {option.choices.map((choice) => (
-                            <div
+                          {option.choices.map((choice, choiceIndex) => (
+                            <motion.div
                               key={choice.id}
+                              initial={{ opacity: 0, scale: 0.95 }}
+                              animate={{ opacity: 1, scale: 1 }}
+                              transition={{ duration: 0.2, delay: choiceIndex * 0.03 }}
                               className={`relative group p-4 rounded-xl border-2 transition-all ${
                                 choice.isAvailable
                                   ? "bg-white border-gray-100 hover:border-gray-200"
@@ -337,7 +404,7 @@ export const MenuItemOptions = () => {
                                   <FiTrash2 className="w-3.5 h-3.5 text-red-500" />
                                 </button>
                               </div>
-                            </div>
+                            </motion.div>
                           ))}
                         </div>
                       ) : (
@@ -354,13 +421,18 @@ export const MenuItemOptions = () => {
                         Agregar opción
                       </button>
                     </div>
-                  </div>
+                  </motion.div>
                 )}
-              </div>
+              </motion.div>
             ))}
           </div>
         ) : (
-          <div className="text-center py-16">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+            className="text-center py-16"
+          >
             <div className="w-16 h-16 mx-auto mb-4 bg-red-50 rounded-2xl flex items-center justify-center">
               <FiPlus className="w-7 h-7 text-red-400" />
             </div>
@@ -375,7 +447,7 @@ export const MenuItemOptions = () => {
               <FiPlus className="w-4 h-4" />
               Crear primera opción
             </button>
-          </div>
+          </motion.div>
         )}
       </div>
 
@@ -575,6 +647,30 @@ export const MenuItemOptions = () => {
           </form>
         </div>
       </Modal>
+
+      <ConfirmModal
+        isOpen={!!deleteOption}
+        onClose={() => setDeleteOption(null)}
+        onConfirm={confirmDeleteOption}
+        title="Eliminar Opción"
+        message={`¿Estás seguro de que deseas eliminar la opción "${deleteOption?.name}"? Se eliminarán también todas las opciones asociadas.`}
+        confirmText="Eliminar"
+        cancelText="Cancelar"
+        variant="danger"
+        isLoading={deleteOptionMutation.isPending}
+      />
+
+      <ConfirmModal
+        isOpen={!!deleteChoice}
+        onClose={() => setDeleteChoice(null)}
+        onConfirm={confirmDeleteChoice}
+        title="Eliminar Elección"
+        message={`¿Estás seguro de que deseas eliminar "${deleteChoice?.name}"?`}
+        confirmText="Eliminar"
+        cancelText="Cancelar"
+        variant="danger"
+        isLoading={deleteChoiceMutation.isPending}
+      />
     </>
   );
 };

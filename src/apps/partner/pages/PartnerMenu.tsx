@@ -1,14 +1,31 @@
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 import { Select } from "@/shared/components/ui";
 import { menuService } from "@/shared/services";
 import { MenuItem } from "@/shared/types";
 import { MenuItemFormModal } from "../features/menu/components/MenuItemFormModal";
+import { ConfirmModal } from "../components/ConfirmModal";
 import { FiEdit2, FiTrash2, FiPlus, FiSettings } from "react-icons/fi";
 import { HiChevronRight } from "react-icons/hi2";
 import { formatPrice } from "@/shared/utils";
 import { useRestaurantContext } from "../contexts";
+
+// Skeleton for menu item cards
+const MenuItemSkeleton = () => (
+  <div className="rounded-xl overflow-hidden border border-gray-200 bg-white animate-pulse">
+    <div className="w-full aspect-square bg-gray-200" />
+    <div className="p-3">
+      <div className="h-4 w-3/4 bg-gray-200 rounded mb-2" />
+      <div className="h-3 w-full bg-gray-200 rounded mb-2" />
+      <div className="flex items-center justify-between mt-2">
+        <div className="h-4 w-16 bg-gray-200 rounded" />
+        <div className="w-2 h-2 bg-gray-200 rounded-full" />
+      </div>
+    </div>
+  </div>
+);
 
 export const PartnerMenu = () => {
   const navigate = useNavigate();
@@ -16,6 +33,7 @@ export const PartnerMenu = () => {
   const { selectedRestaurant, selectedRestaurantId } = useRestaurantContext();
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<MenuItem | null>(null);
+  const [deleteItem, setDeleteItem] = useState<MenuItem | null>(null);
   const [filterStatus, setFilterStatus] = useState<
     "all" | "active" | "inactive"
   >("all");
@@ -70,12 +88,13 @@ export const PartnerMenu = () => {
   };
 
   const handleDelete = async (item: MenuItem) => {
-    if (
-      window.confirm(
-        `¿Estás seguro de que deseas eliminar "${item.name}"? Esta acción no se puede deshacer.`,
-      )
-    ) {
-      await deleteMutation.mutateAsync(item.id);
+    setDeleteItem(item);
+  };
+
+  const confirmDelete = async () => {
+    if (deleteItem) {
+      await deleteMutation.mutateAsync(deleteItem.id);
+      setDeleteItem(null);
     }
   };
 
@@ -155,12 +174,19 @@ export const PartnerMenu = () => {
 
         <div className="p-6">
           {isLoading ? (
-            <p className="text-gray-500 text-center py-8">Cargando...</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              {[...Array(8)].map((_, i) => (
+                <MenuItemSkeleton key={i} />
+              ))}
+            </div>
           ) : filteredItems.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {filteredItems.map((item) => (
-                <div
+              {filteredItems.map((item, index) => (
+                <motion.div
                   key={item.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: index * 0.03 }}
                   className="group rounded-xl overflow-hidden border border-gray-200 hover:shadow-lg transition-shadow bg-white"
                 >
                   <div className="relative">
@@ -244,11 +270,16 @@ export const PartnerMenu = () => {
                       />
                     </div>
                   </div>
-                </div>
+                </motion.div>
               ))}
             </div>
           ) : (
-            <div className="text-center py-16">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+              className="text-center py-16"
+            >
               <div className="w-16 h-16 mx-auto mb-4 bg-red-50 rounded-2xl flex items-center justify-center">
                 <FiPlus className="w-7 h-7 text-red-400" />
               </div>
@@ -265,7 +296,7 @@ export const PartnerMenu = () => {
                 <FiPlus className="w-4 h-4" />
                 Agregar primer producto
               </button>
-            </div>
+            </motion.div>
           )}
         </div>
       </div>
@@ -277,6 +308,18 @@ export const PartnerMenu = () => {
         menuItem={editingItem}
         restaurantId={selectedRestaurantId || 0}
         isLoading={createMutation.isPending || updateMutation.isPending}
+      />
+
+      <ConfirmModal
+        isOpen={!!deleteItem}
+        onClose={() => setDeleteItem(null)}
+        onConfirm={confirmDelete}
+        title="Eliminar Producto"
+        message={`¿Estás seguro de que deseas eliminar "${deleteItem?.name}"? Esta acción no se puede deshacer.`}
+        confirmText="Eliminar"
+        cancelText="Cancelar"
+        variant="danger"
+        isLoading={deleteMutation.isPending}
       />
     </>
   );

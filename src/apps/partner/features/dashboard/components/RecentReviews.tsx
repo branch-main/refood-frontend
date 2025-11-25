@@ -49,11 +49,13 @@ export const RecentReviews = () => {
     );
   }
 
-  return RECENT_USER_REVIEWS.map((review) => (
-    <div
-      key={review.id}
-      className="transition-all duration-200 bg-gray-50 rounded-2xl p-4 hover:bg-red-50"
-    >
+  return (
+    <div className="flex flex-col gap-4">
+      {RECENT_USER_REVIEWS.map((review) => (
+        <div
+          key={review.id}
+          className="transition-all duration-200 bg-gray-50 rounded-2xl p-4 hover:bg-red-50"
+        >
       <div className="flex items-start gap-3 mb-3">
         <div className="w-10 h-10 rounded-full bg-red-500 flex items-center justify-center text-white font-bold text-xs">
           {review.userInitials}
@@ -95,5 +97,7 @@ export const RecentReviews = () => {
         {review.comment}
       </p>
     </div>
-  ));
+  ))}
+    </div>
+  );
 };
