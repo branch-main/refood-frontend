@@ -88,4 +88,26 @@ export const orderService = {
     );
     return response.data.map(toOrder);
   },
+
+  getOrdersByRestaurant: async (restaurantId: number): Promise<Order[]> => {
+    const response = await ordersApiClient.get<any[]>(
+      `/orders?restaurant_id=${restaurantId}`,
+    );
+    return response.data.map(toOrder);
+  },
+
+  confirmOrder: async (orderId: string): Promise<Order> => {
+    const response = await ordersApiClient.post<any>(`/orders/${orderId}/confirm`);
+    return toOrder(response.data);
+  },
+
+  startPreparation: async (orderId: string): Promise<Order> => {
+    const response = await ordersApiClient.post<any>(`/orders/${orderId}/start-preparation`);
+    return toOrder(response.data);
+  },
+
+  cancelOrder: async (orderId: string, reason: string): Promise<Order> => {
+    const response = await ordersApiClient.post<any>(`/orders/${orderId}/cancel`, { reason });
+    return toOrder(response.data);
+  },
 };
