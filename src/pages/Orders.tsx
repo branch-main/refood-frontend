@@ -11,6 +11,27 @@ import {
 } from "@/shared/utils";
 import { Link } from "react-router-dom";
 
+const getStatusHint = (status: OrderStatus): string => {
+  switch (status) {
+    case "PENDING":
+      return "Tu pago está siendo procesado";
+    case "CONFIRMED":
+      return "El restaurante ha recibido tu pedido";
+    case "PREPARING":
+      return "El restaurante está preparando tu pedido";
+    case "READY":
+      return "Tu pedido está listo, esperando al repartidor";
+    case "DELIVERING":
+      return "El repartidor está en camino con tu pedido";
+    case "COMPLETED":
+      return "¡Tu pedido ha sido entregado!";
+    case "CANCELLED":
+      return "Este pedido ha sido cancelado";
+    default:
+      return "";
+  }
+};
+
 const Order = ({ order }: { order: OrderType }) => {
   const { data: restaurant } = useRestaurant(order.restaurantId);
   const quantity = order.items.reduce((acc, item) => acc + item.quantity, 0);
@@ -30,14 +51,19 @@ const Order = ({ order }: { order: OrderType }) => {
             </span>
           </div>
 
-          <span
-            className={`flex items-center gap-2 text-xs font-semibold px-3 py-1.5 rounded-full ${getStatusColor(
-              order.status,
-            )}`}
-          >
-            {getStatusIcon(order.status)}
-            {getStatusText(order.status)}
-          </span>
+          <div className="flex flex-col items-end gap-1">
+            <span
+              className={`flex items-center gap-2 text-xs font-semibold px-3 py-1.5 rounded-full ${getStatusColor(
+                order.status,
+              )}`}
+            >
+              {getStatusIcon(order.status)}
+              {getStatusText(order.status)}
+            </span>
+            <span className="text-xs text-gray-500 italic">
+              {getStatusHint(order.status)}
+            </span>
+          </div>
         </div>
       )}
 

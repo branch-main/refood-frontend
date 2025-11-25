@@ -2,12 +2,12 @@ import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { RestaurantFormModal } from "../features/restaurants/components/RestaurantFormModal";
-import { Button } from "@/shared/components/ui";
 import { restaurantService } from "@/shared/services";
 import { Restaurant } from "@/shared/types";
 import { FiEdit2, FiTrash2, FiPlus, FiSettings } from "react-icons/fi";
 import { formatPrice, formatRating } from "@/shared/utils";
 import { BsFillStarFill } from "react-icons/bs";
+import { motion } from "framer-motion";
 
 export const PartnerRestaurants = () => {
   const navigate = useNavigate();
@@ -16,6 +16,7 @@ export const PartnerRestaurants = () => {
   const [editingRestaurant, setEditingRestaurant] = useState<Restaurant | null>(
     null
   );
+  const [hoveredId, setHoveredId] = useState<number | null>(null);
 
   const { data: restaurants, isLoading } = useQuery({
     queryKey: ["my-restaurants"],
@@ -83,10 +84,10 @@ export const PartnerRestaurants = () => {
   if (isLoading) {
     return (
       <>
-        <h1 className="text-2xl font-medium text-black mb-7">
+        <h1 className="text-2xl font-bold text-gray-800 mb-7">
           Mis Restaurantes
         </h1>
-        <div className="bg-white rounded-4xl p-8 shadow-[0_0_20px_rgba(0,0,0,0.02)] card">
+        <div className="bg-white rounded-2xl p-6 shadow-[0px_0px_25px_2px_rgba(0,0,0,0.025)]">
           <p className="text-gray-500">Cargando...</p>
         </div>
       </>
@@ -96,24 +97,25 @@ export const PartnerRestaurants = () => {
   return (
     <>
       <div className="flex justify-between items-center mb-7">
-        <h1 className="text-2xl font-medium text-black">Mis Restaurantes</h1>
-        <Button
-          variant="primary"
+        <h1 className="text-2xl leading-none font-bold text-gray-800">Mis Restaurantes</h1>
+        <button
           onClick={handleCreate}
-          className="flex items-center gap-2"
+          className="inline-flex items-center gap-2 px-5 py-2.5 bg-red-500 text-white rounded-xl font-medium text-sm shadow-sm shadow-red-500/25 hover:bg-red-600 hover:shadow-md hover:shadow-red-500/30 active:scale-[0.98] transition-all"
         >
-          <FiPlus className="w-5 h-5" />
-          Crear Restaurante
-        </Button>
+          <FiPlus className="w-4 h-4" />
+          Nuevo Restaurante
+        </button>
       </div>
 
-      <div className="bg-white rounded-4xl p-8 shadow-[0_0_20px_rgba(0,0,0,0.02)] card">
+      <div className="bg-white rounded-2xl p-6 shadow-[0px_0px_25px_2px_rgba(0,0,0,0.025)]">
         {restaurants && restaurants.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {restaurants.map((restaurant) => (
+            {[...restaurants].sort((a, b) => a.name.localeCompare(b.name)).map((restaurant) => (
               <div
                 key={restaurant.id}
-                className="rounded-xl overflow-hidden border border-gray-200 hover:shadow-lg transition-shadow"
+                className="rounded-xl overflow-hidden border border-gray-200 hover:shadow-lg transition-shadow group"
+                onMouseEnter={() => setHoveredId(restaurant.id)}
+                onMouseLeave={() => setHoveredId(null)}
               >
                 <div className="relative">
                   <img
@@ -125,7 +127,22 @@ export const PartnerRestaurants = () => {
                     }
                     className="w-full aspect-video object-cover"
                   />
-                  <div className="absolute top-3 right-3 flex gap-2">
+                  {/* Overlay on hover */}
+                  <div 
+                    className={`absolute inset-0 bg-black/40 transition-opacity duration-200 ${
+                      hoveredId === restaurant.id ? 'opacity-100' : 'opacity-0'
+                    }`}
+                  />
+                  {/* Action buttons */}
+                  <motion.div 
+                    className="absolute top-3 right-3 flex gap-2"
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ 
+                      opacity: hoveredId === restaurant.id ? 1 : 0,
+                      y: hoveredId === restaurant.id ? 0 : -10
+                    }}
+                    transition={{ duration: 0.2 }}
+                  >
                     <button
                       onClick={() =>
                         navigate(`/partner/restaurants/${restaurant.id}/settings`)
@@ -150,7 +167,7 @@ export const PartnerRestaurants = () => {
                     >
                       <FiTrash2 className="w-4 h-4 text-red-600" />
                     </button>
-                  </div>
+                  </motion.div>
                 </div>
 
                 <div className="p-4 space-y-3">
@@ -200,13 +217,21 @@ export const PartnerRestaurants = () => {
             ))}
           </div>
         ) : (
-          <div className="text-center py-12">
-            <p className="text-gray-500 mb-4">
-              No tienes restaurantes registrados.
+          <div className="text-center py-16">
+            <div className="w-16 h-16 mx-auto mb-4 bg-red-50 rounded-2xl flex items-center justify-center">
+              <FiPlus className="w-7 h-7 text-red-400" />
+            </div>
+            <h3 className="text-lg font-medium text-gray-800 mb-2">Sin restaurantes</h3>
+            <p className="text-gray-500 mb-6 max-w-sm mx-auto">
+              Comienza creando tu primer restaurante para empezar a vender.
             </p>
-            <Button variant="primary" onClick={handleCreate}>
-              Crear tu primer restaurante
-            </Button>
+            <button
+              onClick={handleCreate}
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-red-500 text-white rounded-xl font-medium text-sm shadow-sm shadow-red-500/25 hover:bg-red-600 hover:shadow-md hover:shadow-red-500/30 active:scale-[0.98] transition-all"
+            >
+              <FiPlus className="w-4 h-4" />
+              Crear primer restaurante
+            </button>
           </div>
         )}
       </div>

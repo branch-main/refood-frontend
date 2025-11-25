@@ -4,7 +4,7 @@ import {
   usePaymentByOrder,
   useRestaurant,
 } from "@/shared/hooks";
-import { OrderItem as OrderItemType } from "@/shared/types";
+import { OrderItem as OrderItemType, OrderStatus } from "@/shared/types";
 import {
   getFallbackImage,
   formatPrice,
@@ -18,6 +18,27 @@ import {
 } from "@/shared/utils";
 import { useNavigate, useParams } from "react-router-dom";
 import { SlArrowLeft } from "react-icons/sl";
+
+const getStatusHint = (status: OrderStatus): string => {
+  switch (status) {
+    case "PENDING":
+      return "Tu pago está siendo procesado";
+    case "CONFIRMED":
+      return "El restaurante ha recibido tu pedido";
+    case "PREPARING":
+      return "El restaurante está preparando tu pedido";
+    case "READY":
+      return "Tu pedido está listo, esperando al repartidor";
+    case "DELIVERING":
+      return "El repartidor está en camino con tu pedido";
+    case "COMPLETED":
+      return "¡Tu pedido ha sido entregado!";
+    case "CANCELLED":
+      return "Este pedido ha sido cancelado";
+    default:
+      return "";
+  }
+};
 
 const OrderItem = ({ item }: { item: OrderItemType }) => {
   const { data: menuItem } = useMenuItem(item.menuItemId);
@@ -105,12 +126,17 @@ export const Order = () => {
             </span>
             <span className="text-gray-800 text-sm">{restaurant.address}</span>
           </div>
-          <span
-            className={`flex items-center gap-2 text-xs font-bold px-4 py-1.5 rounded-full ${getStatusColor(order.status)}`}
-          >
-            {getStatusIcon(order.status)}
-            {getStatusText(order.status)}
-          </span>
+          <div className="flex flex-col items-end gap-1">
+            <span
+              className={`flex items-center gap-2 text-xs font-bold px-4 py-1.5 rounded-full ${getStatusColor(order.status)}`}
+            >
+              {getStatusIcon(order.status)}
+              {getStatusText(order.status)}
+            </span>
+            <span className="text-xs text-gray-500 italic">
+              {getStatusHint(order.status)}
+            </span>
+          </div>
         </div>
 
         <div className="flex flex-col border-b border-gray-200 pb-4 px-5">

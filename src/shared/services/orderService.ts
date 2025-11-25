@@ -106,6 +106,11 @@ export const orderService = {
     return toOrder(response.data);
   },
 
+  markReady: async (orderId: string): Promise<Order> => {
+    const response = await ordersApiClient.post<any>(`/orders/${orderId}/mark-ready`);
+    return toOrder(response.data);
+  },
+
   cancelOrder: async (orderId: string, reason: string): Promise<Order> => {
     const response = await ordersApiClient.post<any>(`/orders/${orderId}/cancel`, { reason });
     return toOrder(response.data);

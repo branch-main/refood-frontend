@@ -1,16 +1,19 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useParams, useNavigate } from "react-router-dom";
-import { Button } from "@/shared/components/ui";
+import { Modal } from "@/shared/components/ui/Modal";
 import { menuService } from "@/shared/services";
 import { MenuItemOption, MenuItemChoice } from "@/shared/types";
-import { FiEdit2, FiTrash2, FiPlus, FiChevronDown, FiChevronUp } from "react-icons/fi";
+import { FiEdit2, FiTrash2, FiPlus, FiChevronDown, FiChevronUp, FiArrowLeft } from "react-icons/fi";
+import { HiChevronRight } from "react-icons/hi2";
 import { formatPrice } from "@/shared/utils";
+import { useRestaurantContext } from "../contexts";
 
 export const MenuItemOptions = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { selectedRestaurant } = useRestaurantContext();
   const [expandedOptions, setExpandedOptions] = useState<Set<number>>(new Set());
   const [isOptionFormOpen, setIsOptionFormOpen] = useState(false);
   const [isChoiceFormOpen, setIsChoiceFormOpen] = useState(false);
@@ -204,352 +207,374 @@ export const MenuItemOptions = () => {
 
   if (isLoading) {
     return (
-      <div className="bg-white rounded-4xl p-8 shadow-[0_0_20px_rgba(0,0,0,0.02)]">
+      <div className="bg-white rounded-2xl p-8 shadow-[0px_0px_25px_2px_rgba(0,0,0,0.025)]">
         <p className="text-gray-500">Cargando...</p>
       </div>
     );
   }
 
   return (
-    <div>
+    <>
       <div className="flex justify-between items-center mb-7">
-        <div>
-          <h1 className="text-2xl font-medium text-black">
-            Opciones de Personalización
-          </h1>
-          {menuItem && (
-            <p className="text-gray-500 mt-1">{menuItem.name}</p>
-          )}
-        </div>
-        <div className="flex gap-3">
-          <Button variant="outline" onClick={() => navigate("/partner/menu")}>
-            Volver
-          </Button>
-          <Button
-            variant="primary"
-            onClick={handleCreateOption}
-            className="flex items-center gap-2"
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => navigate("/partner/menu")}
+            className="p-2 -ml-2 hover:bg-gray-100 rounded-lg transition-colors"
           >
-            <FiPlus className="w-5 h-5" />
-            Agregar Opción
-          </Button>
+            <FiArrowLeft className="w-5 h-5 text-gray-500" />
+          </button>
+          <span className="text-2xl leading-none text-gray-500">{menuItem?.name || "Producto"}</span>
+          <HiChevronRight className="w-5 h-5 text-gray-400" />
+          <h1 className="text-2xl leading-none font-bold text-gray-800">Opciones</h1>
         </div>
+        <button
+          onClick={handleCreateOption}
+          className="inline-flex items-center gap-2 px-5 py-2.5 bg-red-500 text-white rounded-xl font-medium text-sm shadow-sm shadow-red-500/25 hover:bg-red-600 hover:shadow-md hover:shadow-red-500/30 active:scale-[0.98] transition-all"
+        >
+          <FiPlus className="w-4 h-4" />
+          Nueva Opción
+        </button>
       </div>
 
-      <div className="bg-white rounded-4xl p-8 shadow-[0_0_20px_rgba(0,0,0,0.02)]">
+      <div className="bg-white rounded-2xl shadow-[0px_0px_25px_2px_rgba(0,0,0,0.025)]">
         {options && options.length > 0 ? (
-          <div className="space-y-4">
+          <div className="divide-y divide-gray-100">
             {options.map((option) => (
-              <div
-                key={option.id}
-                className="border border-gray-200 rounded-xl overflow-hidden"
-              >
-                <div className="bg-gray-50 px-6 py-4 flex items-center justify-between">
+              <div key={option.id}>
+                {/* Option Header */}
+                <div className="px-6 py-4 flex items-center justify-between">
                   <div className="flex items-center gap-4 flex-1">
                     <button
                       onClick={() => toggleOption(option.id)}
-                      className="text-gray-600 hover:text-gray-800"
+                      className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
                     >
                       {expandedOptions.has(option.id) ? (
-                        <FiChevronUp className="w-5 h-5" />
+                        <FiChevronUp className="w-5 h-5 text-gray-500" />
                       ) : (
-                        <FiChevronDown className="w-5 h-5" />
+                        <FiChevronDown className="w-5 h-5 text-gray-500" />
                       )}
                     </button>
                     <div className="flex-1">
-                      <h3 className="font-semibold text-gray-900">
-                        {option.name}
-                      </h3>
-                      <p className="text-sm text-gray-500">
-                        {option.isRequired ? "Obligatorio" : "Opcional"} •{" "}
-                        {option.minChoices}-{option.maxChoices} opciones
+                      <div className="flex items-center gap-3">
+                        <h3 className="font-medium text-gray-900">{option.name}</h3>
+                        <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                          option.isRequired 
+                            ? "bg-red-50 text-red-600" 
+                            : "bg-gray-100 text-gray-600"
+                        }`}>
+                          {option.isRequired ? "Obligatorio" : "Opcional"}
+                        </span>
+                      </div>
+                      <p className="text-sm text-gray-500 mt-0.5">
+                        {option.choices.length} {option.choices.length === 1 ? "opción" : "opciones"} • 
+                        Seleccionar {option.minChoices === option.maxChoices 
+                          ? option.minChoices 
+                          : `${option.minChoices}-${option.maxChoices}`}
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm text-gray-500">
-                      {option.choices.length} opciones
-                    </span>
+                  <div className="flex items-center gap-1">
                     <button
                       onClick={() => handleEditOption(option)}
-                      className="p-2 hover:bg-gray-200 rounded-lg transition-colors"
+                      className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
                       title="Editar"
                     >
-                      <FiEdit2 className="w-4 h-4 text-gray-700" />
+                      <FiEdit2 className="w-4 h-4 text-gray-500" />
                     </button>
                     <button
                       onClick={() => handleDeleteOption(option)}
-                      className="p-2 hover:bg-red-100 rounded-lg transition-colors"
+                      className="p-2 hover:bg-red-50 rounded-lg transition-colors"
                       title="Eliminar"
                       disabled={deleteOptionMutation.isPending}
                     >
-                      <FiTrash2 className="w-4 h-4 text-red-600" />
+                      <FiTrash2 className="w-4 h-4 text-red-500" />
                     </button>
                   </div>
                 </div>
 
+                {/* Choices */}
                 {expandedOptions.has(option.id) && (
-                  <div className="p-6 space-y-3">
-                    {option.choices.map((choice) => (
-                      <div
-                        key={choice.id}
-                        className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
-                      >
-                        <div className="flex-1">
-                          <div className="flex items-center gap-3">
-                            <span className="font-medium text-gray-900">
-                              {choice.name}
-                            </span>
-                            <span className="text-sm text-gray-600">
-                              +{formatPrice(choice.price)}
-                            </span>
-                            <span
-                              className={`px-2 py-1 rounded-full text-xs ${
+                  <div className="px-6 pb-5">
+                    <div className="space-y-3">
+                      {option.choices.length > 0 ? (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                          {option.choices.map((choice) => (
+                            <div
+                              key={choice.id}
+                              className={`relative group p-4 rounded-xl border-2 transition-all ${
                                 choice.isAvailable
-                                  ? "bg-green-100 text-green-700"
-                                  : "bg-gray-200 text-gray-700"
+                                  ? "bg-white border-gray-100 hover:border-gray-200"
+                                  : "bg-gray-50 border-gray-100 opacity-60"
                               }`}
                             >
-                              {choice.isAvailable
-                                ? "Disponible"
-                                : "No disponible"}
-                            </span>
-                          </div>
+                              <div className="flex items-start justify-between">
+                                <div className="flex-1 min-w-0">
+                                  <h4 className="font-medium text-gray-800 truncate">{choice.name}</h4>
+                                  <p className="text-sm text-gray-500 mt-1">
+                                    {choice.price > 0 ? `+${formatPrice(choice.price)}` : "Sin costo adicional"}
+                                  </p>
+                                </div>
+                                <div className={`w-2.5 h-2.5 rounded-full flex-shrink-0 mt-1.5 ${
+                                  choice.isAvailable ? "bg-green-400" : "bg-gray-300"
+                                }`} />
+                              </div>
+                              
+                              {/* Hover actions */}
+                              <div className="absolute top-2 right-8 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <button
+                                  onClick={() => handleEditChoice(choice, option.id)}
+                                  className="p-1.5 bg-white hover:bg-gray-100 rounded-lg transition-colors shadow-sm"
+                                  title="Editar"
+                                >
+                                  <FiEdit2 className="w-3.5 h-3.5 text-gray-500" />
+                                </button>
+                                <button
+                                  onClick={() => handleDeleteChoice(choice)}
+                                  className="p-1.5 bg-white hover:bg-red-50 rounded-lg transition-colors shadow-sm"
+                                  title="Eliminar"
+                                  disabled={deleteChoiceMutation.isPending}
+                                >
+                                  <FiTrash2 className="w-3.5 h-3.5 text-red-500" />
+                                </button>
+                              </div>
+                            </div>
+                          ))}
                         </div>
-                        <div className="flex items-center gap-2">
-                          <button
-                            onClick={() => handleEditChoice(choice, option.id)}
-                            className="p-2 hover:bg-gray-200 rounded-lg transition-colors"
-                            title="Editar"
-                          >
-                            <FiEdit2 className="w-4 h-4 text-gray-700" />
-                          </button>
-                          <button
-                            onClick={() => handleDeleteChoice(choice)}
-                            className="p-2 hover:bg-red-100 rounded-lg transition-colors"
-                            title="Eliminar"
-                            disabled={deleteChoiceMutation.isPending}
-                          >
-                            <FiTrash2 className="w-4 h-4 text-red-600" />
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-
-                    <Button
-                      variant="outline"
-                      onClick={() => handleCreateChoice(option.id)}
-                      className="w-full flex items-center justify-center gap-2"
-                      size="sm"
-                    >
-                      <FiPlus className="w-4 h-4" />
-                      Agregar Opción
-                    </Button>
+                      ) : (
+                        <p className="text-sm text-gray-400 text-center py-4">
+                          No hay opciones agregadas
+                        </p>
+                      )}
+                      
+                      <button
+                        onClick={() => handleCreateChoice(option.id)}
+                        className="w-full flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-gray-200 rounded-xl text-sm font-medium text-gray-500 hover:border-red-300 hover:text-red-500 hover:bg-red-50/50 transition-all"
+                      >
+                        <FiPlus className="w-4 h-4" />
+                        Agregar opción
+                      </button>
+                    </div>
                   </div>
                 )}
               </div>
             ))}
           </div>
         ) : (
-          <div className="text-center py-12">
-            <p className="text-gray-500 mb-4">
-              No hay opciones de personalización para este producto.
+          <div className="text-center py-16">
+            <div className="w-16 h-16 mx-auto mb-4 bg-red-50 rounded-2xl flex items-center justify-center">
+              <FiPlus className="w-7 h-7 text-red-400" />
+            </div>
+            <h3 className="text-lg font-medium text-gray-800 mb-2">Sin opciones</h3>
+            <p className="text-gray-500 mb-6 max-w-sm mx-auto">
+              Agrega opciones de personalización para que tus clientes puedan elegir extras o variantes.
             </p>
-            <Button variant="primary" onClick={handleCreateOption}>
+            <button
+              onClick={handleCreateOption}
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-red-500 text-white rounded-xl font-medium text-sm shadow-sm shadow-red-500/25 hover:bg-red-600 hover:shadow-md hover:shadow-red-500/30 active:scale-[0.98] transition-all"
+            >
+              <FiPlus className="w-4 h-4" />
               Crear primera opción
-            </Button>
+            </button>
           </div>
         )}
       </div>
 
       {/* Option Form Modal */}
-      {isOptionFormOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl p-6 w-full max-w-md">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">
-              {editingOption ? "Editar Opción" : "Agregar Opción"}
+      <Modal isOpen={isOptionFormOpen} onClose={() => {
+        setIsOptionFormOpen(false);
+        setEditingOption(null);
+      }}>
+        <div className="w-[400px] max-w-[90vw]">
+          <div className="px-6 py-4 border-b border-gray-100">
+            <h2 className="text-lg font-bold text-gray-900">
+              {editingOption ? "Editar Opción" : "Nueva Opción"}
             </h2>
-            <form onSubmit={handleSubmitOption} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Nombre *
-                </label>
-                <input
-                  type="text"
-                  value={optionForm.name}
-                  onChange={(e) =>
-                    setOptionForm({ ...optionForm, name: e.target.value })
-                  }
-                  className="w-full px-4 py-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-red-500"
-                  placeholder="Ej: Tamaño, Ingredientes extras"
-                  required
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Mínimo *
-                  </label>
-                  <input
-                    type="number"
-                    value={optionForm.minChoices}
-                    onChange={(e) =>
-                      setOptionForm({
-                        ...optionForm,
-                        minChoices: parseInt(e.target.value) || 0,
-                      })
-                    }
-                    className="w-full px-4 py-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-red-500"
-                    min="0"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Máximo *
-                  </label>
-                  <input
-                    type="number"
-                    value={optionForm.maxChoices}
-                    onChange={(e) =>
-                      setOptionForm({
-                        ...optionForm,
-                        maxChoices: parseInt(e.target.value) || 1,
-                      })
-                    }
-                    className="w-full px-4 py-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-red-500"
-                    min="1"
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="flex items-center gap-3">
-                <input
-                  type="checkbox"
-                  id="isRequired"
-                  checked={optionForm.isRequired}
-                  onChange={(e) =>
-                    setOptionForm({
-                      ...optionForm,
-                      isRequired: e.target.checked,
-                    })
-                  }
-                  className="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500"
-                />
-                <label htmlFor="isRequired" className="text-sm font-medium text-gray-700">
-                  Obligatorio
-                </label>
-              </div>
-
-              <div className="flex gap-3 pt-4">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => {
-                    setIsOptionFormOpen(false);
-                    setEditingOption(null);
-                  }}
-                  fullWidth
-                >
-                  Cancelar
-                </Button>
-                <Button type="submit" variant="primary" fullWidth>
-                  {editingOption ? "Actualizar" : "Crear"}
-                </Button>
-              </div>
-            </form>
           </div>
-        </div>
-      )}
+          <form onSubmit={handleSubmitOption} className="p-6 space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Nombre
+              </label>
+              <input
+                type="text"
+                value={optionForm.name}
+                onChange={(e) =>
+                  setOptionForm({ ...optionForm, name: e.target.value })
+                }
+                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent text-sm"
+                placeholder="Ej: Tamaño, Ingredientes extras"
+                required
+              />
+            </div>
 
-      {/* Choice Form Modal */}
-      {isChoiceFormOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl p-6 w-full max-w-md">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">
-              {editingChoice ? "Editar Opción" : "Agregar Opción"}
-            </h2>
-            <form onSubmit={handleSubmitChoice} className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Nombre *
-                </label>
-                <input
-                  type="text"
-                  value={choiceForm.name}
-                  onChange={(e) =>
-                    setChoiceForm({ ...choiceForm, name: e.target.value })
-                  }
-                  className="w-full px-4 py-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-red-500"
-                  placeholder="Ej: Grande, Queso extra"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Precio Adicional (S/) *
+                  Mínimo
                 </label>
                 <input
                   type="number"
-                  value={choiceForm.price}
+                  value={optionForm.minChoices}
                   onChange={(e) =>
-                    setChoiceForm({
-                      ...choiceForm,
-                      price: parseFloat(e.target.value) || 0,
+                    setOptionForm({
+                      ...optionForm,
+                      minChoices: parseInt(e.target.value) || 0,
                     })
                   }
-                  className="w-full px-4 py-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-red-500"
-                  step="0.01"
+                  className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent text-sm"
                   min="0"
                   required
                 />
               </div>
-
-              <div className="flex items-center gap-3">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Máximo
+                </label>
                 <input
-                  type="checkbox"
-                  id="choiceAvailable"
-                  checked={choiceForm.isAvailable}
+                  type="number"
+                  value={optionForm.maxChoices}
                   onChange={(e) =>
-                    setChoiceForm({
-                      ...choiceForm,
-                      isAvailable: e.target.checked,
+                    setOptionForm({
+                      ...optionForm,
+                      maxChoices: parseInt(e.target.value) || 1,
                     })
                   }
-                  className="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500"
+                  className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent text-sm"
+                  min="1"
+                  required
                 />
-                <label
-                  htmlFor="choiceAvailable"
-                  className="text-sm font-medium text-gray-700"
-                >
-                  Disponible
-                </label>
               </div>
+            </div>
 
-              <div className="flex gap-3 pt-4">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => {
-                    setIsChoiceFormOpen(false);
-                    setEditingChoice(null);
-                    setSelectedOptionId(null);
-                  }}
-                  fullWidth
-                >
-                  Cancelar
-                </Button>
-                <Button type="submit" variant="primary" fullWidth>
-                  {editingChoice ? "Actualizar" : "Crear"}
-                </Button>
-              </div>
-            </form>
-          </div>
+            <div className="flex items-center gap-3 py-2">
+              <input
+                type="checkbox"
+                id="isRequired"
+                checked={optionForm.isRequired}
+                onChange={(e) =>
+                  setOptionForm({
+                    ...optionForm,
+                    isRequired: e.target.checked,
+                  })
+                }
+                className="w-4 h-4 text-red-500 border-gray-300 rounded focus:ring-red-500"
+              />
+              <label htmlFor="isRequired" className="text-sm text-gray-700">
+                Obligatorio para el cliente
+              </label>
+            </div>
+
+            <div className="flex gap-3 pt-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsOptionFormOpen(false);
+                  setEditingOption(null);
+                }}
+                className="flex-1 px-4 py-2.5 border border-gray-200 text-gray-700 rounded-xl font-medium text-sm hover:bg-gray-50 transition-colors"
+              >
+                Cancelar
+              </button>
+              <button
+                type="submit"
+                className="flex-1 px-4 py-2.5 bg-red-500 text-white rounded-xl font-medium text-sm hover:bg-red-600 transition-colors"
+              >
+                {editingOption ? "Guardar" : "Crear"}
+              </button>
+            </div>
+          </form>
         </div>
-      )}
-    </div>
+      </Modal>
+
+      {/* Choice Form Modal */}
+      <Modal isOpen={isChoiceFormOpen} onClose={() => {
+        setIsChoiceFormOpen(false);
+        setEditingChoice(null);
+        setSelectedOptionId(null);
+      }}>
+        <div className="w-[400px] max-w-[90vw]">
+          <div className="px-6 py-4 border-b border-gray-100">
+            <h2 className="text-lg font-bold text-gray-900">
+              {editingChoice ? "Editar Opción" : "Nueva Opción"}
+            </h2>
+          </div>
+          <form onSubmit={handleSubmitChoice} className="p-6 space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Nombre
+              </label>
+              <input
+                type="text"
+                value={choiceForm.name}
+                onChange={(e) =>
+                  setChoiceForm({ ...choiceForm, name: e.target.value })
+                }
+                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent text-sm"
+                placeholder="Ej: Grande, Queso extra"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Precio Adicional (S/)
+              </label>
+              <input
+                type="number"
+                value={choiceForm.price}
+                onChange={(e) =>
+                  setChoiceForm({
+                    ...choiceForm,
+                    price: parseFloat(e.target.value) || 0,
+                  })
+                }
+                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent text-sm"
+                step="0.01"
+                min="0"
+                required
+              />
+            </div>
+
+            <div className="flex items-center gap-3 py-2">
+              <input
+                type="checkbox"
+                id="choiceAvailable"
+                checked={choiceForm.isAvailable}
+                onChange={(e) =>
+                  setChoiceForm({
+                    ...choiceForm,
+                    isAvailable: e.target.checked,
+                  })
+                }
+                className="w-4 h-4 text-red-500 border-gray-300 rounded focus:ring-red-500"
+              />
+              <label htmlFor="choiceAvailable" className="text-sm text-gray-700">
+                Disponible
+              </label>
+            </div>
+
+            <div className="flex gap-3 pt-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsChoiceFormOpen(false);
+                  setEditingChoice(null);
+                  setSelectedOptionId(null);
+                }}
+                className="flex-1 px-4 py-2.5 border border-gray-200 text-gray-700 rounded-xl font-medium text-sm hover:bg-gray-50 transition-colors"
+              >
+                Cancelar
+              </button>
+              <button
+                type="submit"
+                className="flex-1 px-4 py-2.5 bg-red-500 text-white rounded-xl font-medium text-sm hover:bg-red-600 transition-colors"
+              >
+                {editingChoice ? "Guardar" : "Crear"}
+              </button>
+            </div>
+          </form>
+        </div>
+      </Modal>
+    </>
   );
 };

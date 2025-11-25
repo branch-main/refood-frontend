@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { orderService, restaurantService, menuService } from "@/shared/services";
+import { orderService, menuService } from "@/shared/services";
 import { Order, OrderStatus, MenuItem } from "@/shared/types";
 import { Modal } from "@/shared/components/ui/Modal";
 import {
@@ -21,17 +21,22 @@ import {
   FiMapPin,
   FiPackage,
   FiEye,
+  FiCheck,
 } from "react-icons/fi";
+import { HiChevronRight } from "react-icons/hi2";
 import { GiCookingPot } from "react-icons/gi";
+import { MdOutlineDoneAll } from "react-icons/md";
 import { IoClose } from "react-icons/io5";
+import { useRestaurantContext } from "../contexts";
 
-type TabStatus = "NEW" | "PREPARING" | "WAITING" | "HISTORY";
+type TabStatus = "NEW" | "PREPARING" | "READY" | "HISTORY";
 
 const statusToTab: Record<OrderStatus, TabStatus> = {
   [OrderStatus.PENDING]: "NEW",
   [OrderStatus.CONFIRMED]: "NEW",
   [OrderStatus.PREPARING]: "PREPARING",
-  [OrderStatus.DELIVERING]: "WAITING",
+  [OrderStatus.READY]: "READY",
+  [OrderStatus.DELIVERING]: "HISTORY",
   [OrderStatus.COMPLETED]: "HISTORY",
   [OrderStatus.CANCELLED]: "HISTORY",
 };
@@ -42,6 +47,7 @@ const OrderDetailModal = ({
   isOpen,
   onClose,
   onStartPreparation,
+  onMarkReady,
   onCancel,
   isLoading,
 }: {
@@ -49,6 +55,7 @@ const OrderDetailModal = ({
   isOpen: boolean;
   onClose: () => void;
   onStartPreparation: (orderId: string) => void;
+  onMarkReady: (orderId: string) => void;
   onCancel: (orderId: string) => void;
   isLoading: boolean;
 }) => {
@@ -78,7 +85,8 @@ const OrderDetailModal = ({
   const canCancel =
     order.status !== OrderStatus.COMPLETED &&
     order.status !== OrderStatus.CANCELLED &&
-    order.status !== OrderStatus.DELIVERING;
+    order.status !== OrderStatus.DELIVERING &&
+    order.status !== OrderStatus.READY;
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
@@ -238,16 +246,30 @@ const OrderDetailModal = ({
             )}
 
             {order.status === OrderStatus.PREPARING && (
-              <div className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-purple-100 text-purple-700 rounded-xl font-medium text-sm">
-                <GiCookingPot className="w-4 h-4 animate-pulse" />
-                Preparando pedido...
+              <button
+                onClick={() => {
+                  onMarkReady(order.id);
+                  onClose();
+                }}
+                disabled={isLoading}
+                className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-emerald-500 text-white rounded-xl font-medium text-sm hover:bg-emerald-600 transition-colors disabled:opacity-50"
+              >
+                <MdOutlineDoneAll className="w-4 h-4" />
+                Marcar como listo
+              </button>
+            )}
+
+            {order.status === OrderStatus.READY && (
+              <div className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-emerald-100 text-emerald-700 rounded-xl font-medium text-sm">
+                <FiClock className="w-4 h-4" />
+                Esperando repartidor
               </div>
             )}
 
             {order.status === OrderStatus.DELIVERING && (
               <div className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-orange-100 text-orange-700 rounded-xl font-medium text-sm">
                 <FiClock className="w-4 h-4" />
-                Esperando repartidor
+                En camino
               </div>
             )}
 
@@ -272,19 +294,22 @@ const OrderCard = ({
   order,
   onViewDetails,
   onStartPreparation,
+  onMarkReady,
   onCancel,
   isLoading,
 }: {
   order: Order;
   onViewDetails: (order: Order) => void;
   onStartPreparation: (orderId: string) => void;
+  onMarkReady: (orderId: string) => void;
   onCancel: (orderId: string) => void;
   isLoading: boolean;
 }) => {
   const canCancel =
     order.status !== OrderStatus.COMPLETED &&
     order.status !== OrderStatus.CANCELLED &&
-    order.status !== OrderStatus.DELIVERING;
+    order.status !== OrderStatus.DELIVERING &&
+    order.status !== OrderStatus.READY;
 
   return (
     <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
@@ -366,9 +391,20 @@ const OrderCard = ({
             )}
 
             {order.status === OrderStatus.PREPARING && (
-              <div className="flex items-center gap-1.5 px-3 py-2 bg-purple-100 text-purple-700 rounded-lg text-sm font-medium">
-                <GiCookingPot className="w-4 h-4 animate-pulse" />
-                Preparando
+              <button
+                onClick={() => onMarkReady(order.id)}
+                disabled={isLoading}
+                className="flex items-center gap-1.5 px-3 py-2 bg-emerald-500 text-white rounded-lg text-sm font-medium hover:bg-emerald-600 transition-colors disabled:opacity-50"
+              >
+                <MdOutlineDoneAll className="w-4 h-4" />
+                Listo
+              </button>
+            )}
+
+            {order.status === OrderStatus.READY && (
+              <div className="flex items-center gap-1.5 px-3 py-2 bg-emerald-100 text-emerald-700 rounded-lg text-sm font-medium">
+                <FiClock className="w-4 h-4" />
+                Esperando
               </div>
             )}
 
@@ -395,7 +431,7 @@ const EmptyState = ({ tab }: { tab: TabStatus }) => {
       title: "No hay pedidos en preparación",
       subtitle: "Los pedidos que estés preparando aparecerán aquí",
     },
-    WAITING: {
+    READY: {
       title: "No hay pedidos listos",
       subtitle: "Los pedidos esperando repartidor aparecerán aquí",
     },
@@ -420,42 +456,27 @@ const EmptyState = ({ tab }: { tab: TabStatus }) => {
 
 export const PartnerOrders = () => {
   const queryClient = useQueryClient();
-  const [selectedRestaurant, setSelectedRestaurant] = useState<number | null>(
-    null
-  );
+  const { selectedRestaurant, selectedRestaurantId } = useRestaurantContext();
   const [activeTab, setActiveTab] = useState<TabStatus>("NEW");
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
 
-  // Get owner's restaurants
-  const { data: restaurants } = useQuery({
-    queryKey: ["my-restaurants"],
-    queryFn: () => restaurantService.getMyRestaurants(),
-  });
-
   // Get orders for selected restaurant
   const { data: orders, isLoading: ordersLoading } = useQuery({
-    queryKey: ["restaurant-orders", selectedRestaurant],
+    queryKey: ["restaurant-orders", selectedRestaurantId],
     queryFn: () =>
-      selectedRestaurant
-        ? orderService.getOrdersByRestaurant(selectedRestaurant)
+      selectedRestaurantId
+        ? orderService.getOrdersByRestaurant(selectedRestaurantId)
         : Promise.resolve([]),
-    enabled: !!selectedRestaurant,
+    enabled: !!selectedRestaurantId,
     refetchInterval: 30000, // Refetch every 30 seconds
   });
-
-  // Auto-select first restaurant
-  useEffect(() => {
-    if (restaurants && restaurants.length > 0 && !selectedRestaurant) {
-      setSelectedRestaurant(restaurants[0].id);
-    }
-  }, [restaurants, selectedRestaurant]);
 
   // Mutations
   const confirmMutation = useMutation({
     mutationFn: orderService.confirmOrder,
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["restaurant-orders", selectedRestaurant],
+        queryKey: ["restaurant-orders", selectedRestaurantId],
       });
     },
   });
@@ -464,7 +485,16 @@ export const PartnerOrders = () => {
     mutationFn: orderService.startPreparation,
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["restaurant-orders", selectedRestaurant],
+        queryKey: ["restaurant-orders", selectedRestaurantId],
+      });
+    },
+  });
+
+  const markReadyMutation = useMutation({
+    mutationFn: orderService.markReady,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["restaurant-orders", selectedRestaurantId],
       });
     },
   });
@@ -474,13 +504,17 @@ export const PartnerOrders = () => {
       orderService.cancelOrder(orderId, reason),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["restaurant-orders", selectedRestaurant],
+        queryKey: ["restaurant-orders", selectedRestaurantId],
       });
     },
   });
 
   const handleStartPreparation = (orderId: string) => {
     startPreparationMutation.mutate(orderId);
+  };
+
+  const handleMarkReady = (orderId: string) => {
+    markReadyMutation.mutate(orderId);
   };
 
   const handleCancel = (orderId: string) => {
@@ -510,58 +544,50 @@ export const PartnerOrders = () => {
       ).length || 0,
     PREPARING:
       orders?.filter((o) => o.status === OrderStatus.PREPARING).length || 0,
-    WAITING:
-      orders?.filter((o) => o.status === OrderStatus.DELIVERING).length || 0,
+    READY:
+      orders?.filter((o) => o.status === OrderStatus.READY).length || 0,
     HISTORY:
       orders?.filter(
         (o) =>
           o.status === OrderStatus.COMPLETED ||
-          o.status === OrderStatus.CANCELLED
+          o.status === OrderStatus.CANCELLED ||
+          o.status === OrderStatus.DELIVERING
       ).length || 0,
   };
 
   const tabs: { key: TabStatus; label: string; color: string }[] = [
     { key: "NEW", label: "Nuevos", color: "blue" },
     { key: "PREPARING", label: "En Preparación", color: "purple" },
-    { key: "WAITING", label: "Esperando", color: "orange" },
+    { key: "READY", label: "Listos", color: "orange" },
     { key: "HISTORY", label: "Historial", color: "gray" },
   ];
 
   const isLoading =
     confirmMutation.isPending ||
     startPreparationMutation.isPending ||
+    markReadyMutation.isPending ||
     cancelMutation.isPending;
+
+  if (!selectedRestaurant) {
+    return (
+      <div className="bg-white rounded-2xl p-8 shadow-[0px_0px_25px_2px_rgba(0,0,0,0.025)] text-center">
+        <p className="text-gray-500">Selecciona un restaurante en el menú lateral para ver los pedidos.</p>
+      </div>
+    );
+  }
 
   return (
     <>
       <div className="flex justify-between items-center mb-7">
-        <h1 className="text-2xl font-medium text-black">Pedidos</h1>
-      </div>
-
-      {/* Restaurant Selector */}
-      <div className="mb-6">
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Seleccionar Restaurante
-        </label>
-        <select
-          value={selectedRestaurant || ""}
-          onChange={(e) => setSelectedRestaurant(Number(e.target.value))}
-          className="w-full md:w-64 px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
-        >
-          {restaurants && restaurants.length > 0 ? (
-            restaurants.map((restaurant) => (
-              <option key={restaurant.id} value={restaurant.id}>
-                {restaurant.name}
-              </option>
-            ))
-          ) : (
-            <option value="">Sin restaurantes</option>
-          )}
-        </select>
+        <div className="flex items-center gap-2">
+          <span className="text-2xl leading-none text-gray-500">{selectedRestaurant.name}</span>
+          <HiChevronRight className="w-5 h-5 text-gray-400" />
+          <h1 className="text-2xl leading-none font-bold text-gray-800">Pedidos</h1>
+        </div>
       </div>
 
       {/* Tabs */}
-      <div className="bg-white rounded-t-4xl shadow-[0_0_20px_rgba(0,0,0,0.02)] border-b border-gray-200">
+      <div className="bg-white rounded-t-2xl shadow-[0px_0px_25px_2px_rgba(0,0,0,0.025)] border-b border-gray-100">
         <div className="flex">
           {tabs.map((tab) => (
             <button
@@ -596,7 +622,7 @@ export const PartnerOrders = () => {
       </div>
 
       {/* Orders List */}
-      <div className="bg-white rounded-b-4xl shadow-[0_0_20px_rgba(0,0,0,0.02)] p-6">
+      <div className="bg-white rounded-b-2xl shadow-[0px_0px_25px_2px_rgba(0,0,0,0.025)] p-6">
         {ordersLoading ? (
           <div className="text-center py-16">
             <div className="w-8 h-8 mx-auto mb-4 border-2 border-red-500 border-t-transparent rounded-full animate-spin" />
@@ -610,6 +636,7 @@ export const PartnerOrders = () => {
                 order={order}
                 onViewDetails={handleViewDetails}
                 onStartPreparation={handleStartPreparation}
+                onMarkReady={handleMarkReady}
                 onCancel={handleCancel}
                 isLoading={isLoading}
               />

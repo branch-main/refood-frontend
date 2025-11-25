@@ -5,5 +5,6 @@ export * from "./Input";
 export * from "./Loading";
 export * from "./Modal";
 export * from "./Radio";
+export * from "./Select";
 export * from "./Skeleton";
 export * from "./Textarea";
