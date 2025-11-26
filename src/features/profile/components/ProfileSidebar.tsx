@@ -1,4 +1,5 @@
 import { useAuth } from "@/shared/hooks";
+import { useUnreadNotificationCount } from "@/shared/hooks/useNotifications";
 import { getFallbackImage } from "@/shared/utils";
 import { GoHeart, GoClock } from "react-icons/go";
 import { IoSettingsOutline, IoNotificationsOutline } from "react-icons/io5";
@@ -14,6 +15,7 @@ const profileLinks = [
     to: "/profile/notifications",
     icon: IoNotificationsOutline,
     label: "Centro de notificaciones",
+    showBadge: true,
   },
   {
     to: "/profile/favorites",
@@ -30,6 +32,7 @@ const profileLinks = [
 export const ProfileSidebar = () => {
   const { pathname } = useLocation();
   const { user } = useAuth();
+  const { data: unreadCount = 0 } = useUnreadNotificationCount();
 
   if (!user) return null;
 
@@ -49,7 +52,7 @@ export const ProfileSidebar = () => {
         </div>
       </div>
 
-      {profileLinks.map(({ to, icon: Icon, label }) => {
+      {profileLinks.map(({ to, icon: Icon, label, showBadge }) => {
         const isActive = pathname.startsWith(to);
 
         return (
@@ -60,7 +63,14 @@ export const ProfileSidebar = () => {
               ${isActive ? "text-red-500" : "text-gray-500 hover:text-red-500"}
             `}
           >
-            <Icon size={16} className="text-red-500 shrink-0" />
+            <div className="relative">
+              <Icon size={16} className="text-red-500 shrink-0" />
+              {showBadge && unreadCount > 0 && (
+                <span className="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[10px] font-bold rounded-full min-w-[16px] h-4 flex items-center justify-center px-1">
+                  {unreadCount > 99 ? "99+" : unreadCount}
+                </span>
+              )}
+            </div>
             <span className="text-sm">{label}</span>
           </Link>
         );

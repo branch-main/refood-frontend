@@ -5,6 +5,7 @@ export * from "./useFavorites";
 export * from "./useMenu";
 export * from "./useMenuByRestaurant";
 export * from "./useMenuItem";
+export * from "./useNotifications";
 export * from "./useOrder";
 export * from "./useOrdersByCustomer";
 export * from "./usePayment";
