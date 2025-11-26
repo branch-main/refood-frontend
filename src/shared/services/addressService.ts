@@ -14,9 +14,9 @@ const toAddress = (data: any): UserAddress => ({
 
 export const addressService = {
   getAddresses: async (): Promise<UserAddress[]> => {
-    return apiClient
-      .get<any[]>("/users/addresses/")
-      .then((addresses) => addresses.map(toAddress));
+    const response = await apiClient.get<any>("/users/addresses/");
+    const addresses = Array.isArray(response) ? response : response?.results ?? [];
+    return addresses.map(toAddress);
   },
 
   getAddress: async (id: number): Promise<UserAddress> => {
