@@ -183,15 +183,15 @@ export const PartnerRestaurants = () => {
   return (
     <>
       <motion.div 
-        className="flex justify-between items-center mb-7"
+        className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-7"
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
       >
-        <h1 className="text-2xl leading-none font-bold text-gray-800">Mis Restaurantes</h1>
+        <h1 className="text-xl sm:text-2xl leading-none font-bold text-gray-800">Mis Restaurantes</h1>
         <button
           onClick={handleCreate}
-          className="inline-flex items-center gap-2 px-5 py-2.5 bg-red-500 text-white rounded-xl font-medium text-sm shadow-sm shadow-red-500/25 hover:bg-red-600 hover:shadow-md hover:shadow-red-500/30 active:scale-[0.98] transition-all"
+          className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-red-500 text-white rounded-xl font-medium text-sm shadow-sm shadow-red-500/25 hover:bg-red-600 hover:shadow-md hover:shadow-red-500/30 active:scale-[0.98] transition-all"
         >
           <FiPlus className="w-4 h-4" />
           Nuevo Restaurante
@@ -199,7 +199,7 @@ export const PartnerRestaurants = () => {
       </motion.div>
 
       <motion.div 
-        className="bg-white rounded-2xl p-6 shadow-[0px_0px_25px_2px_rgba(0,0,0,0.025)]"
+        className="bg-white rounded-2xl p-4 sm:p-6 shadow-[0px_0px_25px_2px_rgba(0,0,0,0.025)]"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, delay: 0.1 }}

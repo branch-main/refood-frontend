@@ -159,19 +159,19 @@ export const RestaurantSettings = () => {
   return (
     <>
       {/* Header with breadcrumb */}
-      <div className="flex items-center justify-between mb-7">
-        <div className="flex items-center gap-2">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-7">
+        <div className="flex items-center gap-2 min-w-0">
           <button
             onClick={() => navigate("/partner/restaurants")}
-            className="p-2 -ml-2 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-2 -ml-2 hover:bg-gray-100 rounded-lg transition-colors flex-shrink-0"
           >
             <FiArrowLeft className="w-5 h-5 text-gray-500" />
           </button>
-          <span className="text-2xl leading-none text-gray-500">
+          <span className="text-lg sm:text-2xl leading-none text-gray-500 truncate">
             {restaurant.name}
           </span>
-          <HiChevronRight className="w-5 h-5 text-gray-400" />
-          <h1 className="text-2xl leading-none font-bold text-gray-800">
+          <HiChevronRight className="w-5 h-5 text-gray-400 flex-shrink-0" />
+          <h1 className="text-lg sm:text-2xl leading-none font-bold text-gray-800">
             Configuración
           </h1>
         </div>

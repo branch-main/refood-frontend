@@ -304,8 +304,8 @@ export const PartnerAnalytics = () => {
   if (restaurantIds.length === 0 && restaurants !== undefined) {
     return (
       <>
-        <div className="flex items-center justify-between mb-7">
-          <h1 className="text-2xl font-bold text-gray-800">Analíticas</h1>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-7">
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-800">Analíticas</h1>
         </div>
         <div className="bg-white rounded-2xl shadow-[0px_0px_25px_2px_rgba(0,0,0,0.025)] p-12 text-center">
           <FiTrendingUp className="w-12 h-12 text-gray-300 mx-auto mb-4" />
@@ -319,11 +319,11 @@ export const PartnerAnalytics = () => {
   if (isLoading || !analytics) {
     return (
       <>
-        <div className="flex items-center justify-between mb-7">
-          <h1 className="text-2xl font-bold text-gray-800">Analíticas</h1>
-          <div className="w-44 h-10 bg-gray-200 rounded-lg animate-pulse" />
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-7">
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-800">Analíticas</h1>
+          <div className="w-full sm:w-44 h-10 bg-gray-200 rounded-lg animate-pulse" />
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           {Array.from({ length: 4 }).map((_, i) => (
             <StatCardSkeleton key={i} />
           ))}
@@ -346,8 +346,8 @@ export const PartnerAnalytics = () => {
 
   return (
     <>
-      <div className="flex items-center justify-between mb-7">
-        <h1 className="text-2xl font-bold text-gray-800">Analíticas</h1>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-7">
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-800">Analíticas</h1>
         <Select
           options={[
             { value: "7d", label: "Últimos 7 días" },
@@ -357,12 +357,12 @@ export const PartnerAnalytics = () => {
           ]}
           value={period}
           onChange={(value) => setPeriod(value as string)}
-          className="min-w-[180px]"
+          className="w-full sm:w-auto sm:min-w-[180px]"
         />
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <StatCard
           icon={FiDollarSign}
           label={`Ingresos (${periodLabel})`}

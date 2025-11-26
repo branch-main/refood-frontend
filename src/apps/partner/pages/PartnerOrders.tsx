@@ -379,22 +379,22 @@ export const PartnerOrders = () => {
 
   return (
     <>
-      <div className="flex justify-between items-center mb-7">
-        <div className="flex items-center gap-2">
-          <span className="text-2xl leading-none text-gray-500">{selectedRestaurant.name}</span>
-          <HiChevronRight className="w-5 h-5 text-gray-400" />
-          <h1 className="text-2xl leading-none font-bold text-gray-800">Pedidos</h1>
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mb-7">
+        <div className="flex items-center gap-2 min-w-0">
+          <span className="text-lg sm:text-2xl leading-none text-gray-500 truncate">{selectedRestaurant.name}</span>
+          <HiChevronRight className="w-5 h-5 text-gray-400 flex-shrink-0" />
+          <h1 className="text-lg sm:text-2xl leading-none font-bold text-gray-800">Pedidos</h1>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="bg-white rounded-t-2xl shadow-[0px_0px_25px_2px_rgba(0,0,0,0.025)] border-b border-gray-100">
-        <div className="flex">
+      <div className="bg-white rounded-t-2xl shadow-[0px_0px_25px_2px_rgba(0,0,0,0.025)] border-b border-gray-100 overflow-x-auto">
+        <div className="flex min-w-max">
           {tabs.map((tab) => (
             <button
               key={tab.key}
               onClick={() => handleTabChange(tab.key)}
-              className={`flex-1 px-6 py-4 text-sm font-medium transition-all relative ${
+              className={`flex-1 min-w-[120px] px-4 md:px-6 py-4 text-sm font-medium transition-all relative ${
                 activeTab === tab.key
                   ? "text-red-600"
                   : "text-gray-500 hover:text-gray-700"

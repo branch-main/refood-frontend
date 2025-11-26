@@ -76,12 +76,14 @@ const ReviewsSkeleton = () => (
 const DashboardSkeleton = () => (
   <>
     <SkeletonPulse className="h-8 w-32 mb-7" />
-    <div className="grid grid-cols-3 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
       <StatCardSkeleton />
       <StatCardSkeleton />
-      <StatCardSkeleton />
+      <div className="sm:col-span-2 lg:col-span-1">
+        <StatCardSkeleton />
+      </div>
       
-      <div className="col-span-2 h-full bg-white rounded-2xl p-5 shadow-[0px_0px_25px_2px_rgba(0,0,0,0.025)] flex flex-col">
+      <div className="sm:col-span-2 lg:col-span-2 h-full bg-white rounded-2xl p-5 shadow-[0px_0px_25px_2px_rgba(0,0,0,0.025)] flex flex-col">
         <SkeletonPulse className="h-5 w-36 mb-4" />
         <div className="flex-1">
           <TableSkeleton />
@@ -95,7 +97,7 @@ const DashboardSkeleton = () => (
         </div>
       </div>
       
-      <div className="col-span-3 bg-white rounded-2xl p-5 shadow-[0px_0px_25px_2px_rgba(0,0,0,0.025)]">
+      <div className="sm:col-span-2 lg:col-span-3 bg-white rounded-2xl p-5 shadow-[0px_0px_25px_2px_rgba(0,0,0,0.025)]">
         <SkeletonPulse className="h-5 w-40 mb-4" />
         <ReviewsSkeleton />
       </div>
@@ -179,7 +181,7 @@ export const PartnerDashboard = () => {
       </motion.h1>
       
       <motion.div 
-        className="grid grid-cols-3 gap-4"
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
         variants={containerVariants}
         initial="hidden"
         animate="visible"
@@ -201,7 +203,7 @@ export const PartnerDashboard = () => {
           />
         </motion.div>
         
-        <motion.div variants={itemVariants}>
+        <motion.div variants={itemVariants} className="sm:col-span-2 lg:col-span-1">
           <StatIndicator
             title="Productos del día"
             current={stats.todayItems}
@@ -209,7 +211,7 @@ export const PartnerDashboard = () => {
           />
         </motion.div>
 
-        <motion.div variants={itemVariants} className="col-span-2 h-full">
+        <motion.div variants={itemVariants} className="sm:col-span-2 lg:col-span-2 h-full">
           <DashboardCard title="Pedidos recientes">
             {stats.recentOrders.length > 0 ? (
               <OrderTable orders={stats.recentOrders} onOrderClick={handleOrderClick} />
@@ -225,7 +227,7 @@ export const PartnerDashboard = () => {
           </DashboardCard>
         </motion.div>
 
-        <motion.div variants={itemVariants} className="col-span-3">
+        <motion.div variants={itemVariants} className="sm:col-span-2 lg:col-span-3">
           <DashboardCard title="Opiniones recientes">
             <RecentReviews />
           </DashboardCard>

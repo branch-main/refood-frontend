@@ -5,6 +5,7 @@ import {
   FiLogOut,
   FiMenu,
   FiGrid,
+  FiX,
 } from "react-icons/fi";
 import { MdRestaurantMenu, MdDashboard } from "react-icons/md";
 import { useAuthContext } from "@/shared/contexts";
@@ -25,7 +26,12 @@ const restaurantMenuItems = [
   { path: "/partner/orders", label: "Pedidos", icon: FiShoppingBag },
 ];
 
-export const PartnerSidebar = () => {
+interface PartnerSidebarProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+export const PartnerSidebar = ({ isOpen, onClose }: PartnerSidebarProps) => {
   const location = useLocation();
   const navigate = useNavigate();
   const { logout } = useAuthContext();
@@ -47,9 +53,21 @@ export const PartnerSidebar = () => {
     );
   };
 
+  const handleNavClick = () => {
+    // Close sidebar on mobile when navigating
+    if (window.innerWidth < 1024) {
+      onClose();
+    }
+  };
+
   return (
     <aside
-      className={`sticky top-0 h-screen bg-white shadow-[0px_0px_25px_2px_rgba(0,0,0,0.025)] flex flex-col transition-all overflow-x-hidden overflow-y-auto ${isCollapsed ? "w-16" : "w-64"}`}
+      className={`
+        fixed lg:sticky top-0 h-screen bg-white shadow-[0px_0px_25px_2px_rgba(0,0,0,0.025)] 
+        flex flex-col transition-all overflow-x-hidden overflow-y-auto z-50
+        ${isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
+        ${isCollapsed ? "lg:w-16" : "w-64"}
+      `}
     >
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-gray-100">
@@ -61,12 +79,22 @@ export const PartnerSidebar = () => {
             </span>
           </Link>
         )}
-        <button
-          onClick={() => setIsCollapsed(!isCollapsed)}
-          className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-        >
-          <FiMenu size={18} className="text-gray-600" />
-        </button>
+        <div className="flex items-center gap-1">
+          {/* Close button for mobile */}
+          <button
+            onClick={onClose}
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors lg:hidden"
+          >
+            <FiX size={18} className="text-gray-600" />
+          </button>
+          {/* Collapse button for desktop */}
+          <button
+            onClick={() => setIsCollapsed(!isCollapsed)}
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors hidden lg:block"
+          >
+            <FiMenu size={18} className="text-gray-600" />
+          </button>
+        </div>
       </div>
 
       {/* Navigation */}
@@ -80,8 +108,9 @@ export const PartnerSidebar = () => {
             <Link
               key={item.path}
               to={item.path}
+              onClick={handleNavClick}
               className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors no-underline ${
-                isCollapsed ? "justify-center" : ""
+                isCollapsed ? "lg:justify-center" : ""
               } ${
                 active
                   ? "bg-red-50 text-red-500 font-medium"
@@ -90,14 +119,14 @@ export const PartnerSidebar = () => {
               title={isCollapsed ? item.label : undefined}
             >
               <Icon size={20} className="flex-shrink-0" />
-              {!isCollapsed && <span className="text-sm">{item.label}</span>}
+              <span className={`text-sm ${isCollapsed ? "lg:hidden" : ""}`}>{item.label}</span>
             </Link>
           );
         })}
 
         {/* Restaurant Selector */}
-        {!isCollapsed && restaurants.length > 0 && (
-          <div className="pt-4 mt-4 border-t border-gray-100">
+        {restaurants.length > 0 && (
+          <div className={`pt-4 mt-4 border-t border-gray-100 ${isCollapsed ? "lg:hidden" : ""}`}>
             <p className="px-3 mb-2 text-xs font-medium text-gray-400 uppercase tracking-wider">
               Restaurante
             </p>
@@ -118,11 +147,9 @@ export const PartnerSidebar = () => {
         {/* Restaurant-specific Menu Items */}
         {selectedRestaurant && (
           <div className={`${isCollapsed ? "" : "pt-3"} space-y-2`}>
-            {!isCollapsed && (
-              <p className="px-3 mb-2 text-xs font-medium text-gray-400 uppercase tracking-wider">
-                Gestión
-              </p>
-            )}
+            <p className={`px-3 mb-2 text-xs font-medium text-gray-400 uppercase tracking-wider ${isCollapsed ? "lg:hidden" : ""}`}>
+              Gestión
+            </p>
             {restaurantMenuItems.map((item) => {
               const Icon = item.icon;
               const active = isActive(item.path);
@@ -131,8 +158,9 @@ export const PartnerSidebar = () => {
                 <Link
                   key={item.path}
                   to={item.path}
+                  onClick={handleNavClick}
                   className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors no-underline ${
-                    isCollapsed ? "justify-center" : ""
+                    isCollapsed ? "lg:justify-center" : ""
                   } ${
                     active
                       ? "bg-red-50 text-red-500 font-medium"
@@ -141,9 +169,7 @@ export const PartnerSidebar = () => {
                   title={isCollapsed ? item.label : undefined}
                 >
                   <Icon size={20} className="flex-shrink-0" />
-                  {!isCollapsed && (
-                    <span className="text-sm">{item.label}</span>
-                  )}
+                  <span className={`text-sm ${isCollapsed ? "lg:hidden" : ""}`}>{item.label}</span>
                 </Link>
               );
             })}
@@ -156,12 +182,12 @@ export const PartnerSidebar = () => {
         <button
           onClick={handleLogout}
           className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-red-500 hover:bg-red-50 transition-colors ${
-            isCollapsed ? "justify-center" : ""
+            isCollapsed ? "lg:justify-center" : ""
           }`}
           title={isCollapsed ? "Cerrar sesión" : undefined}
         >
           <FiLogOut size={20} className="flex-shrink-0" />
-          {!isCollapsed && <span className="text-sm">Cerrar Sesión</span>}
+          <span className={`text-sm ${isCollapsed ? "lg:hidden" : ""}`}>Cerrar Sesión</span>
         </button>
       </div>
     </aside>

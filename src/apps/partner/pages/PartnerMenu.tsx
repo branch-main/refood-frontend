@@ -196,19 +196,19 @@ export const PartnerMenu = () => {
 
   return (
     <>
-      <div className="flex justify-between items-center mb-7">
-        <div className="flex items-center gap-2">
-                    <span className="text-2xl leading-none text-gray-500">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-7">
+        <div className="flex items-center gap-2 min-w-0">
+          <span className="text-lg sm:text-2xl leading-none text-gray-500 truncate">
             {selectedRestaurant.name}
           </span>
-          <HiChevronRight className="w-5 h-5 text-gray-400" />
-          <h1 className="text-2xl leading-none font-bold text-gray-800">
+          <HiChevronRight className="w-5 h-5 text-gray-400 flex-shrink-0" />
+          <h1 className="text-lg sm:text-2xl leading-none font-bold text-gray-800">
             Menú
           </h1>
         </div>
         <button
           onClick={handleCreate}
-          className="inline-flex items-center gap-2 px-5 py-2.5 bg-red-500 text-white rounded-xl font-medium text-sm shadow-sm shadow-red-500/25 hover:bg-red-600 hover:shadow-md hover:shadow-red-500/30 active:scale-[0.98] transition-all"
+          className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-red-500 text-white rounded-xl font-medium text-sm shadow-sm shadow-red-500/25 hover:bg-red-600 hover:shadow-md hover:shadow-red-500/30 active:scale-[0.98] transition-all"
         >
           <FiPlus className="w-4 h-4" />
           Agregar Producto
@@ -217,10 +217,10 @@ export const PartnerMenu = () => {
 
       {/* Menu Items List */}
       <div className="bg-white rounded-2xl shadow-[0px_0px_25px_2px_rgba(0,0,0,0.025)]">
-        <div className="px-6 py-4 border-b border-gray-100">
-          <div className="flex items-center justify-between">
+        <div className="px-4 sm:px-6 py-4 border-b border-gray-100">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             <h2 className="text-lg font-medium text-gray-800">Productos</h2>
-            <div className="flex items-center gap-3">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
               {categories.length > 0 && (
                 <Select
                   options={[
@@ -229,7 +229,7 @@ export const PartnerMenu = () => {
                   ]}
                   value={filterCategory}
                   onChange={(value) => handleFilterChange('category', value)}
-                  className="min-w-[180px]"
+                  className="w-full sm:min-w-[180px]"
                 />
               )}
               <Select
@@ -240,7 +240,7 @@ export const PartnerMenu = () => {
                 ]}
                 value={filterStatus}
                 onChange={(value) => handleFilterChange('status', value)}
-                className="min-w-[140px]"
+                className="w-full sm:min-w-[140px]"
               />
               <Select
                 options={[
@@ -250,13 +250,13 @@ export const PartnerMenu = () => {
                 ]}
                 value={sortBy}
                 onChange={(value) => handleFilterChange('sort', value)}
-                className="min-w-[140px]"
+                className="w-full sm:min-w-[140px]"
               />
             </div>
           </div>
         </div>
 
-        <div className="p-6">
+        <div className="p-4 sm:p-6">
           {isLoading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {[...Array(8)].map((_, i) => (
