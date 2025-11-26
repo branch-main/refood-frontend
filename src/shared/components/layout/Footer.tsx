@@ -40,26 +40,10 @@ export const Footer = () => (
           <ul className="space-y-3">
             <li>
               <Link
-                to="/menu"
-                className="text-gray-500 text-sm no-underline transition-colors duration-200 hover:text-red-500"
-              >
-                Explorar Alimentos
-              </Link>
-            </li>
-            <li>
-              <Link
                 to="/restaurants"
                 className="text-gray-500 text-sm no-underline transition-colors duration-200 hover:text-red-500"
               >
                 Restaurantes
-              </Link>
-            </li>
-            <li>
-              <Link
-                to="/partners"
-                className="text-gray-500 text-sm no-underline transition-colors duration-200 hover:text-red-500"
-              >
-                Para Restaurantes
               </Link>
             </li>
             <li>
@@ -124,14 +108,6 @@ export const Footer = () => (
                 className="text-gray-500 text-sm no-underline transition-colors duration-200 hover:text-red-500"
               >
                 Términos de Servicio
-              </Link>
-            </li>
-            <li>
-              <Link
-                to="/cookies"
-                className="text-gray-500 text-sm no-underline transition-colors duration-200 hover:text-red-500"
-              >
-                Política de Cookies
               </Link>
             </li>
           </ul>

@@ -14,3 +14,8 @@ export * from "./Profile";
 export * from "./Register";
 export * from "./Restaurant";
 export * from "./Restaurants";
+export * from "./About";
+export * from "./Help";
+export * from "./FAQ";
+export * from "./Privacy";
+export * from "./Terms";

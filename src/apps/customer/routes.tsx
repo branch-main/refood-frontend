@@ -16,6 +16,11 @@ import {
   PaymentFailed,
   Contact,
   PartnerInfo,
+  About,
+  Help,
+  FAQ,
+  Privacy,
+  Terms,
 } from "@/pages";
 import { Layout } from "@/shared/components/layout";
 import { authService } from "@/shared/services";
@@ -56,6 +61,11 @@ export const routes: RouteObject = {
         { path: "restaurants/:id", element: <Restaurant /> },
         { path: "contact", element: <Contact /> },
         { path: "partner-info", element: <PartnerInfo /> },
+        { path: "about", element: <About /> },
+        { path: "help", element: <Help /> },
+        { path: "faq", element: <FAQ /> },
+        { path: "privacy", element: <Privacy /> },
+        { path: "terms", element: <Terms /> },
       ],
     },
 
