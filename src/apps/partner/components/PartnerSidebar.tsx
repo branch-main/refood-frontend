@@ -1,5 +1,11 @@
 import { useLocation, Link, useNavigate } from "react-router-dom";
-import { FiShoppingBag, FiBarChart2, FiLogOut, FiMenu, FiGrid } from "react-icons/fi";
+import {
+  FiShoppingBag,
+  FiBarChart2,
+  FiLogOut,
+  FiMenu,
+  FiGrid,
+} from "react-icons/fi";
 import { MdRestaurantMenu, MdDashboard } from "react-icons/md";
 import { useAuthContext } from "@/shared/contexts";
 import { AiOutlineShop } from "react-icons/ai";
@@ -24,7 +30,8 @@ export const PartnerSidebar = () => {
   const navigate = useNavigate();
   const { logout } = useAuthContext();
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const { restaurants, selectedRestaurant, setSelectedRestaurantId } = useRestaurantContext();
+  const { restaurants, selectedRestaurant, setSelectedRestaurantId } =
+    useRestaurantContext();
 
   const handleLogout = async () => {
     await logout();
@@ -35,7 +42,9 @@ export const PartnerSidebar = () => {
     if (exact) {
       return location.pathname === path;
     }
-    return location.pathname === path || location.pathname.startsWith(path + "/");
+    return (
+      location.pathname === path || location.pathname.startsWith(path + "/")
+    );
   };
 
   return (
@@ -46,10 +55,10 @@ export const PartnerSidebar = () => {
       <div className="flex items-center justify-between p-4 border-b border-gray-100">
         {!isCollapsed && (
           <Link to="/" className="flex items-center gap-2 no-underline">
-            <div className="w-8 h-8 rounded-lg bg-[#B21F1F] flex items-center justify-center">
-              <img src="/logo.png" alt="ReFood" className="h-5 w-auto" />
-            </div>
-            <span className="font-bold text-gray-900">ReFood</span>
+            <span className="font-bold text-red-500">
+              <span className="text-gray-800">Re</span>
+              Food
+            </span>
           </Link>
         )}
         <button
@@ -81,9 +90,7 @@ export const PartnerSidebar = () => {
               title={isCollapsed ? item.label : undefined}
             >
               <Icon size={20} className="flex-shrink-0" />
-              {!isCollapsed && (
-                <span className="text-sm">{item.label}</span>
-              )}
+              {!isCollapsed && <span className="text-sm">{item.label}</span>}
             </Link>
           );
         })}
@@ -96,7 +103,10 @@ export const PartnerSidebar = () => {
             </p>
             <div className="px-1">
               <Select
-                options={restaurants.map((r) => ({ value: r.id, label: r.name }))}
+                options={restaurants.map((r) => ({
+                  value: r.id,
+                  label: r.name,
+                }))}
                 value={selectedRestaurant?.id || null}
                 onChange={(value) => setSelectedRestaurantId(Number(value))}
                 placeholder="Seleccionar..."
@@ -151,12 +161,9 @@ export const PartnerSidebar = () => {
           title={isCollapsed ? "Cerrar sesión" : undefined}
         >
           <FiLogOut size={20} className="flex-shrink-0" />
-          {!isCollapsed && (
-            <span className="text-sm">Cerrar Sesión</span>
-          )}
+          {!isCollapsed && <span className="text-sm">Cerrar Sesión</span>}
         </button>
       </div>
     </aside>
   );
 };
-

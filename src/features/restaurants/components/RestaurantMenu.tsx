@@ -3,6 +3,7 @@ import { MenuItem } from "@/features/menu/components";
 import { MenuItemModal } from "@/features/menu/components/MenuItemModal";
 import { Skeleton } from "@/shared/components/ui";
 import { useMenuByRestaurant } from "@/shared/hooks";
+import { useRestaurantContext } from "@/features/restaurants/contexts";
 import { MenuItem as MenuItemType, Category } from "@/shared/types";
 
 export const RestaurantMenu = ({
@@ -15,6 +16,8 @@ export const RestaurantMenu = ({
   const { isLoading, data: menu } = useMenuByRestaurant(restaurantId);
   const [selectedItem, setSelectedItem] = useState<MenuItemType | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const restaurantContext = useRestaurantContext();
+  const menuSearchQuery = restaurantContext?.menuSearchQuery || "";
 
   if (isLoading) {
     return <RestaurantMenu.Skeleton />;
@@ -31,9 +34,21 @@ export const RestaurantMenu = ({
   };
 
   // Filter items: only show available items that belong to this category
-  const filteredItems = menu?.filter(
-    (item) => item.categoryId === category.id && item.isAvailable
-  ) || [];
+  // Also apply menu search filter if there's a search query
+  let filteredItems =
+    menu?.filter(
+      (item) => item.categoryId === category.id && item.isAvailable,
+    ) || [];
+
+  // Apply search filter if there's a search query
+  if (menuSearchQuery) {
+    const query = menuSearchQuery.toLowerCase();
+    filteredItems = filteredItems.filter(
+      (item) =>
+        item.name.toLowerCase().includes(query) ||
+        item.description.toLowerCase().includes(query),
+    );
+  }
 
   // Don't render section if no items
   if (filteredItems.length === 0) {
@@ -43,12 +58,14 @@ export const RestaurantMenu = ({
   return (
     <>
       <div>
-        <h2 className="text-2xl font-bold text-gray-800 mb-8">{category.name}</h2>
+        <h2 className="text-2xl font-bold text-gray-800 mb-8">
+          {category.name}
+        </h2>
         <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-8">
           {filteredItems.map((item) => (
-            <MenuItem 
-              key={item.id} 
-              item={item} 
+            <MenuItem
+              key={item.id}
+              item={item}
               onClick={() => handleOpenModal(item)}
             />
           ))}

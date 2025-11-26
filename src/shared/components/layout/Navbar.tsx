@@ -32,8 +32,24 @@ export const Navbar = () => {
     e.preventDefault();
     if (searchValue.trim()) {
       setIsMobileMenuOpen(false);
-      navigate(`/restaurants?search=${encodeURIComponent(searchValue.trim())}`);
-      setSearchValue("");
+      
+      // If we're in a restaurant page, search within the menu
+      if (currentRestaurant && restaurantContext) {
+        restaurantContext.setMenuSearchQuery(searchValue.trim());
+        setSearchValue("");
+      } else {
+        // Otherwise, search restaurants globally
+        navigate(`/restaurants?search=${encodeURIComponent(searchValue.trim())}`);
+        setSearchValue("");
+      }
+    }
+  };
+
+  // Clear menu search when search value is empty
+  const handleSearchChange = (value: string) => {
+    setSearchValue(value);
+    if (currentRestaurant && restaurantContext && value === "") {
+      restaurantContext.setMenuSearchQuery("");
     }
   };
 
@@ -123,12 +139,30 @@ export const Navbar = () => {
             onSubmit={handleSearch}
             className="h-10 hidden md:flex flex-1 max-w-xl items-center rounded-full bg-neutral-50 text-gray-800 px-4 gap-3"
           >
+            {/* Restaurant Logo - Only shown when in restaurant page */}
+            {currentRestaurant && (
+              <div className="flex-shrink-0">
+                {currentRestaurant.logo ? (
+                  <img 
+                    src={currentRestaurant.logo} 
+                    alt={currentRestaurant.name}
+                    className="w-6 h-6 rounded-full object-cover border border-gray-200"
+                  />
+                ) : (
+                  <div className="w-6 h-6 rounded-full bg-red-100 flex items-center justify-center">
+                    <span className="text-xs font-bold text-red-600">
+                      {currentRestaurant.name.charAt(0).toUpperCase()}
+                    </span>
+                  </div>
+                )}
+              </div>
+            )}
             <input
               type="search"
               placeholder={searchPlaceholder}
               value={searchValue}
-              onChange={(e) => setSearchValue(e.target.value)}
-              className="w-full h-10 text-sm focus:outline-none caret-red-500"
+              onChange={(e) => handleSearchChange(e.target.value)}
+              className="w-full h-10 text-sm focus:outline-none caret-red-500 bg-transparent"
             />
             <button type="submit">
               <ImSearch
@@ -182,76 +216,154 @@ export const Navbar = () => {
                     </div>
                   </button>
                   {isProfileOpen && (
-                    <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-gray-200 py-2 animate-[fadeIn_0.2s_ease-out]">
-                      <div className="px-4 py-3 border-b border-gray-100">
-                        <p className="text-sm font-semibold text-gray-900">
-                          {getUserDisplayName()}
-                        </p>
-                        <p className="text-xs text-gray-500 mt-1">
-                          {user?.email}
-                        </p>
+                    <div className="absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-[0px_0px_25px_2px_rgba(0,0,0,0.08)] border border-gray-100 overflow-hidden animate-[fadeIn_0.15s_ease-out]">
+                      {/* User Info Header */}
+                      <div className="px-4 py-4 bg-gradient-to-r from-gray-50 to-white border-b border-gray-100">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-red-500 to-red-600 flex items-center justify-center text-white font-semibold text-sm shadow-sm">
+                            {getUserInitials()}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-semibold text-gray-900 truncate">
+                              {getUserDisplayName()}
+                            </p>
+                            <p className="text-xs text-gray-500 truncate">
+                              {user?.email}
+                            </p>
+                          </div>
+                        </div>
                       </div>
-                      {user?.role === "restaurant_owner" && (
+
+                      {/* Navigation Links */}
+                      <nav className="p-2">
+                        {user?.role === "restaurant_owner" && (
+                          <Link
+                            to="/partner"
+                            className="flex items-center gap-3 px-3 py-2.5 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors no-underline rounded-xl"
+                            onClick={() => setIsProfileOpen(false)}
+                          >
+                            <div className="w-8 h-8 rounded-lg bg-red-50 flex items-center justify-center">
+                              <svg
+                                className="w-4 h-4 text-red-500"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+                                />
+                              </svg>
+                            </div>
+                            <div>
+                              <span className="font-medium">Panel de Socio</span>
+                              <p className="text-xs text-gray-400">Gestiona tus restaurantes</p>
+                            </div>
+                          </Link>
+                        )}
                         <Link
-                          to="/partner"
-                          className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-red-50 hover:text-[#B21F1F] transition-colors no-underline"
+                          to="/profile"
+                          className="flex items-center gap-3 px-3 py-2.5 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors no-underline rounded-xl"
                           onClick={() => setIsProfileOpen(false)}
                         >
-                          <svg
-                            className="w-4 h-4"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
-                            />
-                          </svg>
-                          <span className="font-medium">Panel de Socio</span>
+                          <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
+                            <svg
+                              className="w-4 h-4 text-blue-500"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                              />
+                            </svg>
+                          </div>
+                          <div>
+                            <span className="font-medium">Mi Perfil</span>
+                            <p className="text-xs text-gray-400">Cuenta y preferencias</p>
+                          </div>
                         </Link>
-                      )}
-                      <Link
-                        to="/profile"
-                        className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-red-50 hover:text-[#B21F1F] transition-colors no-underline"
-                        onClick={() => setIsProfileOpen(false)}
-                      >
-                        <svg
-                          className="w-4 h-4"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
+                        <Link
+                          to="/profile/orders"
+                          className="flex items-center gap-3 px-3 py-2.5 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors no-underline rounded-xl"
+                          onClick={() => setIsProfileOpen(false)}
                         >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                          />
-                        </svg>
-                        <span className="font-medium">Mi Perfil</span>
-                      </Link>
-                      <button
-                        onClick={handleLogout}
-                        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors border-0 bg-transparent cursor-pointer text-left rounded-lg"
-                      >
-                        <svg
-                          className="w-4 h-4"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
+                          <div className="w-8 h-8 rounded-lg bg-green-50 flex items-center justify-center">
+                            <svg
+                              className="w-4 h-4 text-green-500"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"
+                              />
+                            </svg>
+                          </div>
+                          <div>
+                            <span className="font-medium">Mis Pedidos</span>
+                            <p className="text-xs text-gray-400">Historial y seguimiento</p>
+                          </div>
+                        </Link>
+                        <Link
+                          to="/profile/favorites"
+                          className="flex items-center gap-3 px-3 py-2.5 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors no-underline rounded-xl"
+                          onClick={() => setIsProfileOpen(false)}
                         >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-                          />
-                        </svg>
-                        <span className="font-medium">Cerrar Sesión</span>
-                      </button>
+                          <div className="w-8 h-8 rounded-lg bg-pink-50 flex items-center justify-center">
+                            <svg
+                              className="w-4 h-4 text-pink-500"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                              />
+                            </svg>
+                          </div>
+                          <div>
+                            <span className="font-medium">Favoritos</span>
+                            <p className="text-xs text-gray-400">Restaurantes guardados</p>
+                          </div>
+                        </Link>
+                      </nav>
+
+                      {/* Logout Section */}
+                      <div className="p-2 border-t border-gray-100">
+                        <button
+                          onClick={handleLogout}
+                          className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors border-0 bg-transparent cursor-pointer text-left rounded-xl"
+                        >
+                          <div className="w-8 h-8 rounded-lg bg-red-50 flex items-center justify-center">
+                            <svg
+                              className="w-4 h-4 text-red-500"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                              />
+                            </svg>
+                          </div>
+                          <span className="font-medium">Cerrar Sesión</span>
+                        </button>
+                      </div>
                     </div>
                   )}
                 </div>
@@ -305,11 +417,29 @@ export const Navbar = () => {
               {/* Mobile Search Bar */}
               <form onSubmit={handleSearch} className="px-4 pb-2">
                 <div className="flex items-center rounded-xl shadow-sm bg-white text-gray-800 px-4 gap-3">
+                  {/* Restaurant Logo - Only shown when in restaurant page */}
+                  {currentRestaurant && (
+                    <div className="flex-shrink-0">
+                      {currentRestaurant.logo ? (
+                        <img 
+                          src={currentRestaurant.logo} 
+                          alt={currentRestaurant.name}
+                          className="w-6 h-6 rounded-full object-cover border border-gray-200"
+                        />
+                      ) : (
+                        <div className="w-6 h-6 rounded-full bg-red-100 flex items-center justify-center">
+                          <span className="text-xs font-bold text-red-600">
+                            {currentRestaurant.name.charAt(0).toUpperCase()}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  )}
                   <input
                     type="search"
                     placeholder={searchPlaceholder}
                     value={searchValue}
-                    onChange={(e) => setSearchValue(e.target.value)}
+                    onChange={(e) => handleSearchChange(e.target.value)}
                     className="w-full h-10 text-sm focus:outline-none caret-red-500"
                   />
                   <button type="submit">
@@ -351,97 +481,95 @@ export const Navbar = () => {
 
               {user ? (
                 <>
-                  <Link
-                    to="/orders"
-                    className="text-gray-600 no-underline font-medium text-sm px-4 py-3 rounded-lg transition-all hover:text-[#B21F1F] hover:bg-red-50"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    Mis Pedidos
-                  </Link>
-                  <Link
-                    to="/favorites"
-                    className="text-gray-600 no-underline font-medium text-sm px-4 py-3 rounded-lg transition-all hover:text-[#B21F1F] hover:bg-red-50"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    Favoritos
-                  </Link>
-
                   {/* Mobile User Section */}
-                  <div className="border-t border-gray-200 pt-4 mt-2">
-                    <div className="px-4 py-2 mb-2">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-linear-to-br from-[#B21F1F] to-[#8B1616] flex items-center justify-center text-white font-bold text-sm shadow-md">
-                          {getUserInitials()}
-                        </div>
-                        <div>
-                          <p className="text-sm font-semibold text-gray-900">
-                            {getUserDisplayName()}
-                          </p>
-                          <p className="text-xs text-gray-500">{user?.email}</p>
-                        </div>
-                      </div>
-                    </div>
-                    {user?.role === "restaurant_owner" && (
-                      <Link
-                        to="/partner"
-                        className="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-red-50 hover:text-[#B21F1F] transition-colors no-underline rounded-lg"
-                        onClick={() => setIsMobileMenuOpen(false)}
-                      >
-                        <svg
-                          className="w-5 h-5"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
-                          />
-                        </svg>
-                        <span className="font-medium">Panel de Socio</span>
-                      </Link>
-                    )}
+                  <div className="border-t border-gray-100 pt-4 mt-2">
+                    {/* User Profile Link */}
                     <Link
                       to="/profile"
-                      className="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-red-50 hover:text-[#B21F1F] transition-colors no-underline rounded-lg"
+                      className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors no-underline rounded-xl mx-2"
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
-                      <svg
-                        className="w-5 h-5"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                        />
+                      <div className="w-11 h-11 rounded-full bg-gradient-to-br from-red-500 to-red-600 flex items-center justify-center text-white font-semibold text-sm shadow-sm">
+                        {getUserInitials()}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold text-gray-900 truncate">
+                          {getUserDisplayName()}
+                        </p>
+                        <p className="text-xs text-gray-500 truncate">{user?.email}</p>
+                      </div>
+                      <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                       </svg>
-                      <span className="font-medium">Mi Perfil</span>
                     </Link>
-                    <button
-                      onClick={handleLogout}
-                      className="w-full flex items-center gap-3 px-4 py-3 text-sm text-red-600 hover:bg-red-50 transition-colors border-0 bg-transparent cursor-pointer text-left rounded-lg"
-                    >
-                      <svg
-                        className="w-5 h-5"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
+
+                    {/* Quick Actions Grid */}
+                    <div className="grid grid-cols-3 gap-2 px-4 mt-3">
+                      <Link
+                        to="/profile/orders"
+                        className="flex flex-col items-center gap-2 p-3 bg-gray-50 hover:bg-red-50 rounded-xl transition-colors no-underline group"
+                        onClick={() => setIsMobileMenuOpen(false)}
                       >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-                        />
-                      </svg>
-                      <span className="font-medium">Cerrar Sesión</span>
-                    </button>
+                        <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm group-hover:shadow">
+                          <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                          </svg>
+                        </div>
+                        <span className="text-xs font-medium text-gray-700 group-hover:text-red-600">Pedidos</span>
+                      </Link>
+                      <Link
+                        to="/profile/favorites"
+                        className="flex flex-col items-center gap-2 p-3 bg-gray-50 hover:bg-red-50 rounded-xl transition-colors no-underline group"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm group-hover:shadow">
+                          <svg className="w-5 h-5 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                          </svg>
+                        </div>
+                        <span className="text-xs font-medium text-gray-700 group-hover:text-red-600">Favoritos</span>
+                      </Link>
+                      {user?.role === "restaurant_owner" ? (
+                        <Link
+                          to="/partner"
+                          className="flex flex-col items-center gap-2 p-3 bg-gray-50 hover:bg-red-50 rounded-xl transition-colors no-underline group"
+                          onClick={() => setIsMobileMenuOpen(false)}
+                        >
+                          <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm group-hover:shadow">
+                            <svg className="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                            </svg>
+                          </div>
+                          <span className="text-xs font-medium text-gray-700 group-hover:text-red-600">Mi Negocio</span>
+                        </Link>
+                      ) : (
+                        <Link
+                          to="/help"
+                          className="flex flex-col items-center gap-2 p-3 bg-gray-50 hover:bg-red-50 rounded-xl transition-colors no-underline group"
+                          onClick={() => setIsMobileMenuOpen(false)}
+                        >
+                          <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm group-hover:shadow">
+                            <svg className="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                          </div>
+                          <span className="text-xs font-medium text-gray-700 group-hover:text-red-600">Ayuda</span>
+                        </Link>
+                      )}
+                    </div>
+
+                    {/* Logout Button */}
+                    <div className="px-4 mt-4">
+                      <button
+                        onClick={handleLogout}
+                        className="w-full flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium text-red-600 bg-red-50 hover:bg-red-100 transition-colors border-0 cursor-pointer rounded-xl"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                        </svg>
+                        Cerrar Sesión
+                      </button>
+                    </div>
                   </div>
                 </>
               ) : (

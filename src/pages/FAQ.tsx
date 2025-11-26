@@ -7,7 +7,6 @@ import { FiChevronDown, FiSearch, FiMessageCircle } from "react-icons/fi";
 const FAQ_CATEGORIES = [
   {
     title: "Pedidos",
-    icon: "🛒",
     questions: [
       {
         question: "¿Cómo puedo realizar un pedido?",
@@ -33,7 +32,6 @@ const FAQ_CATEGORIES = [
   },
   {
     title: "Pagos",
-    icon: "💳",
     questions: [
       {
         question: "¿Cuáles son los métodos de pago aceptados?",
@@ -59,7 +57,6 @@ const FAQ_CATEGORIES = [
   },
   {
     title: "Entregas",
-    icon: "🚴",
     questions: [
       {
         question: "¿En qué zonas hacen entregas?",
@@ -85,7 +82,6 @@ const FAQ_CATEGORIES = [
   },
   {
     title: "Cuenta",
-    icon: "👤",
     questions: [
       {
         question: "¿Cómo creo una cuenta?",
@@ -111,7 +107,6 @@ const FAQ_CATEGORIES = [
   },
   {
     title: "Restaurantes",
-    icon: "🍽️",
     questions: [
       {
         question: "¿Cómo se califican los restaurantes?",
@@ -183,9 +178,9 @@ export const FAQ = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
-      <div className="relative bg-gradient-to-br from-red-50 via-white to-orange-50/50 overflow-hidden">
+      <div className="relative bg-gradient-to-br from-red-50 via-white to-red-50/50 overflow-hidden">
         <div className="absolute top-0 right-0 -mt-20 -mr-20 w-96 h-96 bg-red-100 rounded-full blur-3xl opacity-50" />
-        <div className="absolute bottom-0 left-0 -mb-20 -ml-20 w-72 h-72 bg-orange-100 rounded-full blur-3xl opacity-50" />
+        <div className="absolute bottom-0 left-0 -mb-20 -ml-20 w-72 h-72 bg-red-100 rounded-full blur-3xl opacity-50" />
         
         <div className="relative max-w-7xl mx-auto px-4 md:px-6 py-16 md:py-20">
           <motion.div
@@ -202,7 +197,7 @@ export const FAQ = () => {
             </div>
             <h1 className="text-4xl md:text-5xl font-bold mb-6 tracking-tight text-gray-900">
               Preguntas{" "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-600 to-orange-600">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-red-600">
                 Frecuentes
               </span>
             </h1>
@@ -272,7 +267,6 @@ export const FAQ = () => {
                     : "bg-white text-gray-600 hover:bg-gray-50 border border-gray-200"
                 }`}
               >
-                <span>{category.icon}</span>
                 <span>{category.title}</span>
               </button>
             ))}
@@ -289,7 +283,6 @@ export const FAQ = () => {
                 className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 md:p-8"
               >
                 <div className="flex items-center gap-3 mb-6 pb-6 border-b border-gray-100">
-                  <span className="text-3xl">{FAQ_CATEGORIES[activeCategory].icon}</span>
                   <h2 className="text-2xl font-bold text-gray-900">{FAQ_CATEGORIES[activeCategory].title}</h2>
                 </div>
                 <div className="divide-y divide-gray-100">
@@ -313,7 +306,7 @@ export const FAQ = () => {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5, delay: 0.2 }}
-                  className="bg-gradient-to-br from-red-600 to-orange-600 rounded-2xl p-6 text-white"
+                  className="bg-gradient-to-br from-red-500 to-red-600 rounded-2xl p-6 text-white"
                 >
                   <FiMessageCircle className="w-10 h-10 mb-4" />
                   <h3 className="text-xl font-bold mb-2">¿No encontraste tu respuesta?</h3>

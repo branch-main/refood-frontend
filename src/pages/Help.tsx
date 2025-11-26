@@ -59,7 +59,7 @@ const HELP_CATEGORIES = [
     icon: FiTruck,
     title: "Entregas",
     description: "Zonas de cobertura, tiempos de entrega y problemas",
-    color: "bg-orange-50 text-orange-600",
+    color: "bg-red-50 text-red-600",
     articles: [
       "¿En qué zonas hacen entregas?",
       "¿Cuál es el tiempo promedio de entrega?",
@@ -96,9 +96,9 @@ export const Help = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
-      <div className="relative bg-gradient-to-br from-red-50 via-white to-orange-50/50 overflow-hidden">
+      <div className="relative bg-gradient-to-br from-red-50 via-white to-red-50/50 overflow-hidden">
         <div className="absolute top-0 right-0 -mt-20 -mr-20 w-96 h-96 bg-red-100 rounded-full blur-3xl opacity-50" />
-        <div className="absolute bottom-0 left-0 -mb-20 -ml-20 w-72 h-72 bg-orange-100 rounded-full blur-3xl opacity-50" />
+        <div className="absolute bottom-0 left-0 -mb-20 -ml-20 w-72 h-72 bg-red-100 rounded-full blur-3xl opacity-50" />
         
         <div className="relative max-w-7xl mx-auto px-4 md:px-6 py-16 md:py-20">
           <motion.div
@@ -115,7 +115,7 @@ export const Help = () => {
             </div>
             <h1 className="text-4xl md:text-5xl font-bold mb-6 tracking-tight text-gray-900">
               ¿En qué podemos{" "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-600 to-orange-600">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-red-600">
                 ayudarte?
               </span>
             </h1>
@@ -313,7 +313,7 @@ export const Help = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
-          className="bg-gradient-to-r from-red-600 to-orange-600 rounded-3xl p-8 md:p-12"
+          className="bg-gradient-to-r from-red-500 to-red-600 rounded-3xl p-8 md:p-12"
         >
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="text-center md:text-left">
