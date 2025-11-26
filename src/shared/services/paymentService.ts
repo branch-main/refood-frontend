@@ -1,8 +1,7 @@
 import axios from "axios";
 
-// Separate API client for payments (port 8081)
 const paymentsApiClient = axios.create({
-  baseURL: "http://localhost:8081/api/v1",
+  baseURL: import.meta.env.VITE_JAVA_API_BASE_URL,
   headers: {
     "Content-Type": "application/json",
   },

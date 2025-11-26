@@ -1,9 +1,8 @@
 import axios from "axios";
 import { Order } from "../types";
 
-// Separate API client for orders (port 8081)
 const ordersApiClient = axios.create({
-  baseURL: "http://localhost:8081/api/v1",
+  baseURL: import.meta.env.VITE_JAVA_API_BASE_URL,
   headers: {
     "Content-Type": "application/json",
   },
