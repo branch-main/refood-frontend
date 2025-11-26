@@ -3,6 +3,12 @@ FROM node:20-alpine AS build
 
 WORKDIR /app
 
+# Build arguments for Vite env vars
+ARG VITE_API_BASE_URL
+ARG VITE_JAVA_API_BASE_URL
+ARG VITE_APP_NAME
+ARG VITE_APP_VERSION
+
 # Copy package files
 COPY package*.json ./
 
@@ -12,7 +18,11 @@ RUN npm ci
 # Copy source code
 COPY . .
 
-# Build the application
+# Build the application with env vars
+ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
+ENV VITE_JAVA_API_BASE_URL=$VITE_JAVA_API_BASE_URL
+ENV VITE_APP_NAME=$VITE_APP_NAME
+ENV VITE_APP_VERSION=$VITE_APP_VERSION
 RUN npm run build
 
 # Production stage
