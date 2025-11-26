@@ -16,10 +16,11 @@ import {
   formatDate,
   formatTimeFromDate,
 } from "@/shared/utils";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { SlArrowLeft } from "react-icons/sl";
 import { Skeleton } from "@/shared/components/ui";
 import { motion } from "framer-motion";
+import { useEffect, useRef } from "react";
 
 const getStatusHint = (status: OrderStatus): string => {
   switch (status) {
@@ -163,13 +164,28 @@ const OrderSkeleton = () => (
 
 export const Order = () => {
   const { orderId } = useParams<{ orderId: string }>();
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const printRef = useRef<HTMLDivElement>(null);
+  const shouldPrint = searchParams.get("print") === "true";
 
   const { data: order, isLoading: orderLoading } = useOrder(orderId);
   const { data: payment, isLoading: paymentLoading } = usePaymentByOrder(order?.id);
   const { data: restaurant, isLoading: restaurantLoading } = useRestaurant(order?.restaurantId);
 
   const isLoading = orderLoading || paymentLoading || restaurantLoading;
+
+  const handlePrint = () => {
+    window.print();
+  };
+
+  useEffect(() => {
+    if (shouldPrint && !isLoading && order && restaurant && payment) {
+      setTimeout(() => {
+        window.print();
+      }, 500);
+    }
+  }, [shouldPrint, isLoading, order, restaurant, payment]);
 
   if (isLoading || !order || !restaurant || !payment) {
     return <OrderSkeleton />;
@@ -189,15 +205,52 @@ export const Order = () => {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3 }}
     >
-      <div className="p-6 border-b border-gray-200 flex items-center gap-5">
-        <SlArrowLeft
-          className="w-5 h-5 cursor-pointer hover:text-red-500 transition-colors"
-          onClick={() => navigate("/profile/orders")}
-        />
-        <span className="text-gray-800 font-bold">Resumen</span>
+      {/* Print styles */}
+      <style>
+        {`
+          @media print {
+            body * {
+              visibility: hidden;
+            }
+            .print-area, .print-area * {
+              visibility: visible;
+            }
+            .print-area {
+              position: absolute;
+              left: 0;
+              top: 0;
+              width: 100%;
+              padding: 20px;
+            }
+            .no-print {
+              display: none !important;
+            }
+          }
+        `}
+      </style>
+
+      <div className="p-6 border-b border-gray-200 flex items-center justify-between no-print">
+        <div className="flex items-center gap-5">
+          <SlArrowLeft
+            className="w-5 h-5 cursor-pointer hover:text-red-500 transition-colors"
+            onClick={() => navigate("/profile/orders")}
+          />
+          <span className="text-gray-800 font-bold">Resumen</span>
+        </div>
+        {order.status !== OrderStatus.PENDING && order.status !== OrderStatus.CANCELLED && (
+          <button
+            onClick={handlePrint}
+            className="flex items-center gap-2 text-sm text-red-500 border border-red-500 px-4 py-2 rounded-lg hover:bg-red-500 hover:text-white transition"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+            </svg>
+            Imprimir comprobante
+          </button>
+        )}
       </div>
 
-      <div className="px-24 py-12 flex flex-col gap-4">
+      <div ref={printRef} className="print-area px-24 py-12 flex flex-col gap-4">
         <motion.div 
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
