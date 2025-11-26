@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import {
@@ -8,6 +8,8 @@ import {
   FiDollarSign,
   FiUsers,
   FiPackage,
+  FiPrinter,
+  FiDownload,
 } from "react-icons/fi";
 import { Select } from "@/shared/components/ui";
 import { orderService, Analytics } from "@/shared/services/orderService";
@@ -269,6 +271,11 @@ const ChartSkeleton = () => (
 export const PartnerAnalytics = () => {
   const { user } = useAuth();
   const [period, setPeriod] = useState("7d");
+  const printRef = useRef<HTMLDivElement>(null);
+
+  const handlePrint = () => {
+    window.print();
+  };
 
   // Fetch restaurants
   const { data: restaurants = [] } = useQuery({
@@ -346,19 +353,74 @@ export const PartnerAnalytics = () => {
 
   return (
     <>
+      {/* Print styles */}
+      <style>
+        {`
+          @media print {
+            body * {
+              visibility: hidden;
+            }
+            .print-area, .print-area * {
+              visibility: visible;
+            }
+            .print-area {
+              position: absolute;
+              left: 0;
+              top: 0;
+              width: 100%;
+              padding: 20px;
+            }
+            .no-print {
+              display: none !important;
+            }
+            .print\\:block {
+              display: block !important;
+            }
+            @page {
+              size: A4;
+              margin: 10mm;
+            }
+          }
+        `}
+      </style>
+
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-7">
         <h1 className="text-xl sm:text-2xl font-bold text-gray-800">Analíticas</h1>
-        <Select
-          options={[
-            { value: "7d", label: "Últimos 7 días" },
-            { value: "30d", label: "Últimos 30 días" },
-            { value: "3m", label: "Últimos 3 meses" },
-            { value: "1y", label: "Último año" },
-          ]}
-          value={period}
-          onChange={(value) => setPeriod(value as string)}
-          className="w-full sm:w-auto sm:min-w-[180px]"
-        />
+        <div className="flex items-center gap-3">
+          <button
+            onClick={handlePrint}
+            className="no-print flex items-center gap-2 text-sm text-red-500 border border-red-500 px-4 py-2 rounded-lg hover:bg-red-500 hover:text-white transition"
+          >
+            <FiPrinter className="w-4 h-4" />
+            Imprimir informe
+          </button>
+          <Select
+            options={[
+              { value: "7d", label: "Últimos 7 días" },
+              { value: "30d", label: "Últimos 30 días" },
+              { value: "3m", label: "Últimos 3 meses" },
+              { value: "1y", label: "Último año" },
+            ]}
+            value={period}
+            onChange={(value) => setPeriod(value as string)}
+            className="w-full sm:w-auto sm:min-w-[180px] no-print"
+          />
+        </div>
+      </div>
+
+      <div ref={printRef} className="print-area">
+      {/* Print Header - only visible when printing */}
+      <div className="hidden print:block mb-6 pb-4 border-b border-gray-200">
+        <h1 className="text-2xl font-bold text-gray-800">Informe de Analíticas - ReFood</h1>
+        <p className="text-sm text-gray-500 mt-1">
+          Período: {periodLabel} | Generado el: {new Date().toLocaleDateString("es-PE", { 
+            day: "2-digit", 
+            month: "long", 
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit"
+          })}
+        </p>
       </div>
 
       {/* Stats Cards */}
@@ -559,6 +621,7 @@ export const PartnerAnalytics = () => {
             </p>
           </div>
         </motion.div>
+      </div>
       </div>
     </>
   );
