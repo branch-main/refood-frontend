@@ -6,7 +6,7 @@ import {
   useContext,
 } from "react";
 import { User } from "@/shared/types";
-import { authService, RegisterRequest } from "@/shared/services";
+import { authService, RegisterRequest, UpdateUserRequest } from "@/shared/services";
 
 type AuthContextType = {
   user: User | null;
@@ -14,6 +14,8 @@ type AuthContextType = {
   register: (request: RegisterRequest) => Promise<void>;
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
+  updateUser: (request: UpdateUserRequest) => Promise<void>;
+  setUser: (user: User | null) => void;
 };
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -72,6 +74,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const updateUser = async (request: UpdateUserRequest) => {
+    if (!user) return;
+    const updatedUser = await authService.updateUser(user.id, request);
+    setUser(updatedUser);
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -80,6 +88,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         register,
         login,
         logout,
+        updateUser,
+        setUser,
       }}
     >
       {children}

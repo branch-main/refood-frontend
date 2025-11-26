@@ -14,6 +14,8 @@ import {
   Favorites,
   PayPalCallback,
   PaymentFailed,
+  Contact,
+  PartnerInfo,
 } from "@/pages";
 import { Layout } from "@/shared/components/layout";
 import { authService } from "@/shared/services";
@@ -52,6 +54,8 @@ export const routes: RouteObject = {
         { path: "menu", element: <Menu /> },
         { path: "restaurants", element: <Restaurants /> },
         { path: "restaurants/:id", element: <Restaurant /> },
+        { path: "contact", element: <Contact /> },
+        { path: "partner-info", element: <PartnerInfo /> },
       ],
     },
 

@@ -10,6 +10,13 @@ export interface RegisterRequest {
   password2: string;
 }
 
+export interface UpdateUserRequest {
+  firstName?: string;
+  lastName?: string;
+  phone?: string;
+  image?: File | null;
+}
+
 export interface AuthResponse {
   token: string;
   user: User;
@@ -58,5 +65,30 @@ export const authService = {
     const token = localStorage.getItem("auth_token");
     if (!token) throw new Error("No token");
     return apiClient.get<any>("/users/me").then(toUser);
+  },
+
+  updateUser: async (userId: number, request: UpdateUserRequest): Promise<User> => {
+    const formData = new FormData();
+    
+    if (request.firstName !== undefined) {
+      formData.append("first_name", request.firstName);
+    }
+    if (request.lastName !== undefined) {
+      formData.append("last_name", request.lastName);
+    }
+    if (request.phone !== undefined) {
+      formData.append("phone", request.phone);
+    }
+    if (request.image) {
+      formData.append("image", request.image);
+    }
+
+    return apiClient
+      .patch<any>(`/users/${userId}/`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
+      .then(toUser);
   },
 };

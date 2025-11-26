@@ -1,4 +1,5 @@
 export * from "./Checkout";
+export * from "./Contact";
 export * from "./Favorites";
 export * from "./Home";
 export * from "./Login";
@@ -6,6 +7,7 @@ export * from "./Menu";
 export * from "./Notifications";
 export * from "./Order";
 export * from "./Orders";
+export * from "./PartnerInfo";
 export * from "./PaymentFailed";
 export * from "./PayPalCallback";
 export * from "./Profile";

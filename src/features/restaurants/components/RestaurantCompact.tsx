@@ -11,14 +11,18 @@ export const RestaurantCompact = ({
   return (
     <Link
       to={`/restaurants/${restaurant.id}`}
-      className="flex flex-col items-center transition-transform duration-300 hover:scale-110"
+      className="flex flex-col items-center shrink-0"
     >
-      <img
-        src={getFallbackImage(restaurant.name, restaurant.logo)}
-        alt={restaurant.name}
-        className="min-w-20 max-w-20 min-h-20 max-h-20 rounded-full mb-4 shadow-md"
-      />
-      <span className="text-xs font-bold text-red-500">{restaurant.name}</span>
+      <div className="p-1">
+        <img
+          src={getFallbackImage(restaurant.name, restaurant.logo)}
+          alt={restaurant.name}
+          className="w-20 h-20 rounded-full shadow-md object-cover transition-transform duration-300 hover:scale-110"
+        />
+      </div>
+      <span className="text-xs font-bold text-red-500 mt-2 text-center max-w-20 line-clamp-2">
+        {restaurant.name}
+      </span>
     </Link>
   );
 };
@@ -26,8 +30,10 @@ export const RestaurantCompact = ({
 RestaurantCompact.Skeleton = () => {
   return (
     <div className="flex flex-col items-center shrink-0">
-      <Skeleton className="w-20 h-20 rounded-full mb-4" />
-      <Skeleton className="h-3 w-16" />
+      <div className="p-1">
+        <Skeleton className="w-20 h-20 rounded-full" />
+      </div>
+      <Skeleton className="h-3 w-16 mt-2" />
     </div>
   );
 };

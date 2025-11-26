@@ -11,6 +11,7 @@ import {
 } from "@/shared/utils";
 import { Link } from "react-router-dom";
 import { Skeleton } from "@/shared/components/ui";
+import { motion } from "framer-motion";
 
 const getStatusHint = (status: OrderStatus): string => {
   switch (status) {
@@ -33,12 +34,17 @@ const getStatusHint = (status: OrderStatus): string => {
   }
 };
 
-const Order = ({ order }: { order: OrderType }) => {
+const Order = ({ order, index }: { order: OrderType; index: number }) => {
   const { data: restaurant, isLoading } = useRestaurant(order.restaurantId);
   const quantity = order.items.reduce((acc, item) => acc + item.quantity, 0);
 
   return (
-    <div className="mt-5 rounded-lg p-5 border border-gray-200">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3, delay: index * 0.05 }}
+      className="mt-5 rounded-lg p-5 border border-gray-200"
+    >
       {isLoading ? (
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -111,7 +117,7 @@ const Order = ({ order }: { order: OrderType }) => {
             </Link>
           )}
       </div>
-    </div>
+    </motion.div>
   );
 };
 
@@ -169,44 +175,76 @@ export const Orders = () => {
   };
 
   return (
-    <div className="p-6">
-      <h1 className="text-4xl font-bold">¡Mis últimos pedidos!</h1>
-      <p className="mt-1 text-sm text-gray-500 border-b border-gray-200 pb-4">
+    <motion.div 
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.3 }}
+      className="p-6"
+    >
+      <motion.h1 
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+        className="text-4xl font-bold"
+      >
+        ¡Mis últimos pedidos!
+      </motion.h1>
+      <motion.p 
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3, delay: 0.1 }}
+        className="mt-1 text-sm text-gray-500 border-b border-gray-200 pb-4"
+      >
         Hazle seguimiento al detalle a tus pedidos anteriores y solicita ayuda
         si hay algún inconveniente con una de tus compras.
-      </p>
+      </motion.p>
 
       {visibleOrders.length === 0 ? (
-        <div className="mt-8 text-center py-12">
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.3, delay: 0.2 }}
+          className="mt-8 text-center py-12"
+        >
           <h3 className="text-lg font-semibold mb-1">No tienes pedidos aún</h3>
           <p className="text-sm text-gray-500">
             Cuando realices tu primer pedido, aparecerá aquí
           </p>
-        </div>
+        </motion.div>
       ) : (
         <>
-          {visibleOrders.map((order) => (
-            <Order key={order.id} order={order} />
+          {visibleOrders.map((order, index) => (
+            <Order key={order.id} order={order} index={index} />
           ))}
 
           {hasMore && (
-            <div className="mt-8 flex justify-center">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.3, delay: 0.3 }}
+              className="mt-8 flex justify-center"
+            >
               <button
                 onClick={handleLoadMore}
                 className="px-6 py-3 text-sm font-medium text-red-500 border-2 border-red-500 rounded-lg hover:bg-red-500 hover:text-white transition-all duration-200"
               >
                 Ver más pedidos
               </button>
-            </div>
+            </motion.div>
           )}
 
           {!hasMore && orders.length > 10 && (
-            <div className="mt-8 text-center text-sm text-gray-500">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.3 }}
+              className="mt-8 text-center text-sm text-gray-500"
+            >
               No hay más pedidos para mostrar
-            </div>
+            </motion.div>
           )}
         </>
       )}
-    </div>
+    </motion.div>
   );
 };

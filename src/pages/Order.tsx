@@ -19,6 +19,7 @@ import {
 import { useNavigate, useParams } from "react-router-dom";
 import { SlArrowLeft } from "react-icons/sl";
 import { Skeleton } from "@/shared/components/ui";
+import { motion } from "framer-motion";
 
 const getStatusHint = (status: OrderStatus): string => {
   switch (status) {
@@ -182,20 +183,27 @@ export const Order = () => {
 
   const total = productsTotal + order.deliveryFee;
 
-  console.log(order);
-
   return (
-    <>
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.3 }}
+    >
       <div className="p-6 border-b border-gray-200 flex items-center gap-5">
         <SlArrowLeft
-          className="w-5 h-5 cursor-pointer"
+          className="w-5 h-5 cursor-pointer hover:text-red-500 transition-colors"
           onClick={() => navigate("/profile/orders")}
         />
         <span className="text-gray-800 font-bold">Resumen</span>
       </div>
 
       <div className="px-24 py-12 flex flex-col gap-4">
-        <div className="flex items-center justify-between border-b border-gray-200 pb-4 px-5">
+        <motion.div 
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.1 }}
+          className="flex items-center justify-between border-b border-gray-200 pb-4 px-5"
+        >
           <div className="flex flex-col">
             <span className="text-gray-800 font-bold text-xl">
               {restaurant.name}
@@ -213,9 +221,14 @@ export const Order = () => {
               {getStatusHint(order.status)}
             </span>
           </div>
-        </div>
+        </motion.div>
 
-        <div className="flex flex-col border-b border-gray-200 pb-4 px-5">
+        <motion.div 
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.15 }}
+          className="flex flex-col border-b border-gray-200 pb-4 px-5"
+        >
           <span className="text-gray-800 text-lg font-bold">Inicio</span>
           <span className="text-gray-800 text-sm">
             {formatDate(order.createdAt)}
@@ -223,9 +236,14 @@ export const Order = () => {
           <span className="text-gray-800 text-sm">
             {formatTimeFromDate(order.createdAt)}
           </span>
-        </div>
+        </motion.div>
 
-        <div className="flex flex-col border-b border-gray-200 pb-4 px-5">
+        <motion.div 
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.2 }}
+          className="flex flex-col border-b border-gray-200 pb-4 px-5"
+        >
           <span className="text-gray-800 text-lg font-bold">Entrega</span>
           {order.deliveredAt ? (
             <>
@@ -242,18 +260,28 @@ export const Order = () => {
           <span className="text-gray-800 text-sm mt-4">
             {order.deliveryAddress}
           </span>
-        </div>
+        </motion.div>
 
-        <div className="flex flex-col border-b border-gray-200 pb-4 px-5">
+        <motion.div 
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.25 }}
+          className="flex flex-col border-b border-gray-200 pb-4 px-5"
+        >
           <span className="text-gray-800 text-lg font-bold">Resumen</span>
           <div className="space-y-4 my-4">
             {order.items.map((item, index) => (
               <OrderItem key={index} item={item} />
             ))}
           </div>
-        </div>
+        </motion.div>
 
-        <div className="flex flex-col border-b border-gray-200 pb-4 px-5">
+        <motion.div 
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.3 }}
+          className="flex flex-col border-b border-gray-200 pb-4 px-5"
+        >
           <span className="text-gray-800 text-lg font-bold mb-2">
             Método de pago
           </span>
@@ -261,9 +289,14 @@ export const Order = () => {
             {getPaymentMethodIcon(payment.method)}
             {getPaymentMethodText(payment.method)}
           </span>
-        </div>
+        </motion.div>
 
-        <div className="flex flex-col px-5">
+        <motion.div 
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.35 }}
+          className="flex flex-col px-5"
+        >
           <span className="text-gray-800 text-lg font-bold pb-4">Costos</span>
           <div className="flex flex-col gap-2">
             <div className="text-gray-800 text-sm flex justify-between">
@@ -279,8 +312,8 @@ export const Order = () => {
               <span>{formatPrice(total)}</span>
             </div>
           </div>
-        </div>
+        </motion.div>
       </div>
-    </>
+    </motion.div>
   );
 };
